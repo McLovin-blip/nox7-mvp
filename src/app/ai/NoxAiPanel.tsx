@@ -20,6 +20,7 @@ export function NoxAiPanel({ question }: { question: string }) {
         </section>
         <section className="ai-facts">
           <span>Sourced facts</span>
+          <p className="ai-note">From seeded records only</p>
           <ul>
             {hubAi.facts.map((fact) => (
               <li key={fact.citationId}>
@@ -47,6 +48,7 @@ export function NoxAiPanel({ question }: { question: string }) {
         </section>
         <section className="ai-interp">
           <span>AI interpretation</span>
+          <p className="ai-note">Inference, not a sourced fact</p>
           <p>{hubAi.interpretation}</p>
         </section>
         <section>
@@ -76,6 +78,7 @@ export function NoxAiPanel({ question }: { question: string }) {
       </div>
       <section className="ai-act">
         <span>Recommended action</span>
+        <p className="ai-note">Not applied until human approval</p>
         <p>{hubAi.recommendedAction}</p>
         <p>{hubAi.approval}</p>
       </section>

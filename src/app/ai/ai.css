@@ -49,7 +49,13 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-2);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+}
+
+.ai-note {
+  margin: 0 0 10px !important;
+  font-size: 11px !important;
+  color: var(--text-2);
 }
 
 .ai-panel p,
@@ -67,16 +73,24 @@
   gap: 10px;
 }
 
+.ai-facts {
+  background: #0a0a10;
+}
+
+.ai-facts span {
+  color: #c9c9d6;
+}
+
 .ai-facts li {
   padding-left: 12px;
-  border-left: 2px solid rgba(232, 232, 240, 0.16);
+  border-left: 2px solid #8b6fe8;
 }
 
 .cite {
   appearance: none;
   border: 0;
   background: none;
-  color: inherit;
+  color: #cbbfff;
   font: inherit;
   padding: 0;
   cursor: pointer;
@@ -86,21 +100,28 @@
 
 .cite[aria-current='true'] {
   font-weight: 650;
+  color: #fff;
 }
 
 .ai-source {
   margin-top: 10px;
   padding: 10px;
-  border: 1px solid var(--border);
+  border: 1px dashed var(--purple-line);
   border-radius: 8px;
   font-size: 12px;
+  background: rgba(139, 111, 232, 0.08);
 }
 
 .ai-interp {
-  background: rgba(139, 111, 232, 0.05);
+  background: rgba(139, 111, 232, 0.1);
+  border-left: 3px solid var(--purple);
 }
 
-.ai-interp p {
+.ai-interp span {
+  color: #b7a8f2;
+}
+
+.ai-interp p:last-child {
   font-style: italic;
 }
 
@@ -120,10 +141,10 @@
 
 .ai-act {
   flex-shrink: 0;
-  background: #101117;
-  border-top: 1px solid var(--border);
+  background: #14121c;
+  border-top: 2px solid var(--purple);
 }
 
 .ai-act span {
-  color: #b7a8f2;
+  color: #d5ccff;
 }
