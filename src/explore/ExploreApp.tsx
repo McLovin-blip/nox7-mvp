@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { DirectionA } from './DirectionA.tsx'
 import { DirectionB } from './DirectionB.tsx'
 import { DirectionC } from './DirectionC.tsx'
+import { ReferenceLogin } from './ReferenceLogin.tsx'
 import './lab.css'
+import './login.css'
 import './a.css'
 import './b.css'
 import './c.css'
@@ -62,7 +64,7 @@ export function ExploreApp() {
             </button>
           </div>
         ) : null}
-        {direction === 'c' ? (
+        {screen === 'hub' && direction === 'c' ? (
           <div className="lab-group">
             <span>Theme</span>
             <button type="button" aria-pressed={theme === 'light'} onClick={() => setTheme('light')}>
@@ -76,28 +78,25 @@ export function ExploreApp() {
         <p className="lab-note">Exploration only · same viewport · not production navigation</p>
       </div>
       <div className="lab-stage">
-        {direction === 'a' ? (
+        {screen === 'login' ? (
+          <ReferenceLogin onShowHub={showHub} />
+        ) : null}
+        {screen === 'hub' && direction === 'a' ? (
           <DirectionA
-            screen={screen}
             aiOpen={aiOpen}
-            onShowHub={showHub}
             onToggleAi={() => setAiOpen((value) => !value)}
           />
         ) : null}
-        {direction === 'b' ? (
+        {screen === 'hub' && direction === 'b' ? (
           <DirectionB
-            screen={screen}
             aiOpen={aiOpen}
-            onShowHub={showHub}
             onToggleAi={() => setAiOpen((value) => !value)}
           />
         ) : null}
-        {direction === 'c' ? (
+        {screen === 'hub' && direction === 'c' ? (
           <DirectionC
-            screen={screen}
             aiOpen={aiOpen}
             theme={theme}
-            onShowHub={showHub}
             onToggleAi={() => setAiOpen((value) => !value)}
           />
         ) : null}

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Owl, Orbit, Wordmark } from './Brand.tsx'
+import { Owl } from './Brand.tsx'
 import {
   activity,
   ai,
@@ -10,54 +10,13 @@ import {
   sources,
 } from './content.ts'
 
-type Screen = 'login' | 'hub'
-
 export function DirectionA({
-  screen,
   aiOpen,
-  onShowHub,
   onToggleAi,
 }: {
-  screen: Screen
   aiOpen: boolean
-  onShowHub: () => void
   onToggleAi: () => void
 }) {
-  if (screen === 'login') {
-    return (
-      <div className="dir-a a-login">
-        <div className="a-frame a-orbit-well">
-          <Orbit className="a-orbit" />
-        </div>
-        <div className="a-frame a-sign">
-          <Wordmark className="wordmark" />
-          <form
-            onSubmit={(event) => {
-              event.preventDefault()
-              onShowHub()
-            }}
-          >
-            <label>
-              Email
-              <input type="email" name="email" autoComplete="username" />
-            </label>
-            <label>
-              Password
-              <input type="password" name="password" autoComplete="current-password" />
-            </label>
-            <div className="row">
-              <button className="submit" type="submit">
-                Sign in
-              </button>
-              <span className="forgot">Forgot password</span>
-            </div>
-          </form>
-          <p className="a-antler">Prepared for Antler</p>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="dir-a a-hub">
       <aside className="a-rail">

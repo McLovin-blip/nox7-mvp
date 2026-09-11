@@ -2,13 +2,15 @@
 
 Isolated route: `/explore.html`. Not part of production navigation. Awaiting product approval. Do not merge until approved.
 
-The laboratory compares three compositions for **login**, **Executive Hub**, and the **Nox AI right-side panel**. It does not implement the product.
+The laboratory uses **one login taken from the approved HTML reference** (centered brand on the space field). Directions A, B and C compare **Executive Hub** and the **Nox AI right-side panel** only.
 
 ## Directions
 
-**A — Executive Intelligence Console.** Architectural dark frame, vertical rail, typographic ledger instead of equal cards. Login is a split structure with a quiet orbit.
+**Login (shared).** Composition from `reference/Nox7_VC_Demo_QA_Final.html`: space field, overlay, centered owl, Nox7.ai wordmark, email, password, Sign in. Hub directions do not restyle this screen.
 
-**B — Connected Assurance.** Hub is a relationship map: frameworks feed a central supplier-assurance gap, with evidence and risks as neighbours. Nox AI is an intelligence layer over that map. Login places the orbit as the primary field and the form beneath.
+**A — Executive Intelligence Console.** Architectural dark Hub, vertical rail, typographic ledger, ruled AI panel.
+
+**B — Connected Assurance.** Hub as a relationship map: frameworks feed a central supplier-assurance gap, with evidence and risks as neighbours. Nox AI is an intelligence layer over that map.
 
 **C — Modern Governance Suite.** Document and approval language, IBM Plex, coverage bars, a “matter for attention”. Light is default; dark is a graphite treatment of the same structure.
 

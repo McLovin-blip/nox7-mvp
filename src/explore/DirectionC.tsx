@@ -1,65 +1,17 @@
 import { useState } from 'react'
-import { Owl, Orbit, Wordmark } from './Brand.tsx'
+import { Owl, Wordmark } from './Brand.tsx'
 import { activity, ai, frameworks, nav, org, position, sources } from './content.ts'
 
-type Screen = 'login' | 'hub'
-
 export function DirectionC({
-  screen,
   aiOpen,
   theme,
-  onShowHub,
   onToggleAi,
 }: {
-  screen: Screen
   aiOpen: boolean
   theme: 'dark' | 'light'
-  onShowHub: () => void
   onToggleAi: () => void
 }) {
   const root = `dir-c theme-${theme}`
-
-  if (screen === 'login') {
-    return (
-      <div className={`${root} c-login`}>
-        <aside className="c-aside">
-          <div className="c-mark">
-            <Owl className="owl" />
-            <Wordmark className="wordmark" />
-          </div>
-          <Orbit className="c-orbit" />
-          <p className="c-antler">Prepared for Antler</p>
-        </aside>
-        <div className="c-form-wrap">
-          <div className="c-form">
-            <h1>Sign in</h1>
-            <p className="sub">Meridian International</p>
-            <form
-              onSubmit={(event) => {
-                event.preventDefault()
-                onShowHub()
-              }}
-            >
-              <label>
-                Email
-                <input type="email" name="email" autoComplete="username" />
-              </label>
-              <label>
-                Password
-                <input type="password" name="password" autoComplete="current-password" />
-              </label>
-              <div className="row">
-                <span className="forgot">Forgot password</span>
-              </div>
-              <button className="submit" type="submit">
-                Sign in
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className={`${root} c-hub`}>

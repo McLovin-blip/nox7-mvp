@@ -1,0 +1,150 @@
+.html-login {
+  --page: #050508;
+  --text: #e8e8f0;
+  --text-2: #8a8aa0;
+  --text-3: #4a4a60;
+  --border-2: #252540;
+  --purple: #8b6fe8;
+  --grotesk: 'Space Grotesk', Inter, sans-serif;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: var(--page);
+  color: var(--text);
+  font-family: Inter, system-ui, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.html-login-space {
+  position: absolute;
+  inset: 0;
+  background: url('/explore/login-space.jpg') center / cover no-repeat;
+}
+
+.html-login-ov {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(5, 5, 8, 0.65) 0%, rgba(5, 5, 8, 0.93) 70%);
+}
+
+.html-login-box {
+  width: 400px;
+  max-width: calc(100% - 40px);
+  position: relative;
+  z-index: 2;
+  animation: htmlLoginUp 0.7s ease-out;
+}
+
+.html-login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 44px;
+}
+
+.html-login-logo {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  margin-bottom: 22px;
+  filter: drop-shadow(0 12px 40px rgba(139, 111, 232, 0.45));
+}
+
+.html-login-wm {
+  font-family: var(--grotesk);
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  margin-bottom: 7px;
+}
+
+.html-login-wm em {
+  color: var(--purple);
+  font-style: normal;
+}
+
+.html-login-wm span {
+  font-size: 19px;
+  color: var(--text-3);
+  font-weight: 400;
+}
+
+.html-login-tag {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.html-login-f {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.html-login-f span {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-2);
+  margin-bottom: 6px;
+}
+
+.html-login-f input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(15, 15, 26, 0.65);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-2);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+}
+
+.html-login-f input:focus {
+  border-color: var(--purple);
+}
+
+.html-login-f button {
+  padding: 14px;
+  background: var(--text);
+  color: var(--page);
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.html-login-links {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  margin-top: 14px;
+  color: var(--text-2);
+}
+
+.html-login-links span {
+  margin: 0;
+  font-size: 11px;
+  color: var(--text-2);
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+@keyframes htmlLoginUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

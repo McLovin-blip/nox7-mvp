@@ -1,55 +1,14 @@
 import { useState } from 'react'
-import { Owl, Orbit, Wordmark } from './Brand.tsx'
+import { Owl, Wordmark } from './Brand.tsx'
 import { ai, frameworks, nav, org, position, sources } from './content.ts'
 
-type Screen = 'login' | 'hub'
-
 export function DirectionB({
-  screen,
   aiOpen,
-  onShowHub,
   onToggleAi,
 }: {
-  screen: Screen
   aiOpen: boolean
-  onShowHub: () => void
   onToggleAi: () => void
 }) {
-  if (screen === 'login') {
-    return (
-      <div className="dir-b b-login">
-        <div className="b-orbit-field">
-          <Orbit className="b-orbit" />
-        </div>
-        <div className="b-sign">
-          <Wordmark className="wordmark" />
-          <form
-            onSubmit={(event) => {
-              event.preventDefault()
-              onShowHub()
-            }}
-          >
-            <label>
-              Email
-              <input type="email" name="email" autoComplete="username" />
-            </label>
-            <label>
-              Password
-              <input type="password" name="password" autoComplete="current-password" />
-            </label>
-            <button className="submit" type="submit">
-              Sign in
-            </button>
-          </form>
-          <div className="aux">
-            <span>Forgot password</span>
-            <span>Prepared for Antler</span>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="dir-b b-hub">
       <header className="b-top">
