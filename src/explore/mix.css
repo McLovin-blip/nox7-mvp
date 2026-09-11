@@ -176,10 +176,10 @@
   z-index: 1;
   display: grid;
   grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
-  align-items: center;
+  align-items: start;
   gap: 8px;
   min-height: 100%;
-  padding: 20px 12px 24px 28px;
+  padding: 28px 12px 24px 28px;
 }
 
 .mix-intro {
@@ -429,7 +429,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 18px 16px 20px 0;
+  padding: 28px 16px 20px 0;
   overflow: auto;
 }
 
@@ -521,9 +521,16 @@
 .mix-panel {
   border-left: 1px solid rgba(139, 111, 232, 0.2);
   background: linear-gradient(180deg, rgba(139, 111, 232, 0.07), #0b0b14 22%);
-  overflow: auto;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+}
+
+.mix-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
 }
 
 .mix-panel header {
@@ -616,9 +623,7 @@
 }
 
 .mix-act {
-  margin-top: auto;
-  position: sticky;
-  bottom: 0;
+  flex-shrink: 0;
   background: #101117;
 }
 

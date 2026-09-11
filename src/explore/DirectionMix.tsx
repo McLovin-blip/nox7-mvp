@@ -152,6 +152,7 @@ function MixPanel() {
         <p className="mix-ctx">{ai.context}</p>
         <h2>{ai.question}</h2>
       </header>
+      <div className="mix-scroll">
       <div className="mix-block">
         <span>Executive answer</span>
         <p>{ai.answer}</p>
@@ -200,6 +201,7 @@ function MixPanel() {
         <p>
           {ai.confidence}. {ai.freshness}
         </p>
+      </div>
       </div>
       <div className="mix-block mix-act">
         <span>Recommended action</span>
