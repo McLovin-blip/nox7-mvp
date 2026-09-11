@@ -1,6 +1,8 @@
-# Executive Hub — component proposal
+# Executive Hub — component structure
 
-Awaiting product approval. No Hub implementation on this branch until approved.
+Approved. Implementation is on this branch.
+
+Concept A is the Hub frame. Concept B’s connected-assurance map is an expandable section inside that frame.
 
 Base: `main` (spec + foundation). Locked login will be ported from `design/visual-directions` without restyling. `/reference` stays frozen. `/explore.html` stays the visual lab and is not the production Hub.
 

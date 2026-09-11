@@ -22,7 +22,7 @@ Development server (binds to port **5173**):
 npm run dev
 ```
 
-Then open [http://localhost:5173](http://localhost:5173). You should see the Nox7 starter page with the supplied logos.
+Then open [http://localhost:5173](http://localhost:5173). Sign in to the locked login, then the Executive Hub.
 
 Production build and local preview (port **4173**):
 

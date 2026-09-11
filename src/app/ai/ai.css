@@ -1,0 +1,129 @@
+.ai-panel {
+  min-height: 0;
+  border-left: 1px solid var(--purple-line);
+  background: linear-gradient(180deg, rgba(139, 111, 232, 0.07), #0b0b14 18%);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ai-panel header {
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ai-kicker {
+  margin: 0;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #b7a8f2;
+}
+
+.ai-ctx {
+  margin: 4px 0 8px;
+  color: var(--text-2);
+  font-size: 11px;
+}
+
+.ai-panel h2 {
+  margin: 0;
+  font-size: 17px;
+  letter-spacing: -0.03em;
+}
+
+.ai-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.ai-panel section {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ai-panel section span {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  margin-bottom: 8px;
+}
+
+.ai-panel p,
+.ai-panel li {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.ai-facts ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.ai-facts li {
+  padding-left: 12px;
+  border-left: 2px solid rgba(232, 232, 240, 0.16);
+}
+
+.cite {
+  appearance: none;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cite[aria-current='true'] {
+  font-weight: 650;
+}
+
+.ai-source {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.ai-interp {
+  background: rgba(139, 111, 232, 0.05);
+}
+
+.ai-interp p {
+  font-style: italic;
+}
+
+.ai-rel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ai-rel b {
+  font-weight: 500;
+  font-size: 11px;
+  border: 1px solid var(--border);
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.ai-act {
+  flex-shrink: 0;
+  background: #101117;
+  border-top: 1px solid var(--border);
+}
+
+.ai-act span {
+  color: #b7a8f2;
+}
