@@ -1,0 +1,12 @@
+{
+  "name": "Nox7 MVP",
+  "install": "npm ci",
+  "ports": [{ "name": "vite-dev", "port": 5173 }],
+  "terminals": [
+    {
+      "name": "dev",
+      "command": "npm run dev",
+      "description": "Vite dev server for the Nox7 visual MVP, served on 0.0.0.0:5173."
+    }
+  ]
+}
