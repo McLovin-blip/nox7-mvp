@@ -57,12 +57,12 @@ export function DirectionMix({
                 </div>
                 <div className="mix-impact">
                   <div>
-                    <span>Recommended action</span>
-                    <strong>{position.next}</strong>
+                    <span>Control assurance</span>
+                    <strong>Partial — policy without current assessments</strong>
                   </div>
                   <div>
-                    <span>Accountable</span>
-                    <strong>{position.owner}</strong>
+                    <span>Connected exposure</span>
+                    <strong>Third-party · Regulatory</strong>
                   </div>
                 </div>
                 <button className="mix-gap" type="button" onClick={onToggleAi}>
@@ -79,19 +79,19 @@ export function DirectionMix({
                   <p>{position.attention}</p>
                 </div>
                 <div className="mix-sat n">
-                  <b>Fw</b>
+                  <i />
                   <small>Frameworks</small>
                 </div>
                 <div className="mix-sat e">
-                  <b>Ct</b>
+                  <i />
                   <small>Controls</small>
                 </div>
                 <div className="mix-sat s alert">
-                  <b>Ev</b>
+                  <i />
                   <small>Evidence</small>
                 </div>
                 <div className="mix-sat w">
-                  <b>Rk</b>
+                  <i />
                   <small>Risks</small>
                 </div>
               </div>

@@ -156,6 +156,7 @@
 .mix-canvas {
   position: relative;
   overflow: auto;
+  overflow-x: hidden;
   min-width: 0;
 }
 
@@ -173,15 +174,18 @@
 .mix-stage {
   position: relative;
   z-index: 1;
-  min-height: 520px;
-  padding: 8px 8px 24px 24px;
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  min-height: 100%;
+  padding: 20px 12px 24px 28px;
 }
 
 .mix-intro {
   position: relative;
   z-index: 4;
   max-width: 320px;
-  padding-top: 48px;
 }
 
 .mix-kicker {
@@ -278,11 +282,10 @@
 }
 
 .mix-rad {
-  position: absolute;
-  right: -12px;
-  top: 8px;
-  width: 500px;
-  height: 500px;
+  position: relative;
+  width: min(500px, 100%);
+  height: 480px;
+  margin: 0 auto;
   pointer-events: none;
 }
 
@@ -323,8 +326,8 @@
     transparent 100%
   );
   box-shadow:
-    0 0 80px var(--glow),
-    inset 0 0 50px rgba(139, 111, 232, 0.08);
+    0 0 90px var(--glow),
+    inset 0 0 55px rgba(139, 111, 232, 0.09);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -370,10 +373,12 @@
   z-index: 3;
 }
 
-.mix-sat b {
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  color: var(--violet);
+.mix-sat i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--violet);
+  box-shadow: 0 0 10px var(--glow);
 }
 
 .mix-sat small {
@@ -612,6 +617,8 @@
 
 .mix-act {
   margin-top: auto;
+  position: sticky;
+  bottom: 0;
   background: #101117;
 }
 
@@ -622,20 +629,17 @@
   }
 
   .mix-rad {
-    position: relative;
-    right: auto;
-    top: auto;
     width: min(500px, 100%);
     height: 420px;
     margin: 12px auto 0;
   }
 
   .mix-intro {
-    padding-top: 20px;
     max-width: 46rem;
   }
 
   .mix-stage {
+    grid-template-columns: 1fr;
     min-height: 0;
     padding: 16px 20px 8px;
   }
