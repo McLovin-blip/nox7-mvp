@@ -153,55 +153,55 @@ function MixPanel() {
         <h2>{ai.question}</h2>
       </header>
       <div className="mix-scroll">
-      <div className="mix-block">
-        <span>Executive answer</span>
-        <p>{ai.answer}</p>
-      </div>
-      <div className="mix-block">
-        <span>Sourced facts</span>
-        <ul>
-          {ai.facts.map((fact) => (
-            <li key={fact.citationId}>
-              {fact.text}{' '}
-              <button
-                className="cite"
-                type="button"
-                aria-current={sourceId === fact.citationId}
-                onClick={() => setSourceId(fact.citationId)}
-              >
-                Source
-              </button>
-            </li>
-          ))}
-        </ul>
-        {source ? (
-          <div className="mix-src">
-            <strong>{source.title}</strong>
-            <div>
-              {source.kind} · {source.freshness}
-            </div>
-            <div>{source.meta}</div>
-          </div>
-        ) : null}
-      </div>
-      <div className="mix-block mix-interp">
-        <span>AI interpretation</span>
-        <p>{ai.interpretation}</p>
-      </div>
-      <div className="mix-block">
-        <span>Connected</span>
-        <div className="mix-rel">
-          {ai.connected.obligations.map((item) => (
-            <b key={item}>{item}</b>
-          ))}
+        <div className="mix-block">
+          <span>Executive answer</span>
+          <p>{ai.answer}</p>
         </div>
-      </div>
-      <div className="mix-block">
-        <span>Confidence · freshness</span>
-        <p>
-          {ai.confidence}. {ai.freshness}
-        </p>
-      </div>
+        <div className="mix-block">
+          <span>Sourced facts</span>
+          <ul>
+            {ai.facts.map((fact) => (
+              <li key={fact.citationId}>
+                {fact.text}{' '}
+                <button
+                  className="cite"
+                  type="button"
+                  aria-current={sourceId === fact.citationId}
+                  onClick={() => setSourceId(fact.citationId)}
+                >
+                  Source
+                </button>
+              </li>
+            ))}
+          </ul>
+          {source ? (
+            <div className="mix-src">
+              <strong>{source.title}</strong>
+              <div>
+                {source.kind} · {source.freshness}
+              </div>
+              <div>{source.meta}</div>
+            </div>
+          ) : null}
+        </div>
+        <div className="mix-block mix-interp">
+          <span>AI interpretation</span>
+          <p>{ai.interpretation}</p>
+        </div>
+        <div className="mix-block">
+          <span>Connected</span>
+          <div className="mix-rel">
+            {ai.connected.obligations.map((item) => (
+              <b key={item}>{item}</b>
+            ))}
+          </div>
+        </div>
+        <div className="mix-block">
+          <span>Confidence · freshness</span>
+          <p>
+            {ai.confidence}. {ai.freshness}
+          </p>
+        </div>
       </div>
       <div className="mix-block mix-act">
         <span>Recommended action</span>
