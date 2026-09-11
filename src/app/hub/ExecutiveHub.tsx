@@ -11,6 +11,7 @@ export function ExecutiveHub({
   onFilter,
   onSelectNode,
   onAsk,
+  onOpenGap,
 }: {
   mapOpen: boolean
   mapFilter: MapFilter
@@ -19,6 +20,7 @@ export function ExecutiveHub({
   onFilter: (filter: MapFilter) => void
   onSelectNode: (id: MapNodeId) => void
   onAsk: (prompt?: string) => void
+  onOpenGap: (step?: 'overview' | 'evidence') => void
 }) {
   return (
     <div className="hub">
@@ -29,13 +31,14 @@ export function ExecutiveHub({
           selectedNode={selectedNode}
           onFilter={onFilter}
           onSelectNode={onSelectNode}
+          onOpenGap={() => onOpenGap('overview')}
         />
       ) : (
-        <PositionStrip />
+        <PositionStrip onOpenGap={() => onOpenGap('overview')} />
       )}
       <div className="hub-lower">
-        <AiBriefing onAsk={onAsk} />
-        <PriorityActions />
+        <AiBriefing onAsk={onAsk} onOpenGap={() => onOpenGap('overview')} />
+        <PriorityActions onOpenGap={() => onOpenGap('evidence')} />
       </div>
     </div>
   )
@@ -74,7 +77,7 @@ function HubGreeting({
   )
 }
 
-function PositionStrip() {
+function PositionStrip({ onOpenGap }: { onOpenGap: () => void }) {
   const evidence = positionStrip.evidenceHealth
   const lead = positionStrip.leadingFramework
 
@@ -98,12 +101,12 @@ function PositionStrip() {
           ))}
         </div>
       </article>
-      <article className="gap">
+      <button className="gap" type="button" onClick={onOpenGap}>
         <span>Material gaps</span>
         <strong>{positionStrip.materialGaps}</strong>
         <em>Supplier assurance · highest impact</em>
-        <small>Executive attention</small>
-      </article>
+        <small>Open connected gap</small>
+      </button>
       <article>
         <span>Evidence health</span>
         <strong>Attention</strong>
@@ -118,7 +121,13 @@ function PositionStrip() {
   )
 }
 
-function AiBriefing({ onAsk }: { onAsk: (prompt?: string) => void }) {
+function AiBriefing({
+  onAsk,
+  onOpenGap,
+}: {
+  onAsk: (prompt?: string) => void
+  onOpenGap: () => void
+}) {
   return (
     <section className="briefing">
       <header>
@@ -132,9 +141,14 @@ function AiBriefing({ onAsk }: { onAsk: (prompt?: string) => void }) {
           <span key={chip}>{chip}</span>
         ))}
       </div>
-      <button className="follow" type="button" onClick={() => onAsk()}>
-        Ask a follow-up about this briefing
-      </button>
+      <div className="briefing-actions">
+        <button className="primary" type="button" onClick={onOpenGap}>
+          Open connected gap
+        </button>
+        <button className="follow" type="button" onClick={() => onAsk()}>
+          Ask a follow-up about this briefing
+        </button>
+      </div>
       <div className="prompts">
         {briefing.prompts.map((prompt) => (
           <button key={prompt} type="button" onClick={() => onAsk(prompt)}>
@@ -146,7 +160,7 @@ function AiBriefing({ onAsk }: { onAsk: (prompt?: string) => void }) {
   )
 }
 
-function PriorityActions() {
+function PriorityActions({ onOpenGap }: { onOpenGap: () => void }) {
   return (
     <section className="actions">
       <header>
@@ -155,14 +169,29 @@ function PriorityActions() {
       <ol>
         {priorityActions.map((item, index) => (
           <li key={item.id}>
-            <b>{String(index + 1).padStart(2, '0')}</b>
-            <div>
-              <strong>{item.title}</strong>
-              <em>
-                {item.owner} · {item.due}
-              </em>
-            </div>
-            <small>{item.impact}</small>
+            {item.primary ? (
+              <button type="button" className="action-open" onClick={onOpenGap}>
+                <b>{String(index + 1).padStart(2, '0')}</b>
+                <div>
+                  <strong>{item.title}</strong>
+                  <em>
+                    {item.owner} · {item.due}
+                  </em>
+                </div>
+                <small>{item.impact}</small>
+              </button>
+            ) : (
+              <>
+                <b>{String(index + 1).padStart(2, '0')}</b>
+                <div>
+                  <strong>{item.title}</strong>
+                  <em>
+                    {item.owner} · {item.due}
+                  </em>
+                </div>
+                <small>{item.impact}</small>
+              </>
+            )}
           </li>
         ))}
       </ol>

@@ -61,12 +61,20 @@
   gap: 12px;
 }
 
-.strip article {
+.strip article,
+.strip > button.gap {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 14px 16px;
   min-height: 132px;
+}
+
+.strip > button.gap {
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
 }
 
 .strip span {
@@ -219,15 +227,57 @@
   color: var(--text-2);
 }
 
+.briefing-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.primary,
 .follow {
   width: 100%;
   height: 36px;
-  border: 1px solid var(--border);
-  background: #12121c;
-  color: var(--text);
   border-radius: 10px;
   cursor: pointer;
   font-size: 13px;
+}
+
+.primary {
+  border: 1px solid var(--purple-line);
+  background: rgba(139, 111, 232, 0.16);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.follow {
+  border: 1px solid var(--border);
+  background: #12121c;
+  color: var(--text);
+}
+
+.map-open {
+  border: 0;
+  background: none;
+  color: #d5ccff;
+  cursor: pointer;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 0;
+}
+
+.action-open {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
 }
 
 .prompts {

@@ -1,5 +1,5 @@
 import organisationJson from '../../../docs/mock/meridian-organisation.json' with { type: 'json' }
-import type { MapNodeId, ModuleId, SourceKind } from './types.ts'
+import type { AiPanelModel, GapStepId, MapNodeId, ModuleId, SourceKind } from './types.ts'
 
 const data = organisationJson
 const before = data.position.before
@@ -194,7 +194,22 @@ export function lookupSource(id: string) {
   return sourceIndex[id] ?? null
 }
 
-export const hubAi = {
+const connectedTitles = [
+  ...answer.connected.obligationIds.map((id) => data.obligations.find((item) => item.id === id)?.title),
+  ...answer.connected.controlIds.map((id) => data.controls.find((item) => item.id === id)?.title),
+  ...answer.connected.riskIds.map((id) => data.risks.find((item) => item.id === id)?.title),
+].filter((item): item is string => Boolean(item))
+
+const sharedAi = {
+  recommendedAction: answer.recommendedAction,
+  freshness: answer.freshness,
+  confidence: answer.confidence,
+  owner: omar?.name ?? '',
+  approval: 'Human approval required before coverage or risk changes.',
+  expectedImpact: answer.expectedImpact,
+}
+
+export const hubAi: AiPanelModel & { prompts: string[] } = {
   context: `${answer.screen} · ${data.organisation.name}`,
   question: answer.question,
   executiveAnswer: answer.executiveAnswer,
@@ -203,19 +218,304 @@ export const hubAi = {
     citationId: fact.citationIds[0],
   })),
   interpretation: answer.interpretation,
-  recommendedAction: answer.recommendedAction,
-  connected: [
-    ...answer.connected.obligationIds.map((id) => data.obligations.find((item) => item.id === id)?.title),
-    ...answer.connected.controlIds.map((id) => data.controls.find((item) => item.id === id)?.title),
-    ...answer.connected.riskIds.map((id) => data.risks.find((item) => item.id === id)?.title),
-  ].filter((item): item is string => Boolean(item)),
-  freshness: answer.freshness,
-  confidence: answer.confidence,
-  owner: omar?.name ?? '',
-  approval: 'Human approval required before coverage or risk changes.',
-  expectedImpact: answer.expectedImpact,
+  connected: connectedTitles,
   prompts: data.ai.prompts.hub,
+  ...sharedAi,
 }
+
+const supplierControl = data.controls.find((item) => item.id === 'ctl-supplier-assurance')
+const supplierPolicy = evidenceRecords.find((item) => item.id === 'ev-policy-supplier')
+const auditFindings = evidenceRecords.find((item) => item.id === 'ev-audit-findings')
+const expiredAssessments = evidenceRecords.find((item) => item.id === 'ev-supplier-assessments-2023')
+const duplicatePack = evidenceRecords.find((item) => item.id === 'ev-supplier-q-duplicate')
+const layla = peopleById['person-layla']
+
+export const connectedGap = {
+  kicker: 'Connected gap',
+  title: 'Supplier assurance',
+  lede: 'The policy is current, but current assessment evidence is missing for several critical suppliers. That leaves four international obligations only partly covered and keeps the control partial.',
+  steps: [
+    {
+      id: 'policy' as const,
+      index: '01',
+      kicker: 'Policy',
+      title: 'Supplier assurance policy',
+      status: 'Current',
+      tone: 'assured' as const,
+      summary: 'Documented and current. It does not replace assessments.',
+    },
+    {
+      id: 'obligations' as const,
+      index: '02',
+      kicker: 'Obligations',
+      title: 'Four international frameworks',
+      status: 'Partial',
+      tone: 'partial' as const,
+      summary: 'ISO 27001, NIS2, GDPR and NCA ECC share this gap.',
+    },
+    {
+      id: 'control' as const,
+      index: '03',
+      kicker: 'Control',
+      title: 'Supplier assurance',
+      status: 'Partial',
+      tone: 'partial' as const,
+      summary: 'Assured by policy only until current assessments exist.',
+    },
+    {
+      id: 'evidence' as const,
+      index: '04',
+      kicker: 'Evidence',
+      title: 'Current critical-supplier assessments',
+      status: 'Missing',
+      tone: 'attention' as const,
+      summary: 'The 2023 pack is expired and is not acceptable for the review.',
+    },
+    {
+      id: 'risks' as const,
+      index: '05',
+      kicker: 'Risks',
+      title: 'Third-party and regulatory exposure',
+      status: 'Elevated',
+      tone: 'attention' as const,
+      summary: 'The same missing evidence keeps both risks elevated.',
+    },
+  ],
+  details: {
+    overview: {
+      kicker: 'How this gap is connected',
+      title: 'One missing pack sits under four frameworks',
+      status: 'Highest-impact gap',
+      tone: 'attention' as const,
+      body: 'A current supplier-assurance policy sits above four overlapping obligations. The supplier-assurance control stays partial because current assessments are missing. That elevates third-party assurance and regulatory exposure ahead of the review.',
+      items: [] as { label: string; title: string; meta: string }[],
+    },
+    policy: {
+      kicker: 'Policy',
+      title: supplierPolicy?.title ?? 'Supplier assurance policy',
+      status: 'Current',
+      tone: 'assured' as const,
+      body: 'The documented policy exists and is current. It is reused across the connected obligations, but it does not replace current critical-supplier assessments.',
+      items: [
+        {
+          label: 'Record',
+          title: `${supplierPolicy?.fileType} · Version ${supplierPolicy?.version}`,
+          meta: omar ? `${omar.name}, ${omar.role}` : '',
+        },
+      ],
+    },
+    obligations: {
+      kicker: 'Obligations',
+      title: 'Overlapping supplier-assurance requirements',
+      status: 'Partial',
+      tone: 'partial' as const,
+      body: 'Each of these obligations is supported by the same policy and the same control. None is fully supported until current assessments are in place.',
+      items: partialInternational.map((item) => {
+        const framework = data.frameworks.find((entry) => entry.id === item.frameworkId)
+        const owner = peopleById[item.ownerId]
+        return {
+          label: framework?.name ?? '',
+          title: item.title,
+          meta: owner ? `${owner.name} · Partial` : 'Partial',
+        }
+      }),
+    },
+    control: {
+      kicker: 'Control',
+      title: supplierControl?.title ?? 'Supplier assurance',
+      status: 'Partially assured',
+      tone: 'partial' as const,
+      body: supplierControl?.partialReason ?? 'Policy is current. Current assessments for critical suppliers are missing.',
+      items: [
+        {
+          label: 'Control owner',
+          title: nadia ? `${nadia.name}, ${nadia.role}` : 'Information Security Lead',
+          meta: 'Accountable for the control, not the missing pack',
+        },
+        {
+          label: 'Supports',
+          title: internationalFrameworks.map((item) => item.name).join(' · '),
+          meta: 'One control, four international frameworks',
+        },
+      ],
+    },
+    evidence: {
+      kicker: 'Evidence',
+      title: 'Current critical-supplier assessments',
+      status: 'Missing',
+      tone: 'attention' as const,
+      body: 'Current assessment evidence is missing for several critical suppliers. The expired 2023 pack is not acceptable for the review. A 2024 questionnaire pack is flagged as a duplicate.',
+      items: [
+        {
+          label: 'Present',
+          title: supplierPolicy?.title ?? 'Supplier assurance policy',
+          meta: 'Current · does not close the gap',
+        },
+        {
+          label: 'Records the gap',
+          title: auditFindings?.title ?? 'Internal audit findings',
+          meta: 'Current',
+        },
+        {
+          label: 'Not acceptable',
+          title: expiredAssessments?.title ?? '2023 critical-supplier assessments',
+          meta: 'Expired',
+        },
+        {
+          label: 'Flagged',
+          title: duplicatePack?.title ?? '2024 supplier questionnaire pack',
+          meta: 'Duplicate',
+        },
+      ],
+    },
+    risks: {
+      kicker: 'Risks',
+      title: 'Connected exposure ahead of the review',
+      status: 'Elevated',
+      tone: 'attention' as const,
+      body: 'Both elevated risks trace to the same missing assessments. Closing the evidence gap is the efficient remediation before the review.',
+      items: elevatedRisks.map((item) => {
+        const owner = peopleById[item.ownerId]
+        return {
+          label: 'Elevated',
+          title: item.title,
+          meta: owner ? `${owner.name} · ${item.contributingGap}` : item.contributingGap,
+        }
+      }),
+    },
+  },
+  action: {
+    kicker: 'Highest-impact action',
+    title: data.actions[0].title,
+    owner: omar ? `${omar.name}, ${omar.role}` : '',
+    approver: layla ? `${layla.name}, ${layla.role}` : '',
+    due: `Due in ${data.organisation.review.daysRemaining} days`,
+  },
+}
+
+export const gapAi: Record<GapStepId, AiPanelModel> = {
+  overview: {
+    context: `Supplier assurance · ${data.organisation.name}`,
+    question: 'Why is supplier assurance only partially assured?',
+    executiveAnswer:
+      'The control is partial because the policy is current and current assessments for several critical suppliers are missing. That one gap sits under four international frameworks and keeps two connected risks elevated.',
+    facts: hubAi.facts,
+    interpretation: answer.interpretation,
+    connected: connectedTitles,
+    ...sharedAi,
+  },
+  policy: {
+    context: `Supplier assurance policy · ${data.organisation.name}`,
+    question: 'Does a current policy close this gap?',
+    executiveAnswer:
+      'No. The supplier assurance policy is current, but it is not a substitute for current critical-supplier assessments.',
+    facts: [
+      {
+        text: 'The supplier assurance policy is current (version 3.0).',
+        citationId: 'ev-policy-supplier',
+      },
+      {
+        text: 'Internal audit findings record that current critical-supplier assessments are missing.',
+        citationId: 'ev-audit-findings',
+      },
+    ],
+    interpretation:
+      'Counting a current policy under each framework makes coverage look stronger than the evidence supports.',
+    connected: ['Supplier assurance policy', ...partialInternational.map((item) => item.title), 'Supplier assurance'],
+    ...sharedAi,
+  },
+  obligations: {
+    context: `Overlapping obligations · ${data.organisation.name}`,
+    question: 'Where do ISO 27001, NIS2, GDPR and NCA ECC overlap?',
+    executiveAnswer:
+      'All four have a supplier-related obligation that is only partly supported. They share the same policy and the same control.',
+    facts: [
+      {
+        text: 'The same control supports obligations in ISO 27001, NIS2, GDPR and NCA ECC.',
+        citationId: 'ctl-supplier-assurance',
+      },
+      {
+        text: 'Supplier relationships — information security is only partially supported.',
+        citationId: 'obl-iso-a532',
+      },
+    ],
+    interpretation:
+      'Because the overlap is the same missing evidence, closing one pack improves all four obligations together.',
+    connected: partialInternational.map((item) => item.title),
+    ...sharedAi,
+  },
+  control: {
+    context: `Supplier assurance control · ${data.organisation.name}`,
+    question: 'Why is this control only partially assured?',
+    executiveAnswer:
+      supplierControl?.partialReason ??
+      'Policy is current. Current assessments for critical suppliers are missing.',
+    facts: [
+      {
+        text: 'Supplier assurance is partially assured.',
+        citationId: 'ctl-supplier-assurance',
+      },
+      {
+        text: 'Internal audit findings record that current critical-supplier assessments are missing.',
+        citationId: 'ev-audit-findings',
+      },
+    ],
+    interpretation:
+      'The control cannot move to assured until current assessments are uploaded and approved.',
+    connected: ['Supplier assurance', ...internationalFrameworks.map((item) => item.name)],
+    ...sharedAi,
+  },
+  evidence: {
+    context: `Missing assessments · ${data.organisation.name}`,
+    question: 'Which evidence is missing or outdated?',
+    executiveAnswer:
+      'Current critical-supplier assessments are missing. The 2023 pack is expired and is not acceptable for the review. A 2024 questionnaire pack is flagged as a duplicate.',
+    facts: [
+      {
+        text: 'Internal audit findings record that current critical-supplier assessments are missing.',
+        citationId: 'ev-audit-findings',
+      },
+      {
+        text: '2023 critical-supplier assessments are expired.',
+        citationId: 'ev-supplier-assessments-2023',
+      },
+      {
+        text: 'The 2024 supplier questionnaire pack is a duplicate of an older pack.',
+        citationId: 'ev-supplier-q-duplicate',
+      },
+    ],
+    interpretation:
+      'Fresh assessments are the missing piece. The current policy and the expired pack do not close the gap.',
+    connected: [
+      'Supplier assurance policy',
+      'Internal audit findings',
+      '2023 critical-supplier assessments',
+      'Third-party assurance',
+    ],
+    ...sharedAi,
+  },
+  risks: {
+    context: `Connected risks · ${data.organisation.name}`,
+    question: 'Which compliance gaps contribute to this risk?',
+    executiveAnswer:
+      'Third-party assurance and regulatory exposure are elevated because current assessments are missing. The same gap appears across several frameworks.',
+    facts: [
+      {
+        text: 'Third-party assurance is elevated because current assessments for critical suppliers are missing.',
+        citationId: 'risk-third-party',
+      },
+      {
+        text: 'Regulatory exposure ahead of the review is elevated by the same supplier-assurance gap.',
+        citationId: 'risk-regulatory',
+      },
+    ],
+    interpretation:
+      'Approving current assessments reduces both risks together, rather than remediating them as separate issues.',
+    connected: elevatedRisks.map((item) => item.title),
+    ...sharedAi,
+  },
+}
+
 
 export const moduleCopy: Record<Exclude<ModuleId, 'hub'>, { title: string; body: string }> = {
   regulatory: {

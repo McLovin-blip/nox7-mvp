@@ -13,11 +13,13 @@ export function AssuranceMap({
   selectedNode,
   onFilter,
   onSelectNode,
+  onOpenGap,
 }: {
   filter: MapFilter
   selectedNode: MapNodeId
   onFilter: (filter: MapFilter) => void
   onSelectNode: (id: MapNodeId) => void
+  onOpenGap: () => void
 }) {
   return (
     <section className="map" aria-label="Assurance map">
@@ -39,7 +41,12 @@ export function AssuranceMap({
           ))}
         </div>
       </header>
-      <p className="map-lede">One material gap is limiting assurance across four frameworks.</p>
+      <p className="map-lede">
+        One material gap is limiting assurance across four frameworks.{' '}
+        <button type="button" className="map-open" onClick={onOpenGap}>
+          Open connected gap
+        </button>
+      </p>
       <div className="map-stage">
         <svg className="map-lines" viewBox="0 0 800 420" aria-hidden="true">
           <circle cx="400" cy="190" r="118" fill="none" stroke="rgba(139,111,232,0.18)" />
@@ -53,7 +60,10 @@ export function AssuranceMap({
         <button
           className={`map-core${selectedNode === 'centre' ? ' on' : ''}`}
           type="button"
-          onClick={() => onSelectNode('centre')}
+          onClick={() => {
+            onSelectNode('centre')
+            onOpenGap()
+          }}
         >
           <span>{mapCentre.kicker}</span>
           <strong>{mapCentre.title}</strong>
