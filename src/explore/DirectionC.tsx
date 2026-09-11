@@ -23,8 +23,10 @@ export function DirectionC({
     return (
       <div className={`${root} c-login`}>
         <aside className="c-aside">
-          <Owl className="owl" />
-          <Wordmark className="wordmark" />
+          <div className="c-mark">
+            <Owl className="owl" />
+            <Wordmark className="wordmark" />
+          </div>
           <Orbit className="c-orbit" />
           <p className="c-antler">Prepared for Antler</p>
         </aside>
@@ -62,8 +64,10 @@ export function DirectionC({
   return (
     <div className={`${root} c-hub`}>
       <header className="c-top">
-        <Owl className="owl" />
-        <Wordmark className="wordmark" />
+        <div className="c-mark">
+          <Owl className="owl" />
+          <Wordmark className="wordmark" />
+        </div>
         <nav className="c-nav" aria-label="Product">
           {nav.map((item) => (
             <span key={item} aria-current={item === 'Hub' ? 'page' : undefined}>

@@ -43,13 +43,29 @@
   gap: 24px;
 }
 
-.c-aside .owl {
+.c-aside .owl,
+.c-top .owl {
   width: 56px;
   height: 56px;
+  display: block;
 }
 
-.c-aside .wordmark {
-  width: 128px;
+.c-top .owl {
+  width: 28px;
+  height: 28px;
+}
+
+.c-mark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #050508;
+  padding: 6px 8px;
+  width: fit-content;
+}
+
+.c-aside .c-mark .wordmark {
+  width: 120px;
   height: auto;
 }
 

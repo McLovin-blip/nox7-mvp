@@ -244,14 +244,67 @@
 
 .b-graph {
   display: grid;
-  grid-template-columns: 160px 1fr 200px;
-  gap: 12px;
-  align-items: center;
-  min-height: 280px;
+  gap: 10px;
+  align-content: center;
 }
 
-.b-col {
+.b-frameworks {
   display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.b-spine {
+  height: 28px;
+  position: relative;
+}
+
+.b-spine::before {
+  content: '';
+  position: absolute;
+  left: 12.5%;
+  right: 12.5%;
+  top: 50%;
+  height: 1px;
+  background: rgba(139, 111, 232, 0.45);
+}
+
+.b-spine::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(139, 111, 232, 0.45);
+}
+
+.b-center {
+  border: 1px solid rgba(139, 111, 232, 0.4);
+  background: rgba(139, 111, 232, 0.08);
+  text-align: center;
+  padding: 22px 28px;
+  max-width: 520px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.b-center h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+}
+
+.b-center p {
+  margin: 0;
+  color: var(--mute);
+  font-size: 13px;
+  max-width: 46ch;
+  margin-inline: auto;
+}
+
+.b-outcomes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
 }
 
@@ -271,46 +324,6 @@
   font-weight: 600;
   margin-bottom: 4px;
 }
-
-.b-center {
-  height: 100%;
-  border: 1px solid rgba(139, 111, 232, 0.35);
-  background:
-    radial-gradient(circle at 50% 50%, rgba(139, 111, 232, 0.12), transparent 62%),
-    rgba(139, 111, 232, 0.04);
-  display: grid;
-  place-content: center;
-  text-align: center;
-  padding: 24px;
-  position: relative;
-}
-
-.b-center::before,
-.b-center::after {
-  content: '';
-  position: absolute;
-  left: -12px;
-  right: -12px;
-  height: 1px;
-  background: rgba(139, 111, 232, 0.2);
-  top: 50%;
-}
-
-.b-center h2 {
-  margin: 0 0 8px;
-  font-size: 22px;
-  position: relative;
-}
-
-.b-center p {
-  margin: 0;
-  color: var(--mute);
-  font-size: 13px;
-  position: relative;
-  max-width: 28ch;
-}
-
-.b-status {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
@@ -424,14 +437,11 @@
   .b-sign form {
     grid-template-columns: 1fr;
   }
-  .b-graph,
+  .b-frameworks,
+  .b-outcomes,
   .b-status,
   .b-workspace {
     grid-template-columns: 1fr;
-  }
-  .b-center::before,
-  .b-center::after {
-    display: none;
   }
   .b-panel {
     position: absolute;

@@ -80,7 +80,7 @@ export function DirectionB({
             <h1>One gap, four frameworks</h1>
           </div>
           <div className="b-graph">
-            <div className="b-col">
+            <div className="b-frameworks">
               {frameworks.map((item) => (
                 <div className="b-node" key={item.name}>
                   <strong>Framework</strong>
@@ -89,11 +89,13 @@ export function DirectionB({
                 </div>
               ))}
             </div>
+            <div className="b-spine" aria-hidden="true" />
             <div className="b-center">
               <h2>Supplier assurance</h2>
               <p>{position.attention}</p>
             </div>
-            <div className="b-col">
+            <div className="b-spine" aria-hidden="true" />
+            <div className="b-outcomes">
               <div className="b-node">
                 <strong>Evidence</strong>
                 Assessments missing

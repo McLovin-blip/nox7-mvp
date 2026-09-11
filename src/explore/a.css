@@ -251,7 +251,7 @@
   font-size: 10px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #4e4d4a;
+  color: #9a968e;
 }
 
 .a-nav span[aria-current='page'] {
@@ -434,6 +434,12 @@
   overflow: auto;
   display: flex;
   flex-direction: column;
+}
+
+.a-panel .a-action {
+  margin-top: auto;
+  position: sticky;
+  bottom: 0;
 }
 
 .a-panel header {
