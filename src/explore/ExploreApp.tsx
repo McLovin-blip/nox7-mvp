@@ -2,19 +2,21 @@ import { useState } from 'react'
 import { DirectionA } from './DirectionA.tsx'
 import { DirectionB } from './DirectionB.tsx'
 import { DirectionC } from './DirectionC.tsx'
+import { DirectionMix } from './DirectionMix.tsx'
 import { ReferenceLogin } from './ReferenceLogin.tsx'
 import './lab.css'
 import './login.css'
 import './a.css'
 import './b.css'
 import './c.css'
+import './mix.css'
 
-type Direction = 'a' | 'b' | 'c'
+type Direction = 'a' | 'b' | 'c' | 'mix'
 type Screen = 'login' | 'hub'
 type Theme = 'dark' | 'light'
 
 export function ExploreApp() {
-  const [direction, setDirection] = useState<Direction>('a')
+  const [direction, setDirection] = useState<Direction>('mix')
   const [screen, setScreen] = useState<Screen>('login')
   const [theme, setTheme] = useState<Theme>('light')
   const [aiOpen, setAiOpen] = useState(true)
@@ -38,6 +40,9 @@ export function ExploreApp() {
           </button>
           <button type="button" aria-pressed={direction === 'c'} onClick={() => setDirection('c')}>
             C Governance
+          </button>
+          <button type="button" aria-pressed={direction === 'mix'} onClick={() => setDirection('mix')}>
+            A+B Mix
           </button>
         </div>
         <div className="lab-group">
@@ -97,6 +102,12 @@ export function ExploreApp() {
           <DirectionC
             aiOpen={aiOpen}
             theme={theme}
+            onToggleAi={() => setAiOpen((value) => !value)}
+          />
+        ) : null}
+        {screen === 'hub' && direction === 'mix' ? (
+          <DirectionMix
+            aiOpen={aiOpen}
             onToggleAi={() => setAiOpen((value) => !value)}
           />
         ) : null}

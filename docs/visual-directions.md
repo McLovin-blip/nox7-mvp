@@ -2,7 +2,7 @@
 
 Isolated route: `/explore.html`. Not part of production navigation. Awaiting product approval. Do not merge until approved.
 
-The laboratory uses **one login taken from the approved HTML reference** (centered brand on the space field). Directions A, B and C compare **Executive Hub** and the **Nox AI right-side panel** only.
+The laboratory uses **one login taken from the approved HTML reference** (centered brand on the space field). Directions A, B, C and **A+B Mix** compare **Executive Hub** and the **Nox AI right-side panel** only. Mix is the proposed Hub for review.
 
 ## Directions
 
@@ -14,16 +14,18 @@ The laboratory uses **one login taken from the approved HTML reference** (center
 
 **C — Modern Governance Suite.** Document and approval language, IBM Plex, coverage bars, a “matter for attention”. Light is default; dark is a graphite treatment of the same structure.
 
+**A+B Mix — proposed Hub.** A’s architecture (void field, 72px vertical rail, ruled AI) with B’s relationship as the visual centre. Composition taken from the HTML Hub: intro + connected motif + “What changed” / priority action cards — **not** the seven-node cyber orbit and **not** a giant organisation score. Look-and-feel cues from Linear, Stripe Dashboard, Vanta and Drata: 52px top bar, ⌘K Ask Nox AI, hairline borders, 8–13px radius, framework chips, one numbered action. Centre of the motif is the supplier-assurance gap.
+
 ## Visual system (explored here)
 
-| Token | A | B | C |
-|---|---|---|---|
-| Type | Space Grotesk + Inter | Manrope | IBM Plex Serif + Sans |
-| Surface | Void + hairline architecture | Radial dark, dashed orbits | Paper / sheet (light) or graphite (dark) |
-| Accent | Hairline and one briefing mark | Relationship stroke and AI wash | Primary button, coverage bars, AI rule |
-| Nav | Vertical rail | Compact top | Suite underline |
-| AI panel | Ruled ledger | Overlay layer | Memorandum with footnotes |
-| Spacing | 8px, wide executive margins | 8/12, map-led | 8/16, document padding |
+| Token | A | B | C | Mix |
+|---|---|---|---|---|
+| Type | Space Grotesk + Inter | Manrope | IBM Plex Serif + Sans | Space Grotesk + Inter |
+| Surface | Void + hairline architecture | Radial dark, dashed orbits | Paper / sheet (light) or graphite (dark) | HTML `#050508` + Linear density |
+| Accent | Hairline and one briefing mark | Relationship stroke and AI wash | Primary button, coverage bars, AI rule | Purple glow on the gap, restrained elsewhere |
+| Nav | Vertical rail | Compact top | Suite underline | A rail + Linear top bar |
+| AI panel | Ruled ledger | Overlay layer | Memorandum with footnotes | Ruled ledger with B’s intelligence wash |
+| Spacing | 8px, wide executive margins | 8/12, map-led | 8/16, document padding | HTML Hub grid + 318px side cards |
 
 Status colour is used sparingly (partial, missing, elevated) — not as a SOC palette.
 
