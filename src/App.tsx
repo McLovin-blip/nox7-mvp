@@ -148,7 +148,17 @@ function AuthenticatedApp() {
       ) : module === 'controls' ? (
         <ControlsModule selectedId={selectedId} onSelect={(id) => go('controls', id)} />
       ) : module === 'evidence' ? (
-        <EvidenceModule selectedId={selectedId} onSelect={(id) => go('evidence', id)} onApproved={() => go('hub')} />
+        <EvidenceModule
+          selectedId={selectedId}
+          onSelect={(id) => go('evidence', id)}
+          onApproved={() => {
+            setModule('hub')
+            setCanvas('hub')
+            setSelectedId(null)
+            setQuestion(hubAiFor('after').question)
+            setAiOpen(true)
+          }}
+        />
       ) : module === 'risks' ? (
         <RisksModule selectedId={selectedId} onSelect={(id) => go('risks', id)} />
       ) : module === 'reports' ? (

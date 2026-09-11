@@ -313,6 +313,10 @@
   align-items: start;
 }
 
+.actions li:has(> .action-open) {
+  display: block;
+}
+
 .actions li b {
   color: var(--text-2);
   font-size: 12px;

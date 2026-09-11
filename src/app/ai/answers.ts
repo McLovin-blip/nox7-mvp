@@ -259,9 +259,15 @@ export function answerFor(options: {
   selectedTitle?: string
   selectedId?: string
 }): AiPanelModel {
-  const { module, position, question, selectedTitle, selectedId } = options
-  const q = question.trim()
+  const { module, position, selectedTitle, selectedId } = options
   const after = position === 'after'
+  const fallback =
+    module === 'gap'
+      ? gapAiFor(position).overview.question
+      : module === 'hub'
+        ? hubAiFor(position).question
+        : prompts[module][0]
+  const q = options.question.trim() || fallback
 
   if (module === 'gap') {
     const pack = gapAiFor(position)
