@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import { Owl } from '../brand/Brand.tsx'
-import { currentUser, nav, organisation, personInitials, reportingPeriod } from '../mock/store.ts'
+import { personInitials } from '../mock/data.ts'
 import type { ModuleId } from '../mock/types.ts'
+import { useSession } from '../state/SessionProvider.tsx'
 import './chrome.css'
 
 export function AppShell({
@@ -35,6 +36,7 @@ function Sidebar({
   module: ModuleId
   onModule: (id: ModuleId) => void
 }) {
+  const { view } = useSession()
   return (
     <aside className="rail">
       <div className="rail-brand">
@@ -44,7 +46,7 @@ function Sidebar({
         </span>
       </div>
       <nav aria-label="Product">
-        {nav.map((item) => (
+        {view.nav.map((item) => (
           <button
             key={item.id}
             type="button"
@@ -58,10 +60,10 @@ function Sidebar({
         ))}
       </nav>
       <div className="rail-user">
-        <span className="rail-av">{personInitials(currentUser.name)}</span>
+        <span className="rail-av">{personInitials(view.currentUser.name)}</span>
         <span>
-          <strong>{currentUser.name}</strong>
-          <em>{currentUser.role}</em>
+          <strong>{view.currentUser.name}</strong>
+          <em>{view.currentUser.role}</em>
         </span>
       </div>
     </aside>
@@ -69,16 +71,17 @@ function Sidebar({
 }
 
 function TopBar({ onToggleAi }: { onToggleAi: () => void }) {
+  const { view } = useSession()
   return (
     <header className="top">
       <div className="top-org">
-        <strong>{organisation.name}</strong>
+        <strong>{view.organisation.name}</strong>
         <span>
-          {organisation.uiLabel} · {organisation.review.name} · {organisation.review.daysRemaining} days
+          {view.organisation.uiLabel} · {view.organisation.review.name} · {view.organisation.review.daysRemaining} days
         </span>
       </div>
       <div className="top-meta">
-        <span className="top-chip">Reporting period · {reportingPeriod}</span>
+        <span className="top-chip">Reporting period · {view.reportingPeriod}</span>
         <button className="ask" type="button" onClick={onToggleAi}>
           Ask Nox AI
           <kbd>⌘K</kbd>

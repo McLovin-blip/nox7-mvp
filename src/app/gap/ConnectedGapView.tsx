@@ -1,18 +1,22 @@
-import { connectedGap } from '../mock/store.ts'
 import type { GapStepId } from '../mock/types.ts'
+import { useSession } from '../state/SessionProvider.tsx'
 import './gap.css'
 
 export function ConnectedGapView({
   selectedStep,
   onBack,
   onSelectStep,
+  onContinue,
 }: {
   selectedStep: GapStepId
   onBack: () => void
   onSelectStep: (id: GapStepId) => void
+  onContinue: () => void
 }) {
-  const detail = connectedGap.details[selectedStep]
-  const action = connectedGap.action
+  const { view } = useSession()
+  const gap = view.gap
+  const detail = gap.details[selectedStep]
+  const action = gap.action
 
   return (
     <div className="gap-view">
@@ -21,14 +25,14 @@ export function ConnectedGapView({
           <button className="ghost" type="button" onClick={onBack}>
             Back to Hub
           </button>
-          <p className="gap-kicker">{connectedGap.kicker}</p>
-          <h1>{connectedGap.title}</h1>
-          <p className="gap-lede">{connectedGap.lede}</p>
+          <p className="gap-kicker">{gap.kicker}</p>
+          <h1>{gap.title}</h1>
+          <p className="gap-lede">{gap.lede}</p>
         </div>
       </header>
 
       <ol className="gap-chain" aria-label="Connected compliance gap">
-        {connectedGap.steps.map((step) => (
+        {gap.steps.map((step) => (
           <li key={step.id}>
             <button
               type="button"
@@ -67,7 +71,7 @@ export function ConnectedGapView({
           </ul>
         ) : (
           <div className="gap-walk">
-            {connectedGap.steps.map((step) => (
+            {gap.steps.map((step) => (
               <button key={step.id} type="button" onClick={() => onSelectStep(step.id)}>
                 {step.kicker}
               </button>
@@ -83,7 +87,9 @@ export function ConnectedGapView({
           {action.owner} · {action.due}
         </p>
         <p>Approver · {action.approver}</p>
-        <p className="gap-note">Not applied until current assessments are approved.</p>
+        <button className="primary" type="button" onClick={onContinue} style={{ marginTop: 12, width: '100%' }}>
+          {action.cta}
+        </button>
       </aside>
     </div>
   )

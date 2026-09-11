@@ -1,17 +1,23 @@
 import { useState } from 'react'
-import { lookupSource } from '../mock/store.ts'
-import type { AiPanelModel } from '../mock/types.ts'
+import { lookupSource } from '../mock/data.ts'
+import type { AiPanelModel, PositionState } from '../mock/types.ts'
 import './ai.css'
 
 export function NoxAiPanel({
   answer,
   question,
+  position,
+  onAsk,
+  onOpenSource,
 }: {
   answer: AiPanelModel
   question: string
+  position: PositionState
+  onAsk: (prompt: string) => void
+  onOpenSource: (id: string) => void
 }) {
   const [sourceId, setSourceId] = useState<string | null>(null)
-  const source = sourceId ? lookupSource(sourceId) : null
+  const source = sourceId ? lookupSource(sourceId, position) : null
 
   return (
     <aside className="ai-panel" aria-label="Nox AI">
@@ -27,16 +33,19 @@ export function NoxAiPanel({
         </section>
         <section className="ai-facts">
           <span>Sourced facts</span>
-          <p className="ai-note">From seeded records only</p>
+          <p className="ai-note">From organisation records</p>
           <ul>
             {answer.facts.map((fact) => (
-              <li key={fact.citationId}>
+              <li key={`${fact.citationId}-${fact.text}`}>
                 {fact.text}{' '}
                 <button
                   type="button"
                   className="cite"
                   aria-current={sourceId === fact.citationId}
-                  onClick={() => setSourceId(fact.citationId)}
+                  onClick={() => {
+                    setSourceId(fact.citationId)
+                    onOpenSource(fact.citationId)
+                  }}
                 >
                   Source
                 </button>
@@ -82,10 +91,22 @@ export function NoxAiPanel({
           <span>Expected effect</span>
           <p>{answer.expectedImpact}</p>
         </section>
+        <section>
+          <span>Ask this screen</span>
+          <div className="ai-rel">
+            {answer.prompts.map((prompt) => (
+              <button key={prompt} type="button" className="cite" onClick={() => onAsk(prompt)}>
+                {prompt}
+              </button>
+            ))}
+          </div>
+        </section>
       </div>
       <section className="ai-act">
         <span>Recommended action</span>
-        <p className="ai-note">Not applied until human approval</p>
+        <p className="ai-note">
+          {position === 'after' ? 'Already applied after human approval' : 'Not applied until human approval'}
+        </p>
         <p>{answer.recommendedAction}</p>
         <p>{answer.approval}</p>
       </section>

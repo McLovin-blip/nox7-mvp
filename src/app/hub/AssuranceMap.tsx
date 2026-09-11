@@ -1,5 +1,5 @@
-import { mapCentre, mapNodes } from '../mock/store.ts'
 import type { MapFilter, MapNodeId } from '../mock/types.ts'
+import { useSession } from '../state/SessionProvider.tsx'
 
 const FILTERS: { id: MapFilter; label: string }[] = [
   { id: 'all', label: 'All' },
@@ -21,6 +21,7 @@ export function AssuranceMap({
   onSelectNode: (id: MapNodeId) => void
   onOpenGap: () => void
 }) {
+  const { view } = useSession()
   return (
     <section className="map" aria-label="Assurance map">
       <header>
@@ -42,9 +43,11 @@ export function AssuranceMap({
         </div>
       </header>
       <p className="map-lede">
-        One material gap is limiting assurance across four frameworks.{' '}
+        {view.position === 'after'
+          ? 'The material gap is closed. The same objects now agree across the organisation.'
+          : 'One material gap is limiting assurance across four frameworks.'}{' '}
         <button type="button" className="map-open" onClick={onOpenGap}>
-          Open connected gap
+          {view.position === 'after' ? 'Open connected view' : 'Open connected gap'}
         </button>
       </p>
       <div className="map-stage">
@@ -65,11 +68,11 @@ export function AssuranceMap({
             onOpenGap()
           }}
         >
-          <span>{mapCentre.kicker}</span>
-          <strong>{mapCentre.title}</strong>
-          <em>{mapCentre.detail}</em>
+          <span>{view.mapCentre.kicker}</span>
+          <strong>{view.mapCentre.title}</strong>
+          <em>{view.mapCentre.detail}</em>
         </button>
-        {mapNodes.map((node) => (
+        {view.mapNodes.map((node) => (
           <button
             key={node.id}
             type="button"
