@@ -20,6 +20,12 @@ npm run dev
 
 Then open [http://localhost:5173](http://localhost:5173). You should see the Nox7 starter page with the supplied logos.
 
+Visual exploration laboratory (not production navigation):
+
+[http://localhost:5173/explore.html](http://localhost:5173/explore.html)
+
+Use the laboratory switcher to compare directions A, B and C at the same viewport. Notes: [`docs/visual-directions.md`](docs/visual-directions.md).
+
 Production build and local preview (port **4173**):
 
 ```bash

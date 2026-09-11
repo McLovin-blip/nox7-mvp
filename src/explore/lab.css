@@ -1,0 +1,130 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+button.cite,
+button.fn {
+  appearance: none;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+
+html,
+body,
+#explore-root {
+  height: 100%;
+  margin: 0;
+}
+
+body:has(#explore-root) {
+  background: #000;
+}
+
+.lab {
+  --lab-bg: #101114;
+  --lab-line: #2a2c33;
+  --lab-text: #d8dae0;
+  --lab-mute: #8b8e99;
+  --lab-accent: #8b6fe8;
+  height: 100svh;
+  display: grid;
+  grid-template-rows: 48px 1fr;
+  background: #000;
+  color: var(--lab-text);
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.lab-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 12px;
+  background: var(--lab-bg);
+  border-bottom: 1px solid var(--lab-line);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  z-index: 20;
+}
+
+.lab-bar strong {
+  font-weight: 650;
+  color: #fff;
+  padding-right: 12px;
+  border-right: 1px solid var(--lab-line);
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+.lab-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lab-group span {
+  color: var(--lab-mute);
+  margin-right: 6px;
+  text-transform: uppercase;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+
+.lab-bar button {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--lab-mute);
+  font: inherit;
+  padding: 5px 9px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.lab-bar button[aria-pressed='true'] {
+  color: #fff;
+  border-color: #3d3f48;
+  background: #1a1b20;
+}
+
+.lab-note {
+  margin-left: auto;
+  color: var(--lab-mute);
+  font-size: 10px;
+}
+
+.lab-stage {
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.cite {
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cite[aria-current='true'] {
+  font-weight: 600;
+}
+
+@media (max-width: 1280px) {
+  .lab-note {
+    display: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .lab-bar {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 48px;
+    padding: 8px 12px;
+  }
+}
