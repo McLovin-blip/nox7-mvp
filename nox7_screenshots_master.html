@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nox7.ai — Product Screenshots · Master</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --page:#080C18;--surface:#0A0E1A;--card:#0F1628;--card2:#111827;
+  --border:#1A2035;--border2:#243050;
+  --red:#C13A2A;--redbg:rgba(193,58,42,0.12);
+  --amber:#C17A2A;--amberbg:rgba(193,122,42,0.12);
+  --green:#2A9B70;--greenbg:rgba(42,155,112,0.12);
+  --blue:#4A8FBF;--bluebg:rgba(74,143,191,0.12);
+  --purple:#8B6FE8;--purplebg:rgba(139,111,232,0.12);
+  --text:#D4DCE8;--text2:#9AAABE;--text3:#5A6A82;
+  --font:'Inter',sans-serif;
+}
+html{background:var(--page)}
+body{background:var(--page);color:var(--text);font-family:var(--font);padding:48px;display:flex;flex-direction:column;gap:80px}
+
+/* SECTION */
+.section{display:grid;align-items:center;gap:48px}
+.ltr{grid-template-columns:320px 1fr}
+.rtl{grid-template-columns:1fr 320px}
+.divider{height:0.5px;background:var(--border);margin:0 -48px}
+
+/* COPY */
+.copy{display:flex;flex-direction:column;gap:0}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;background:var(--purplebg);border:0.5px solid rgba(139,111,232,0.25);font-size:9px;color:var(--purple);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;width:fit-content}
+.tag-dot{width:4px;height:4px;border-radius:50%;background:var(--purple)}
+.copy h2{font-size:24px;font-weight:700;line-height:1.2;letter-spacing:-.4px;color:var(--text);margin-bottom:10px}
+.copy h2 em{color:var(--purple);font-style:normal}
+.copy p{font-size:12px;color:var(--text3);line-height:1.65;margin-bottom:16px}
+.bullets{display:flex;flex-direction:column;gap:8px}
+.bullet{display:flex;align-items:flex-start;gap:7px;font-size:11px;color:var(--text2);line-height:1.5}
+.bd{width:4px;height:4px;border-radius:50%;background:var(--purple);flex-shrink:0;margin-top:6px}
+
+/* DEVICE */
+.device{background:var(--surface);border-radius:12px;border:0.5px solid var(--border2);overflow:hidden;box-shadow:0 0 0 1px rgba(139,111,232,0.07),0 24px 64px rgba(0,0,0,0.5)}
+.dbar{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;background:var(--card);border-bottom:0.5px solid var(--border)}
+.dname{font-size:11px;font-weight:600;color:var(--text);letter-spacing:-.1px} .n7{color:#8B6FE8}
+.dright{display:flex;align-items:center;gap:10px}
+.dclient{font-size:9px;color:var(--text3)}
+.dlive{display:flex;align-items:center;gap:3px;font-size:9px;color:var(--green)}
+.ldot{width:4px;height:4px;border-radius:50%;background:var(--green);animation:p 2s infinite}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* BADGE */
+.b{display:inline-block;padding:1px 6px;border-radius:3px;font-size:8px;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+.br{background:var(--redbg);color:var(--red)}
+.ba{background:var(--amberbg);color:var(--amber)}
+.bg{background:var(--greenbg);color:var(--green)}
+.bb{background:var(--bluebg);color:var(--blue)}
+.bp{background:var(--purplebg);color:var(--purple)}
+.bgr{background:var(--card2);color:var(--text3);border:0.5px solid var(--border)}
+
+/* ═══════════════════════════
+   S1 — NOX AI REASONING
+═══════════════════════════ */
+.s1{padding:14px 16px 0}
+.nox-bar{display:flex;align-items:center;gap:7px;padding:10px 13px;background:var(--card2);border:0.5px solid var(--border2);border-radius:8px;margin-bottom:10px}
+.nox-icon{width:22px;height:22px;border-radius:6px;background:var(--purplebg);border:0.5px solid rgba(139,111,232,0.3);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--purple);flex-shrink:0}
+.nox-q{flex:1;font-size:11px;color:var(--text);font-style:italic}
+.nox-send{width:24px;height:24px;border-radius:5px;background:var(--red);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;flex-shrink:0}
+.chips{display:flex;gap:5px;margin-bottom:12px}
+.chip{padding:3px 8px;border-radius:100px;border:0.5px solid var(--border);font-size:9px;color:var(--text3);background:var(--card2)}
+.chip.on{border-color:rgba(139,111,232,0.35);background:var(--purplebg);color:var(--purple)}
+
+.ans-card{background:var(--card);border:0.5px solid rgba(139,111,232,0.2);border-top:2px solid var(--purple);border-radius:0 0 10px 10px;padding:13px 16px}
+.ans-top{display:flex;align-items:center;gap:6px;margin-bottom:9px;padding-bottom:8px;border-bottom:0.5px solid var(--border)}
+.ans-star{font-size:12px;color:var(--purple)}
+.ans-lbl{font-size:10px;font-weight:600;color:var(--purple)}
+.ans-src{font-size:9px;color:var(--text3);margin-left:auto}
+.ans-q{font-size:10px;color:var(--text3);font-style:italic;padding:6px 9px;background:var(--card2);border-radius:4px;margin-bottom:9px}
+.ans-txt{font-size:11px;color:var(--text2);line-height:1.7}
+.ans-txt strong{color:var(--text)}
+.hl{display:inline-block;padding:1px 5px;border-radius:3px;font-weight:700;font-style:normal}
+.hlr{background:var(--redbg);color:var(--red)}
+.hlp{background:var(--purplebg);color:var(--purple)}
+
+.data-row{display:grid;grid-template-columns:repeat(4,1fr);border-top:0.5px solid var(--border)}
+.dc{padding:9px 12px;border-right:0.5px solid var(--border)}
+.dc:last-child{border:none}
+.dcl{font-size:8px;color:var(--text3);letter-spacing:.4px;text-transform:uppercase;margin-bottom:3px}
+.dcv{font-size:14px;font-weight:700;letter-spacing:-.2px}
+.dcs{font-size:9px;color:var(--text3);margin-top:2px}
+.vc{color:var(--red)}.va{color:var(--amber)}.vg{color:var(--green)}.vp{color:var(--purple)}
+
+/* ═══════════════════════════
+   S2 — REGULATORY MAPPING
+═══════════════════════════ */
+.s2{padding:14px 16px}
+.s2h{display:flex;align-items:center;gap:7px;margin-bottom:12px}
+.s2icon{width:26px;height:26px;border-radius:6px;background:var(--purplebg);border:0.5px solid rgba(139,111,232,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--purple)}
+.s2title{font-size:12px;font-weight:600;color:var(--text)}
+.s2sub{font-size:10px;color:var(--text3)}
+.s2badge{margin-left:auto;padding:2px 8px;border-radius:100px;background:var(--purplebg);border:0.5px solid rgba(139,111,232,0.25);font-size:9px;color:var(--purple);font-weight:600}
+
+/* compact timeline */
+.tl{display:flex;flex-direction:column;gap:0;margin-bottom:12px}
+.tli{display:flex;gap:10px;position:relative}
+.tli::before{content:'';position:absolute;left:10px;top:22px;width:0.5px;height:calc(100% - 2px);background:var(--border)}
+.tli:last-child::before{display:none}
+.tln{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;margin-top:2px}
+.tl-done{background:var(--greenbg);border:0.5px solid rgba(42,155,112,0.3);color:var(--green)}
+.tl-ai{background:var(--purplebg);border:0.5px solid rgba(139,111,232,0.3);color:var(--purple)}
+.tl-warn{background:var(--redbg);border:0.5px solid rgba(193,58,42,0.3);color:var(--red)}
+.tlb{flex:1;padding:2px 0 10px}
+.tlt{font-size:10px;font-weight:600;color:var(--text);margin-bottom:2px}
+.tld{font-size:9px;color:var(--text3);line-height:1.4}
+
+/* proposal */
+.prop{background:var(--card);border:0.5px solid rgba(139,111,232,0.2);border-top:2px solid var(--purple);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.proph{display:flex;align-items:center;gap:6px;padding:9px 13px;background:rgba(139,111,232,0.06);border-bottom:0.5px solid rgba(139,111,232,0.15)}
+.propstar{font-size:11px;color:var(--purple)}
+.proptitle{font-size:10px;font-weight:600;color:var(--purple)}
+.propsub{font-size:9px;color:var(--text3);margin-left:auto}
+.proprows{padding:9px 13px;display:flex;flex-direction:column;gap:6px}
+.pr{display:flex;align-items:center;gap:7px;padding:7px 9px;border-radius:5px;background:var(--card2);border:0.5px solid var(--border)}
+.pr.gap{border-color:rgba(193,58,42,0.25);background:var(--redbg)}
+.ptype{font-size:7px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase;flex-shrink:0;width:46px;text-align:center}
+.ptr{background:var(--bluebg);color:var(--blue)}
+.ptc{background:var(--greenbg);color:var(--green)}
+.pte{background:var(--amberbg);color:var(--amber)}
+.plabel{flex:1;font-size:10px;color:var(--text2)}
+.plabel strong{color:var(--red)}
+.pconf{font-size:9px;font-weight:700;flex-shrink:0}
+.pcg{color:var(--green)}.pca{color:var(--amber)}.pcp{color:var(--purple)}.pcr{color:var(--red)}
+.propfooter{display:flex;align-items:center;gap:7px;padding:9px 13px;border-top:0.5px solid var(--border);background:var(--card2)}
+.pft{font-size:10px;color:var(--text3);flex:1}
+.pft strong{color:var(--text)}
+.pbtn{padding:5px 10px;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;font-family:var(--font);border:none}
+.pba{background:var(--green);color:#fff}
+.pbe{background:var(--card);border:0.5px solid var(--border);color:var(--text3)}
+
+.insight{display:flex;gap:6px;padding:9px 11px;background:var(--purplebg);border:0.5px solid rgba(139,111,232,0.2);border-radius:7px}
+.istar{font-size:11px;color:var(--purple);flex-shrink:0;margin-top:1px}
+.itxt{font-size:10px;color:var(--text2);line-height:1.6;font-style:italic}
+.itxt strong{color:var(--text);font-style:normal}
+
+/* ═══════════════════════════
+   S3 — BOARD SUMMARY
+═══════════════════════════ */
+.s3{padding:14px 16px}
+.s3h{display:flex;align-items:center;gap:7px;margin-bottom:12px}
+.s3icon{width:26px;height:26px;border-radius:6px;background:var(--purplebg);border:0.5px solid rgba(139,111,232,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--purple)}
+.s3title{font-size:12px;font-weight:600;color:var(--text)}
+.s3sub{font-size:10px;color:var(--text3)}
+.s3pend{margin-left:auto;padding:2px 8px;border-radius:100px;background:var(--amberbg);border:0.5px solid rgba(193,122,42,0.3);font-size:9px;color:var(--amber);font-weight:600}
+
+.s3grid{display:grid;grid-template-columns:1fr 160px;gap:10px}
+.bcard{background:var(--card);border:0.5px solid rgba(139,111,232,0.2);border-top:2px solid var(--purple);border-radius:9px;overflow:hidden}
+.bch{display:flex;align-items:center;gap:6px;padding:9px 13px;background:rgba(139,111,232,0.05);border-bottom:0.5px solid rgba(139,111,232,0.15)}
+.bcstar{font-size:11px;color:var(--purple)}
+.bctitle{font-size:10px;font-weight:600;color:var(--purple)}
+.bcmeta{font-size:9px;color:var(--text3);margin-left:auto;font-style:italic}
+.bcbody{padding:11px 13px}
+
+.why{background:var(--amberbg);border:0.5px solid rgba(193,122,42,0.25);border-radius:6px;padding:9px 11px;margin-bottom:10px}
+.whylbl{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--amber);margin-bottom:6px}
+.whyline{display:flex;align-items:flex-start;gap:5px;font-size:10px;color:var(--text2);line-height:1.5;margin-bottom:3px}
+.whyline:last-child{margin:0}
+.whydot{color:var(--amber);flex-shrink:0}
+
+/* mini chart */
+.mchart{background:var(--card2);border:0.5px solid var(--border);border-radius:6px;padding:9px 11px;margin-bottom:10px}
+.mclbl{font-size:8px;font-weight:600;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px}
+.bars{display:flex;align-items:flex-end;gap:4px;height:36px;margin-bottom:5px}
+.bar{flex:1;border-radius:2px 2px 0 0;background:var(--border)}
+.blabels{display:flex;gap:4px}
+.blabel{flex:1;font-size:7px;color:var(--text3);text-align:center}
+.blabel.now{color:var(--red);font-weight:700}
+
+.narr{font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:10px}
+.narr strong{color:var(--text)}
+
+.decs{background:var(--card2);border:0.5px solid var(--border);border-radius:6px;padding:9px 11px;margin-bottom:10px}
+.declbl{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:7px}
+.dec{display:flex;align-items:flex-start;gap:6px;font-size:10px;color:var(--text2);line-height:1.45;margin-bottom:5px}
+.dec:last-child{margin:0}
+.decn{width:15px;height:15px;border-radius:50%;background:var(--border);color:var(--text3);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;margin-top:1px}
+
+.trace{display:flex;align-items:flex-start;gap:5px;font-size:9px;color:var(--text3);font-style:italic;padding-top:8px;border-top:0.5px dashed var(--border);margin-bottom:9px}
+.tracestar{color:var(--purple)}
+.bactions{display:flex;gap:6px}
+.bbtn{padding:7px 10px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:var(--font);border:none;flex:1}
+.bba{background:var(--green);color:#fff}
+.bbe{background:var(--card2);border:0.5px solid var(--border);color:var(--text3)}
+
+/* sidebar */
+.s3side{display:flex;flex-direction:column;gap:8px}
+.ssc{background:var(--card2);border:0.5px solid var(--border);border-radius:8px;overflow:hidden}
+.ssh{padding:8px 11px;border-bottom:0.5px solid var(--border);font-size:8px;font-weight:600;color:var(--text3);letter-spacing:.5px;text-transform:uppercase}
+.ssb{padding:9px 11px}
+.ssr{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:0.5px solid var(--border);font-size:10px}
+.ssr:last-child{border:none}
+.ssl{color:var(--text3)}
+.ssv{font-weight:700;font-size:12px}
+.srcs{background:var(--card2);border:0.5px solid var(--border);border-radius:8px;padding:9px 11px}
+.srcsh{font-size:8px;font-weight:600;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px}
+.srci{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:0.5px solid var(--border);font-size:9px;color:var(--text2)}
+.srci:last-child{border:none}
+.srcidot{width:4px;height:4px;border-radius:50%;background:var(--green);flex-shrink:0}
+.srcic{margin-left:auto;font-weight:600;color:var(--text3)}
+
+/* ═══════════════════════════
+   S4 — AI DETECTS
+═══════════════════════════ */
+.s4{padding:14px 16px}
+.s4h{display:flex;align-items:center;gap:7px;margin-bottom:12px}
+.s4icon{width:26px;height:26px;border-radius:6px;background:var(--purplebg);border:0.5px solid rgba(139,111,232,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--purple)}
+.s4title{font-size:12px;font-weight:600;color:var(--text)}
+.s4sub{font-size:10px;color:var(--text3)}
+.s4badge{margin-left:auto;padding:2px 8px;border-radius:100px;background:var(--redbg);border:0.5px solid rgba(193,58,42,0.3);font-size:9px;color:var(--red);font-weight:700}
+
+.findings-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.fc{background:var(--card2);border:0.5px solid var(--border);border-radius:8px;padding:10px 12px}
+.fctop{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.fcsrc{font-size:8px;font-weight:700;padding:1px 6px;border-radius:3px;text-transform:uppercase}
+.fcit{background:var(--bluebg);color:var(--blue)}
+.fcot{background:var(--amberbg);color:var(--amber)}
+.fcenv{font-size:9px;color:var(--text3)}
+.fctitle{font-size:10px;font-weight:600;color:var(--text);margin-bottom:4px;line-height:1.35}
+.fcmeta{font-size:9px;color:var(--text3)}
+.fcalone{margin-top:6px;padding:4px 7px;background:var(--greenbg);border-radius:4px;font-size:9px;color:var(--green);font-weight:600}
+
+.conn{display:flex;align-items:center;gap:0;margin-bottom:10px}
+.connline{flex:1;height:0.5px;background:linear-gradient(90deg,var(--border),var(--purple),var(--border))}
+.conncenter{padding:0 14px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.connbadge{padding:3px 10px;border-radius:100px;background:var(--purplebg);border:0.5px solid rgba(139,111,232,0.35);font-size:9px;font-weight:700;color:var(--purple);display:flex;align-items:center;gap:4px;white-space:nowrap}
+.connsub{font-size:8px;color:var(--text3)}
+
+.adc{background:var(--card);border:0.5px solid rgba(139,111,232,0.25);border-top:3px solid var(--purple);border-radius:9px;overflow:hidden}
+.adch{display:flex;align-items:center;gap:7px;padding:10px 14px;background:rgba(139,111,232,0.07);border-bottom:0.5px solid rgba(139,111,232,0.15)}
+.adcstar{font-size:12px;color:var(--purple)}
+.adctitle{font-size:11px;font-weight:700;color:var(--purple)}
+.adcconf{margin-left:auto;text-align:right}
+.adcnum{font-size:20px;font-weight:800;color:var(--red);letter-spacing:-.5px;line-height:1}
+.adcsub{font-size:9px;color:var(--text3)}
+.adcbody{padding:12px 14px}
+.path{display:flex;align-items:center;gap:7px;margin-bottom:10px;flex-wrap:wrap}
+.pnode{padding:5px 10px;border-radius:5px;font-size:10px;font-weight:600;white-space:nowrap}
+.pnit{background:var(--bluebg);border:0.5px solid rgba(74,143,191,0.3);color:var(--blue)}
+.pngap{background:var(--redbg);border:0.5px solid rgba(193,58,42,0.3);color:var(--red)}
+.pnsis{background:var(--redbg);border:0.5px solid rgba(193,58,42,0.4);color:var(--red);font-weight:800}
+.parr{font-size:12px;color:var(--text3)}
+.adcnarr{font-size:11px;color:var(--text2);line-height:1.65;margin-bottom:10px}
+.adcnarr strong{color:var(--text)}
+.factors{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px}
+.factor{background:var(--card2);border:0.5px solid var(--border);border-radius:6px;padding:8px 10px;text-align:center}
+.fv{font-size:15px;font-weight:800;color:var(--red);letter-spacing:-.2px;margin-bottom:2px}
+.fl{font-size:8px;color:var(--text3);letter-spacing:.3px}
+.adcfooter{display:flex;align-items:center;justify-content:space-between;padding-top:9px;border-top:0.5px solid var(--border)}
+.adcresult{font-size:10px;color:var(--text3);font-style:italic}
+.adcresult strong{color:var(--purple);font-style:normal}
+.adcbtns{display:flex;gap:6px}
+.adcbtn{padding:6px 11px;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;font-family:var(--font);border:none}
+.adcconf2{background:var(--red);color:#fff}
+.adcdis{background:var(--card2);border:0.5px solid var(--border);color:var(--text3)}
+
+/* ═══════════════════════════
+   S8 — AUDIT TRAIL
+═══════════════════════════ */
+.s8{padding:14px 16px}
+.s8h{display:flex;align-items:center;gap:7px;margin-bottom:10px}
+.s8icon{width:26px;height:26px;border-radius:6px;background:var(--purplebg);border:0.5px solid rgba(139,111,232,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--purple)}
+.s8title{font-size:12px;font-weight:600;color:var(--text)}
+.s8sub{font-size:10px;color:var(--text3)}
+.s8badge{margin-left:auto;padding:2px 8px;border-radius:100px;background:var(--greenbg);border:0.5px solid rgba(42,155,112,0.3);font-size:9px;color:var(--green);font-weight:600}
+
+.legend{display:flex;align-items:center;gap:14px;margin-bottom:12px;padding:8px 12px;background:var(--card2);border:0.5px solid var(--border);border-radius:7px}
+.leglbl{font-size:8px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-right:4px}
+.legitem{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text2)}
+.legbadge{padding:1px 6px;border-radius:100px;font-size:8px;font-weight:700;letter-spacing:.3px}
+.lbsys{background:var(--card);border:0.5px solid var(--border);color:var(--text3)}
+.lbai{background:var(--purplebg);border:0.5px solid rgba(139,111,232,0.3);color:var(--purple)}
+.lbhum{background:var(--greenbg);border:0.5px solid rgba(42,155,112,0.3);color:var(--green)}
+
+.trail{display:flex;flex-direction:column;gap:0}
+.entry{display:flex;gap:10px;position:relative}
+.entry::before{content:'';position:absolute;left:10px;top:22px;width:0.5px;height:calc(100% - 2px);background:var(--border)}
+.entry:last-child::before{display:none}
+.enode{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-size:10px}
+.esys{background:var(--card2);border:0.5px solid var(--border);color:var(--text3)}
+.eai{background:var(--purplebg);border:0.5px solid rgba(139,111,232,0.3);color:var(--purple)}
+.ehum{background:var(--greenbg);border:0.5px solid rgba(42,155,112,0.3);color:var(--green)}
+.ebody{flex:1;padding:9px 12px;background:var(--card2);border:0.5px solid var(--border);border-radius:7px;margin-bottom:7px}
+.ebody.eai-entry{border-color:rgba(139,111,232,0.2);background:rgba(139,111,232,0.04)}
+.ebody.ehum-entry{border-color:rgba(42,155,112,0.2);background:rgba(42,155,112,0.04)}
+.etop{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.eactor{padding:1px 6px;border-radius:100px;font-size:8px;font-weight:700;letter-spacing:.3px}
+.eaction{font-size:10px;font-weight:600;color:var(--text)}
+.ets{font-size:9px;color:var(--text3);margin-left:auto;white-space:nowrap}
+.edetail{font-size:10px;color:var(--text2);line-height:1.55}
+.edetail strong{color:var(--text)}
+.eout{margin-top:6px;display:flex;align-items:center;gap:5px;padding:5px 8px;background:var(--card);border:0.5px solid var(--border);border-radius:4px;font-size:9px;color:var(--text3)}
+.eoutstar{color:var(--purple);font-size:10px}
+.eouttext{color:var(--text2)}
+
+.govstrip{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:8px;overflow:hidden;margin-top:4px}
+.govcell{background:var(--card2);padding:10px 12px;text-align:center}
+.govval{font-size:16px;font-weight:800;letter-spacing:-.2px;margin-bottom:2px}
+.govlbl{font-size:8px;color:var(--text3);letter-spacing:.3px;text-transform:uppercase}
+.govcell:nth-child(1) .govval{color:var(--text3)}
+.govcell:nth-child(2) .govval{color:var(--purple)}
+.govcell:nth-child(3) .govval{color:var(--green)}
+
+/* ── VISUAL SCREENS ADDITIONAL STYLES ── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --page:#080C18;--surface:#0A0E1A;--card:#0F1628;--card2:#111827;
+  --border:#1A2035;--border2:#243050;
+  --red:#C13A2A;--redbg:rgba(193,58,42,0.12);
+  --amber:#C17A2A;--amberbg:rgba(193,122,42,0.12);
+  --green:#2A9B70;--greenbg:rgba(42,155,112,0.12);
+  --blue:#4A8FBF;--bluebg:rgba(74,143,191,0.12);
+  --purple:#8B6FE8;--purplebg:rgba(139,111,232,0.12);
+  --teal:#2A9B9B;--tealbg:rgba(42,155,155,0.12);
+  --text:#D4DCE8;--text2:#9AAABE;--text3:#5A6A82;
+  --font:'Inter',sans-serif;
+}
+html{background:var(--page)}
+body{background:var(--page);color:var(--text);font-family:var(--font);padding:48px;display:flex;flex-direction:column;gap:80px}
+
+.section{display:grid;align-items:center;gap:48px}
+.ltr{grid-template-columns:300px 1fr}
+.rtl{grid-template-columns:1fr 300px}
+.divider{height:0.5px;background:var(--border);margin:0 -48px}
+
+.copy{display:flex;flex-direction:column}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;background:var(--purplebg);border:0.5px solid rgba(139,111,232,0.25);font-size:9px;color:var(--purple);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;width:fit-content}
+.tag-dot{width:4px;height:4px;border-radius:50%;background:var(--purple)}
+.copy h2{font-size:24px;font-weight:700;line-height:1.2;letter-spacing:-.4px;color:var(--text);margin-bottom:10px}
+.copy h2 em{color:var(--red);font-style:normal}
+.copy p{font-size:12px;color:var(--text3);line-height:1.65;margin-bottom:16px}
+.bullets{display:flex;flex-direction:column;gap:8px}
+.bullet{display:flex;align-items:flex-start;gap:7px;font-size:11px;color:var(--text2);line-height:1.5}
+.bd{width:4px;height:4px;border-radius:50%;background:var(--purple);flex-shrink:0;margin-top:6px}
+
+.device{background:var(--surface);border-radius:12px;border:0.5px solid var(--border2);overflow:hidden;box-shadow:0 0 0 1px rgba(139,111,232,0.07),0 24px 64px rgba(0,0,0,0.5)}
+.dbar{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;background:var(--card);border-bottom:0.5px solid var(--border)}
+.dname{font-size:11px;font-weight:600;color:var(--text);letter-spacing:-.1px}
+.dright{display:flex;align-items:center;gap:10px}
+.dclient{font-size:9px;color:var(--text3)}
+.dlive{display:flex;align-items:center;gap:3px;font-size:9px;color:var(--green)}
+.ldot{width:4px;height:4px;border-radius:50%;background:var(--green);animation:p 2s infinite}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ══════════════════════════════════════
+   SCREEN 6 — SEVEN DIMENSIONS DIAGRAM
+══════════════════════════════════════ */
+.s6{padding:24px}
+.s6-diagram{position:relative;width:100%;height:340px}
+.s6-diagram svg{width:100%;height:100%}
+
+/* ══════════════════════════════════════
+   SCREEN 7 — RISK SCORE TIMELINE
+══════════════════════════════════════ */
+.s7{padding:20px}
+.s7-chart{position:relative;margin-bottom:14px}
+.s7-svg{width:100%;height:200px}
+.s7-events{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.s7-event{display:flex;align-items:center;gap:8px;padding:7px 11px;background:var(--card2);border:0.5px solid var(--border);border-radius:6px}
+.s7-event.red{border-color:rgba(193,58,42,0.25);background:var(--redbg)}
+.s7-event.amber{border-color:rgba(193,122,42,0.25);background:var(--amberbg)}
+.s7-event.purple{border-color:rgba(139,111,232,0.25);background:var(--purplebg)}
+.s7-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.s7-ts{font-size:9px;color:var(--text3);flex-shrink:0;width:60px}
+.s7-label{font-size:10px;font-weight:600;color:var(--text);flex:1}
+.s7-val{font-size:11px;font-weight:700;flex-shrink:0}
+.s7-ai{display:flex;gap:6px;padding:10px 12px;background:var(--purplebg);border:0.5px solid rgba(139,111,232,0.2);border-radius:7px}
+.s7-ai-star{font-size:12px;color:var(--purple);flex-shrink:0;margin-top:1px}
+.s7-ai-text{font-size:11px;color:var(--text2);line-height:1.6;font-style:italic}
+.s7-ai-text strong{color:var(--text);font-style:normal}
+
+/* ══════════════════════════════════════
+   SCREEN 8 — ATTACK PATH MAP
+══════════════════════════════════════ */
+.s8{padding:20px}
+.s8-map{position:relative;width:100%;height:280px;margin-bottom:12px}
+.s8-map svg{width:100%;height:100%}
+.s8-ai{display:flex;gap:6px;padding:10px 12px;background:var(--purplebg);border:0.5px solid rgba(139,111,232,0.2);border-radius:7px;margin-bottom:10px}
+.s8-ai-star{font-size:12px;color:var(--purple);flex-shrink:0;margin-top:1px}
+.s8-ai-text{font-size:11px;color:var(--text2);line-height:1.6;font-style:italic}
+.s8-ai-text strong{color:var(--text);font-style:normal}
+.s8-footer{display:flex;align-items:center;justify-content:space-between}
+.s8-conf{display:flex;align-items:baseline;gap:6px}
+.s8-conf-num{font-size:32px;font-weight:800;color:var(--red);letter-spacing:-1px;line-height:1}
+.s8-conf-label{font-size:10px;color:var(--text3)}
+.s8-btns{display:flex;gap:7px}
+.s8-btn{padding:7px 13px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:var(--font);border:none}
+.s8-confirm{background:var(--red);color:#fff}
+.s8-dismiss{background:var(--card2);border:0.5px solid var(--border);color:var(--text3)}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     NOX7.AI — MASTER SCREENSHOT FILE
+     8 screens · AI-forward · Dark theme · Website-ready
+══════════════════════════════════════════════════════ -->
+
+<!-- S1 — NOX AI REASONING -->
+<div class="section ltr">
+  <div class="copy">
+    <div class="tag"><div class="tag-dot"></div>Nox AI</div>
+    <h2>A Cyber reasoning<br>engine, not a <em>chatbot</em></h2>
+    <p>Nox AI reasons over live regulatory obligations, control state, and security data, then explains what it means in plain language any decision-maker can act on.</p>
+    <div class="bullets">
+      <div class="bullet"><div class="bd"></div>Ask why a score changed, what a regulatory update means for your controls, or what to prioritise today.</div>
+      <div class="bullet"><div class="bd"></div>Every answer grounded in live scored data, not static documentation.</div>
+      <div class="bullet"><div class="bd"></div>AI explains. The rules engine scores. Everything traceable.</div>
+    </div>
+  </div>
+  <div class="device">
+    <div class="dbar">
+      <div class="dname">Nox AI · Cyber Reasoning Engine</div>
+      <div class="dright"><div class="dclient">energy-op-001</div><div class="dlive"><div class="ldot"></div>Live</div></div>
+    </div>
+    <div class="s1">
+      <div class="nox-bar">
+        <div class="nox-icon">✦</div>
+        <div class="nox-q">"Why did our risk score jump to CRITICAL overnight — and what do I tell the board?"</div>
+        <div class="nox-send">↑</div>
+      </div>
+      <div class="chips">
+        <div class="chip on">SIS correlation</div>
+        <div class="chip">Prioritise today</div>
+        <div class="chip">Board summary</div>
+        <div class="chip">What changed?</div>
+      </div>
+    </div>
+    <div class="ans-card">
+      <div class="ans-top">
+        <div class="ans-star">✦</div>
+        <div class="ans-lbl">Nox AI · Reasoning complete</div>
+        <div class="ans-src">Grounded in 5 live data sources</div>
+      </div>
+      <div class="ans-q">"Why did our risk score jump to CRITICAL overnight — and what do I tell the board?"</div>
+      <div class="ans-txt">
+        Your score moved from <span class="hl hlr">16.0 HIGH</span> to <span class="hl hlr">19.2 CRITICAL</span> when an active regulatory advisory was ingested and matched to your open findings. The ×1.4 multiplier was applied automatically.<br><br>
+        <strong>For the board:</strong> two findings — one in IT, one in OT — detected within one day form an <span class="hl hlp">87% confidence attack path</span> to your Safety Instrumented System. No operational impact has occurred. Reloading IT/OT segmentation evidence is the fastest remediation — it reduces both the correlation confidence and the score simultaneously.
+      </div>
+    </div>
+    <div class="data-row">
+      <div class="dc"><div class="dcl">Threat-adjusted</div><div class="dcv vc">19.2</div><div class="dcs">was 16.0 · +3.2</div></div>
+      <div class="dc"><div class="dcl">Correlation</div><div class="dcv vc">87%</div><div class="dcs">PATH · SIS</div></div>
+      <div class="dc"><div class="dcl">Advisory match</div><div class="dcv vc">×1.4</div><div class="dcs">Multiplier active</div></div>
+      <div class="dc"><div class="dcl">Fastest action</div><div class="dcv vp">1</div><div class="dcs">Segmentation evidence</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- S2 — REGULATORY MAPPING -->
+<div class="section rtl">
+  <div class="device">
+    <div class="dbar">
+      <div class="dname">Regulatory Change Intelligence</div>
+      <div class="dright"><div class="dclient">Regulatory Update 2026-02</div><div class="dlive"><div class="ldot"></div>AI Processing</div></div>
+    </div>
+    <div class="s2">
+      <div class="s2h">
+        <div class="s2icon">⚖</div>
+        <div class="s2title">Regulatory Change Intelligence</div>
+        <div class="s2sub">· Clause 4.2.3 · Privileged Access</div>
+        <div class="s2badge">✦ AI proposes · Human approves</div>
+      </div>
+      <div class="tl">
+        <div class="tli"><div class="tln tl-done">✓</div><div class="tlb"><div class="tlt">Regulatory circular ingested and processed</div><div class="tld">Obligations extracted by Nox AI. 2026-06-01 09:00.</div></div></div>
+        <div class="tli"><div class="tln tl-done">✓</div><div class="tlb"><div class="tlt">Applicability assessed — Applicable</div><div class="tld">Regulated entity. Privileged access in scope. Approved by S. Al-Rashidi.</div></div></div>
+        <div class="tli"><div class="tln tl-warn">!</div><div class="tlb"><div class="tlt">Evidence gap — PAM evidence expired</div><div class="tld">Cannot demonstrate annual compliance today. Action required before 2026-06-20.</div></div></div>
+        <div class="tli"><div class="tln tl-ai">4</div><div class="tlb"><div class="tlt">4 actions created · owners assigned · SLA set</div><div class="tld">Evidence reload due Jun 20. First quarterly review due Aug 15.</div></div></div>
+      </div>
+      <div class="prop">
+        <div class="proph"><div class="propstar">✦</div><div class="proptitle">Nox AI — Proposed obligation-to-control mappings</div><div class="propsub">Awaiting human approval</div></div>
+        <div class="proprows">
+          <div class="pr"><div class="ptype ptr">Obligation</div><div class="plabel">Quarterly privileged access review — records available to Authority on request</div><div class="pconf pcg">EXTRACTED</div></div>
+          <div class="pr"><div class="ptype ptc">Control</div><div class="plabel">Privileged Access MFA — <strong>CRITICAL FAILURE · evidence expired</strong></div><div class="pconf pcg">HIGH 0.89</div></div>
+          <div class="pr"><div class="ptype ptc">Control</div><div class="plabel">Remote Access Control — 72% · degrading</div><div class="pconf pca">MED 0.71</div></div>
+          <div class="pr gap"><div class="ptype pte">Evidence</div><div class="plabel">Quarterly review records — <strong>DOES NOT EXIST · new evidence type required</strong></div><div class="pconf pcr">GAP 0.96</div></div>
+        </div>
+        <div class="propfooter"><div class="pft"><strong>Human approval required</strong> before any score or action changes.</div><button class="pbtn pbe">Edit</button><button class="pbtn pba">Approve</button></div>
+      </div>
+      <div class="insight"><div class="istar">✦</div><div class="itxt">PAM evidence is already expired. The organisation cannot demonstrate <strong>annual compliance</strong> today, before the new quarterly requirement takes effect.</div></div>
+    </div>
+  </div>
+  <div class="copy">
+    <div class="tag"><div class="tag-dot"></div>Regulatory Intelligence</div>
+    <h2>Regulation changes.<br>Nox AI maps<br>the <em>impact</em>.</h2>
+    <p>When a regulatory obligation changes, Nox AI maps it to internal controls and surfaces evidence gaps on the day it arrives, not three weeks later.</p>
+    <div class="bullets">
+      <div class="bullet"><div class="bd"></div>Regulatory changes mapped to internal controls in hours, not weeks.</div>
+      <div class="bullet"><div class="bd"></div>Every AI mapping is a proposal. Humans approve before any score or action changes.</div>
+      <div class="bullet"><div class="bd"></div>Evidence gaps identified before the examiner asks.</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- S3 — BOARD SUMMARY -->
+<div class="section ltr">
+  <div class="copy">
+    <div class="tag"><div class="tag-dot"></div>Board Intelligence</div>
+    <h2>Board-ready.<br>In <em>minutes</em>,<br>not days.</h2>
+    <p>Nox AI drafts board summaries grounded in live scored data. Every claim is traceable. Every number was produced by the deterministic rules engine.</p>
+    <div class="bullets">
+      <div class="bullet"><div class="bd"></div>AI drafts from live data. The executive team approves before anyone sees it.</div>
+      <div class="bullet"><div class="bd"></div>Why it matters, what changed, and what decisions the board needs to make.</div>
+      <div class="bullet"><div class="bd"></div>Every number traces back to the finding, the control, and the evidence.</div>
+    </div>
+  </div>
+  <div class="device">
+    <div class="dbar">
+      <div class="dname">Board Intelligence</div>
+      <div class="dright"><div class="dclient">energy-op-001 · Jun 2026</div><div class="dlive"><div class="ldot"></div>AI Draft</div></div>
+    </div>
+    <div class="s3">
+      <div class="s3h">
+        <div class="s3icon">▤</div>
+        <div class="s3title">Board Report — June 2026</div>
+        <div class="s3sub">· Nox AI draft · grounded in live scored data</div>
+        <div class="s3pend">Pending approval</div>
+      </div>
+      <div class="s3grid">
+        <div class="bcard">
+          <div class="bch"><div class="bcstar">✦</div><div class="bctitle">Nox AI — Board Summary Draft</div><div class="bcmeta">Generated from live scores</div></div>
+          <div class="bcbody">
+            <div class="why">
+              <div class="whylbl">Why this matters</div>
+              <div class="whyline"><div class="whydot">•</div>87% confidence attack path detected — IT to safety system.</div>
+              <div class="whyline"><div class="whydot">•</div>Active regulatory advisory matched. ×1.4 multiplier applied. Score at CRITICAL.</div>
+              <div class="whyline"><div class="whydot">•</div>3 controls at critical failure. Evidence expired.</div>
+            </div>
+            <div class="mchart">
+              <div class="mclbl">Risk score trend — 2026</div>
+              <div class="bars">
+                <div class="bar" style="height:32%"></div>
+                <div class="bar" style="height:36%"></div>
+                <div class="bar" style="height:40%"></div>
+                <div class="bar" style="height:44%"></div>
+                <div class="bar" style="height:52%"></div>
+                <div class="bar" style="height:60%;background:var(--amber)"></div>
+                <div class="bar" style="height:64%;background:var(--amber)"></div>
+                <div class="bar" style="height:100%;background:var(--red);box-shadow:0 0 6px rgba(193,58,42,0.4)"></div>
+              </div>
+              <div class="blabels">
+                <div class="blabel">Jan</div><div class="blabel">Feb</div><div class="blabel">Mar</div><div class="blabel">Apr</div><div class="blabel">May</div><div class="blabel">May 28</div><div class="blabel">Jun 4</div><div class="blabel now">Jun 7 ↑</div>
+              </div>
+            </div>
+            <div class="narr">Threat-adjusted position is <strong>CRITICAL</strong> — a confirmed IT/OT attack path at 87% confidence, expired evidence on three critical controls, and an active regulatory advisory matching the organisation's finding profile. <strong>No operational impact has occurred.</strong> Expected return to HIGH within 14 days.</div>
+            <div class="decs">
+              <div class="declbl">Decisions required</div>
+              <div class="dec"><div class="decn">1</div>Approve priority resource allocation for IT/OT segmentation evidence refresh.</div>
+              <div class="dec"><div class="decn">2</div>Note the active regulatory advisory. Confirm management response is underway.</div>
+              <div class="dec"><div class="decn">3</div>Note risk acceptance in place until August 2026 maintenance window.</div>
+            </div>
+            <div class="trace"><div class="tracestar">✦</div>AI-drafted from live scored evidence, control health, and IT/OT correlation data. Every claim is traceable to its source. Pending approval before distribution.</div>
+            <div class="bactions"><button class="bbtn bba">Approve and distribute</button><button class="bbtn bbe">Edit</button><button class="bbtn bbe">Regenerate</button></div>
+          </div>
+        </div>
+        <div class="s3side">
+          <div class="ssc">
+            <div class="ssh">Risk scorecard</div>
+            <div class="ssb">
+              <div class="ssr"><div class="ssl">Standard</div><div class="ssv" style="color:var(--amber)">16.0</div></div>
+              <div class="ssr"><div class="ssl">Time-adj</div><div class="ssv" style="color:var(--amber)">16.0</div></div>
+              <div class="ssr"><div class="ssl">Coverage-adj</div><div class="ssv" style="color:var(--amber)">11.6</div></div>
+              <div class="ssr"><div class="ssl">Threat-adj</div><div class="ssv" style="color:var(--red)">19.2</div></div>
+            </div>
+          </div>
+          <div class="srcs">
+            <div class="srcsh">Nox AI reasoned over</div>
+            <div class="srci"><div class="srcidot"></div>5 open risks<div class="srcic">live</div></div>
+            <div class="srci"><div class="srcidot"></div>8 controls<div class="srcic">scored</div></div>
+            <div class="srci"><div class="srcidot"></div>5 findings<div class="srcic">ingested</div></div>
+            <div class="srci"><div class="srcidot"></div>2 correlations<div class="srcic">detected</div></div>
+            <div class="srci"><div class="srcidot"></div>4 reg changes<div class="srcic">mapped</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- S4 — AI DETECTS -->
+<div class="section rtl">
+  <div class="device">
+    <div class="dbar">
+      <div class="dname">IT/OT Correlation Intelligence</div>
+      <div class="dright"><div class="dclient">energy-op-001</div><div class="dlive"><div class="ldot"></div>Live detection</div></div>
+    </div>
+    <div class="s4">
+      <div class="s4h">
+        <div class="s4icon">⬡</div>
+        <div class="s4title">Active Correlation Detected</div>
+        <div class="s4sub">· 2 findings · analysed together by Nox AI</div>
+        <div class="s4badge">Pending review</div>
+      </div>
+      <div class="findings-row">
+        <div class="fc">
+          <div class="fctop"><div class="fcsrc fcit">IT</div><div class="fcenv">Corporate network</div><span class="b br" style="margin-left:auto">CRITICAL</span></div>
+          <div class="fctitle">Unpatched domain controller — NTLM relay vulnerability</div>
+          <div class="fcmeta">52 days past SLA · access_management</div>
+          <div class="fcalone">Routine in isolation</div>
+        </div>
+        <div class="fc">
+          <div class="fctop"><div class="fcsrc fcot">OT</div><div class="fcenv">Safety system</div><span class="b br" style="margin-left:auto">CRITICAL</span></div>
+          <div class="fctitle">Anomalous protocol communication near Safety Instrumented System</div>
+          <div class="fcmeta">Purdue Level 1.5 · 1 day ago</div>
+          <div class="fcalone">Routine in isolation</div>
+        </div>
+      </div>
+      <div class="conn">
+        <div class="connline"></div>
+        <div class="conncenter">
+          <div class="connbadge"><span>✦</span>Nox AI analysed together</div>
+          <div class="connsub">Segmentation at critical failure · temporal proximity 1 day</div>
+        </div>
+        <div class="connline"></div>
+      </div>
+      <div class="adc">
+        <div class="adch">
+          <div class="adcstar">✦</div>
+          <div class="adctitle">Nox AI — Attack Path Detected</div>
+          <div class="adcconf"><div class="adcnum">87%</div><div class="adcsub">confidence · PATH</div></div>
+        </div>
+        <div class="adcbody">
+          <div class="path">
+            <div class="pnode pnit">Unpatched DC<br><span style="font-size:8px;opacity:.7">IT · +52d SLA</span></div>
+            <div class="parr">→</div>
+            <div class="pnode pngap">Segmentation FAILED<br><span style="font-size:8px;opacity:.7">CES 0% · expired</span></div>
+            <div class="parr">→</div>
+            <div class="pnode pnsis">Safety System<br><span style="font-size:8px;opacity:.7">OT · Purdue L1.5</span></div>
+          </div>
+          <div class="adcnarr">These two findings, reviewed separately, appeared manageable. <strong>Analysed together, they form a confirmed attack path from the corporate network to the Safety Instrumented System.</strong> The segmentation control between them has a zero effectiveness score — the barrier does not exist in a verifiable state.</div>
+          <div class="factors">
+            <div class="factor"><div class="fv">0.90</div><div class="fl">Path viability</div></div>
+            <div class="factor"><div class="fv">1.00</div><div class="fl">Consequence — SIS</div></div>
+            <div class="factor"><div class="fv">0.97</div><div class="fl">Temporal proximity</div></div>
+          </div>
+          <div class="adcfooter">
+            <div><div class="adcresult">AI detected. <strong>Executive decision required.</strong></div><div style="font-size:9px;color:var(--text3);margin-top:2px">Combined residual: <strong style="color:var(--red);font-size:12px">24.0</strong> · life_safety</div></div>
+            <div class="adcbtns"><button class="adcbtn adcconf2">Confirm and escalate</button><button class="adcbtn adcdis">Dismiss</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="copy">
+    <div class="tag"><div class="tag-dot"></div>Correlation Intelligence</div>
+    <h2>Two routine findings.<br>One <em>critical</em> path.</h2>
+    <p>Nox AI continuously analyses signals across IT and OT environments. What appears routine in isolation becomes a high-confidence attack path when analysed together.</p>
+    <div class="bullets">
+      <div class="bullet"><div class="bd"></div>Dangerous combinations detected across environment boundaries that no single monitoring tool would surface alone.</div>
+      <div class="bullet"><div class="bd"></div>AI explains the path in plain language. The decision to act stays with the executive team.</div>
+      <div class="bullet"><div class="bd"></div>Detected before impact. Not reconstructed after.</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- S8 — AUDIT TRAIL -->
+<div class="section ltr">
+  <div class="copy">
+    <div class="tag"><div class="tag-dot"></div>AI Governance</div>
+    <h2>AI that regulators<br>can <em>inspect</em>.</h2>
+    <p>Every AI action is logged. Every human approval is recorded. The complete chain from signal to decision is visible, traceable, and examination-ready.</p>
+    <div class="bullets">
+      <div class="bullet"><div class="bd"></div>AI proposes. Humans approve. Rules decide. Every step logged to a tamper-evident audit trail.</div>
+      <div class="bullet"><div class="bd"></div>When a regulator asks how a decision was made, the complete chain is already there.</div>
+      <div class="bullet"><div class="bd"></div>AI governance is not a policy. It is the architecture.</div>
+    </div>
+  </div>
+  <div class="device">
+    <div class="dbar">
+      <div class="dname">AI Governance Audit Trail</div>
+      <div class="dright"><div class="dclient">energy-op-001</div><div class="dlive"><div class="ldot"></div>Tamper-evident</div></div>
+    </div>
+    <div class="s8">
+      <div class="s8h">
+        <div class="s8icon">🔍</div>
+        <div class="s8title">AI Governance Audit Trail</div>
+        <div class="s8sub">· Every AI action logged · Every decision recorded</div>
+        <div class="s8badge">Verified</div>
+      </div>
+      <div class="legend">
+        <div class="leglbl">Actor</div>
+        <div class="legitem"><div class="legbadge lbsys">System</div>Automated</div>
+        <div class="legitem"><div class="legbadge lbai">✦ Nox AI</div>AI reasoning</div>
+        <div class="legitem"><div class="legbadge lbhum">Human</div>Executive approval</div>
+      </div>
+      <div class="trail">
+        <div class="entry"><div class="enode esys">⟳</div>
+          <div class="ebody"><div class="etop"><div class="eactor lbsys">System</div><div class="eaction">Security finding ingested</div><div class="ets">Jun 7 · 09:01</div></div>
+          <div class="edetail">Passive monitoring feed: anomalous protocol communication near Safety Instrumented System. Purdue Level 1.5. Status: new.</div></div>
+        </div>
+        <div class="entry"><div class="enode eai">✦</div>
+          <div class="ebody eai-entry"><div class="etop"><div class="eactor lbai">✦ Nox AI</div><div class="eaction">Cross-environment correlation detected</div><div class="ets">Jun 7 · 09:04</div></div>
+          <div class="edetail">IT finding (unpatched DC, +52d) and OT finding (SIS anomaly, 1d) analysed together. Segmentation at 0%. <strong>87% confidence PATH correlation detected.</strong> Combined residual: 24.0.</div>
+          <div class="eout"><div class="eoutstar">✦</div><div class="eouttext">AI output: correlation card generated · pending executive review · no score change applied until confirmed.</div></div></div>
+        </div>
+        <div class="entry"><div class="enode eai">✦</div>
+          <div class="ebody eai-entry"><div class="etop"><div class="eactor lbai">✦ Nox AI</div><div class="eaction">Regulatory advisory applicability assessed</div><div class="ets">Jun 7 · 09:06</div></div>
+          <div class="edetail">Active regulatory advisory ingested. AI assessment: <strong>exact match</strong> to open finding profile. Proposed ×1.4 threat multiplier. Affected risks: 3.</div>
+          <div class="eout"><div class="eoutstar">✦</div><div class="eouttext">AI output: applicability proposal · awaiting human confirmation · multiplier not applied.</div></div></div>
+        </div>
+        <div class="entry"><div class="enode ehum">✓</div>
+          <div class="ebody ehum-entry"><div class="etop"><div class="eactor lbhum">Human</div><div class="eaction">Advisory applicability approved</div><div class="ets">Jun 7 · 09:22</div></div>
+          <div class="edetail">S. Al-Rashidi approved AI applicability assessment. Rationale recorded. <strong>×1.4 multiplier applied.</strong> Score recalculated: 16.0 → 19.2 CRITICAL.</div></div>
+        </div>
+        <div class="entry"><div class="enode eai">✦</div>
+          <div class="ebody eai-entry"><div class="etop"><div class="eactor lbai">✦ Nox AI</div><div class="eaction">Board summary drafted</div><div class="ets">Jun 7 · 09:25</div></div>
+          <div class="edetail">Board summary generated from live scored data. Sources: 5 risks, 8 controls, 5 findings, 2 correlations, 4 regulatory changes. <strong>Every claim traceable to scored evidence.</strong></div>
+          <div class="eout"><div class="eoutstar">✦</div><div class="eouttext">AI output: draft board summary · pending executive approval · not distributed.</div></div></div>
+        </div>
+        <div class="entry"><div class="enode ehum">✓</div>
+          <div class="ebody ehum-entry"><div class="etop"><div class="eactor lbhum">Human</div><div class="eaction">Board summary approved and distributed</div><div class="ets">Jun 7 · 10:14</div></div>
+          <div class="edetail">Reviewed and approved by senior executive. Minor edit recorded. <strong>Distributed to board.</strong> Full edit history retained.</div></div>
+        </div>
+      </div>
+      <div class="govstrip">
+        <div class="govcell"><div class="govval">6</div><div class="govlbl">System actions</div></div>
+        <div class="govcell"><div class="govval">4</div><div class="govlbl">✦ AI proposals</div></div>
+        <div class="govcell"><div class="govval">3</div><div class="govlbl">Human approvals</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════
+     SCREEN 6 — SEVEN DIMENSIONS
+══════════════════════════════════ -->
+<div class="section ltr">
+  <div class="copy">
+    <div class="tag"><div class="tag-dot"></div>Seven Dimensions</div>
+    <h2>Every Cyber risk<br>decision. <em>Seven</em><br>dimensions.</h2>
+    <p>No single tool connects all seven. Nox7 reasons across every dimension simultaneously — live, continuously, and in plain language.</p>
+    <div class="bullets">
+      <div class="bullet"><div class="bd"></div>Regulations, Controls, Risks, Assets, Threats, Evidence, and Business Context — connected in real time.</div>
+      <div class="bullet"><div class="bd"></div>Nox AI sits at the centre, reasoning across all seven simultaneously.</div>
+      <div class="bullet"><div class="bd"></div>Every competitor owns one or two dimensions. Nox7 owns the connection between all of them.</div>
+    </div>
+  </div>
+
+  <div class="device">
+    <div class="dbar">
+      <div class="dname">Intelligence Architecture · Seven Dimensions</div>
+      <div class="dright"><div class="dclient">energy-op-001</div><div class="dlive"><div class="ldot"></div>Live</div></div>
+    </div>
+    <div class="s6">
+      <!-- SVG Spoke Diagram -->
+      <svg viewBox="0 0 560 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:340px">
+
+        <!-- Outer ring -->
+        <circle cx="280" cy="168" r="138" fill="none" stroke="#1A2035" stroke-width="0.5" stroke-dasharray="3 5"/>
+
+        <!-- Spokes -->
+        <line x1="280" y1="168" x2="280" y2="44" stroke="#8B6FE8" stroke-width="0.5" opacity="0.35"/>
+        <line x1="280" y1="168" x2="399" y2="82" stroke="#C13A2A" stroke-width="0.5" opacity="0.35"/>
+        <line x1="280" y1="168" x2="418" y2="196" stroke="#C17A2A" stroke-width="0.5" opacity="0.35"/>
+        <line x1="280" y1="168" x2="371" y2="285" stroke="#2A9B70" stroke-width="0.5" opacity="0.35"/>
+        <line x1="280" y1="168" x2="189" y2="285" stroke="#4A8FBF" stroke-width="0.5" opacity="0.35"/>
+        <line x1="280" y1="168" x2="142" y2="196" stroke="#2A9B9B" stroke-width="0.5" opacity="0.35"/>
+        <line x1="280" y1="168" x2="161" y2="82" stroke="#9AAABE" stroke-width="0.5" opacity="0.35"/>
+
+        <!-- Centre — Nox AI -->
+        <circle cx="280" cy="168" r="46" fill="#0F1628" stroke="#8B6FE8" stroke-width="1" opacity="0.6"/>
+        <circle cx="280" cy="168" r="42" fill="rgba(139,111,232,0.08)"/>
+        <text x="280" y="160" text-anchor="middle" font-size="13" font-weight="700" fill="#8B6FE8" font-family="Inter,sans-serif">✦ Nox AI</text>
+        <text x="280" y="176" text-anchor="middle" font-size="9" fill="#5A6A82" font-family="Inter,sans-serif">Cyber Reasoning</text>
+        <text x="280" y="188" text-anchor="middle" font-size="9" fill="#5A6A82" font-family="Inter,sans-serif">Engine</text>
+
+        <!-- Node 1 — Regulations (top) -->
+        <rect x="210" y="20" width="140" height="48" rx="8" fill="#0F1628" stroke="#8B6FE8" stroke-width="0.75" stroke-opacity="0.5"/>
+        <text x="280" y="38" text-anchor="middle" font-size="11" font-weight="700" fill="#D4DCE8" font-family="Inter,sans-serif">Regulations</text>
+        <text x="280" y="52" text-anchor="middle" font-size="9" fill="#5A6A82" font-family="Inter,sans-serif">5 frameworks · 4 changes</text>
+        <rect x="248" y="61" width="5" height="5" rx="2" fill="#8B6FE8" opacity="0.6"/>
+        <rect x="256" y="61" width="5" height="5" rx="2" fill="#8B6FE8" opacity="0.6"/>
+        <rect x="264" y="61" width="5" height="5" rx="2" fill="#8B6FE8" opacity="0.6"/>
+
+        <!-- Node 2 — Risks (top right) -->
+        <rect x="355" y="58" width="128" height="48" rx="8" fill="#0F1628" stroke="#C13A2A" stroke-width="0.75" stroke-opacity="0.6"/>
+        <text x="419" y="76" text-anchor="middle" font-size="11" font-weight="700" fill="#D4DCE8" font-family="Inter,sans-serif">Risks</text>
+        <text x="419" y="90" text-anchor="middle" font-size="9" fill="#C13A2A" font-family="Inter,sans-serif" font-weight="700">19.2 · CRITICAL</text>
+        <rect x="387" y="99" width="5" height="5" rx="2" fill="#C13A2A" opacity="0.7"/>
+        <rect x="395" y="99" width="5" height="5" rx="2" fill="#C13A2A" opacity="0.4"/>
+        <rect x="403" y="99" width="5" height="5" rx="2" fill="#C13A2A" opacity="0.4"/>
+
+        <!-- Node 3 — Assets (right) -->
+        <rect x="384" y="170" width="128" height="48" rx="8" fill="#0F1628" stroke="#C17A2A" stroke-width="0.75" stroke-opacity="0.5"/>
+        <text x="448" y="188" text-anchor="middle" font-size="11" font-weight="700" fill="#D4DCE8" font-family="Inter,sans-serif">Assets</text>
+        <text x="448" y="202" text-anchor="middle" font-size="9" fill="#5A6A82" font-family="Inter,sans-serif">IT and OT · 2 correlated</text>
+        <rect x="416" y="211" width="5" height="5" rx="2" fill="#C17A2A" opacity="0.7"/>
+        <rect x="424" y="211" width="5" height="5" rx="2" fill="#C17A2A" opacity="0.7"/>
+        <rect x="432" y="211" width="5" height="5" rx="2" fill="#1A2035" opacity="0.6"/>
+
+        <!-- Node 4 — Evidence (bottom right) -->
+        <rect x="322" y="264" width="128" height="48" rx="8" fill="#0F1628" stroke="#2A9B70" stroke-width="0.75" stroke-opacity="0.5"/>
+        <text x="386" y="282" text-anchor="middle" font-size="11" font-weight="700" fill="#D4DCE8" font-family="Inter,sans-serif">Evidence</text>
+        <text x="386" y="296" text-anchor="middle" font-size="9" fill="#C13A2A" font-family="Inter,sans-serif">3 expired · gap detected</text>
+        <rect x="354" y="305" width="5" height="5" rx="2" fill="#C13A2A" opacity="0.8"/>
+        <rect x="362" y="305" width="5" height="5" rx="2" fill="#C13A2A" opacity="0.8"/>
+        <rect x="370" y="305" width="5" height="5" rx="2" fill="#C13A2A" opacity="0.8"/>
+
+        <!-- Node 5 — Controls (bottom left) -->
+        <rect x="110" y="264" width="128" height="48" rx="8" fill="#0F1628" stroke="#4A8FBF" stroke-width="0.75" stroke-opacity="0.5"/>
+        <text x="174" y="282" text-anchor="middle" font-size="11" font-weight="700" fill="#D4DCE8" font-family="Inter,sans-serif">Controls</text>
+        <text x="174" y="296" text-anchor="middle" font-size="9" fill="#C13A2A" font-family="Inter,sans-serif">3 critical failure · 8 total</text>
+        <rect x="142" y="305" width="5" height="5" rx="2" fill="#C13A2A" opacity="0.8"/>
+        <rect x="150" y="305" width="5" height="5" rx="2" fill="#C13A2A" opacity="0.8"/>
+        <rect x="158" y="305" width="5" height="5" rx="2" fill="#C13A2A" opacity="0.8"/>
+
+        <!-- Node 6 — Threats (left) -->
+        <rect x="48" y="170" width="128" height="48" rx="8" fill="#0F1628" stroke="#2A9B9B" stroke-width="0.75" stroke-opacity="0.5"/>
+        <text x="112" y="188" text-anchor="middle" font-size="11" font-weight="700" fill="#D4DCE8" font-family="Inter,sans-serif">Threats</text>
+        <text x="112" y="202" text-anchor="middle" font-size="9" fill="#C13A2A" font-family="Inter,sans-serif">1 active · ×1.4 applied</text>
+        <rect x="80" y="211" width="5" height="5" rx="2" fill="#C13A2A" opacity="0.8"/>
+        <rect x="88" y="211" width="5" height="5" rx="2" fill="#1A2035" opacity="0.6"/>
+        <rect x="96" y="211" width="5" height="5" rx="2" fill="#1A2035" opacity="0.6"/>
+
+        <!-- Node 7 — Business Context (top left) -->
+        <rect x="77" y="58" width="128" height="48" rx="8" fill="#0F1628" stroke="#9AAABE" stroke-width="0.75" stroke-opacity="0.4"/>
+        <text x="141" y="76" text-anchor="middle" font-size="11" font-weight="700" fill="#D4DCE8" font-family="Inter,sans-serif">Business Context</text>
+        <text x="141" y="90" text-anchor="middle" font-size="9" fill="#5A6A82" font-family="Inter,sans-serif">life_safety consequence</text>
+        <rect x="109" y="99" width="5" height="5" rx="2" fill="#C13A2A" opacity="0.8"/>
+        <rect x="117" y="99" width="5" height="5" rx="2" fill="#1A2035" opacity="0.6"/>
+        <rect x="125" y="99" width="5" height="5" rx="2" fill="#1A2035" opacity="0.6"/>
+
+        <!-- Status label bottom -->
+        <text x="280" y="328" text-anchor="middle" font-size="9" fill="#3A4A62" font-family="Inter,sans-serif" letter-spacing="1">ALL SEVEN DIMENSIONS · CONNECTED · LIVE</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════
+     SCREEN 7 — RISK SCORE TIMELINE
+══════════════════════════════════ -->
+<div class="section rtl">
+  <div class="device">
+    <div class="dbar">
+      <div class="dname">Risk Score Intelligence · Score Movement</div>
+      <div class="dright"><div class="dclient">energy-op-001</div><div class="dlive"><div class="ldot"></div>Live</div></div>
+    </div>
+    <div class="s7">
+      <!-- SVG Chart -->
+      <svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg" class="s7-svg">
+
+        <!-- Grid lines -->
+        <line x1="48" y1="20" x2="548" y2="20" stroke="#1A2035" stroke-width="0.5"/>
+        <line x1="48" y1="60" x2="548" y2="60" stroke="#1A2035" stroke-width="0.5"/>
+        <line x1="48" y1="100" x2="548" y2="100" stroke="#1A2035" stroke-width="0.5"/>
+        <line x1="48" y1="140" x2="548" y2="140" stroke="#1A2035" stroke-width="0.5"/>
+
+        <!-- Y axis labels -->
+        <text x="42" y="23" text-anchor="end" font-size="9" fill="#3A4A62" font-family="Inter,sans-serif">25</text>
+        <text x="42" y="63" text-anchor="end" font-size="9" fill="#3A4A62" font-family="Inter,sans-serif">20</text>
+        <text x="42" y="103" text-anchor="end" font-size="9" fill="#3A4A62" font-family="Inter,sans-serif">15</text>
+        <text x="42" y="143" text-anchor="end" font-size="9" fill="#3A4A62" font-family="Inter,sans-serif">10</text>
+
+        <!-- Appetite line -->
+        <line x1="48" y1="120" x2="548" y2="120" stroke="#4A8FBF" stroke-width="0.75" stroke-dasharray="4 4" opacity="0.4"/>
+        <text x="550" y="123" font-size="8" fill="#4A8FBF" opacity="0.6" font-family="Inter,sans-serif">appetite</text>
+
+        <!-- Area fill under line -->
+        <defs>
+          <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#C13A2A" stop-opacity="0.2"/>
+            <stop offset="100%" stop-color="#C13A2A" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <polygon points="48,148 112,144 176,136 240,128 304,120 340,116 376,96 412,80 448,72 484,60 520,24 520,160 48,160" fill="url(#lineGrad)"/>
+
+        <!-- Standard residual line (dashed blue) -->
+        <polyline points="48,128 112,126 176,124 240,122 304,120 340,118 376,116 412,114 448,112 484,110 520,108"
+          fill="none" stroke="#4A8FBF" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/>
+
+        <!-- Threat-adjusted line (red) -->
+        <polyline points="48,148 112,144 176,136 240,128 304,120 340,116 376,96 412,80 448,72 484,60 520,24"
+          fill="none" stroke="#C13A2A" stroke-width="2" stroke-linejoin="round"/>
+
+        <!-- Event markers -->
+        <!-- Jan baseline -->
+        <circle cx="48" cy="148" r="3" fill="#1A2035" stroke="#5A6A82" stroke-width="1"/>
+
+        <!-- Evidence expired marker -->
+        <circle cx="376" cy="96" r="5" fill="#0F1628" stroke="#C17A2A" stroke-width="1.5"/>
+        <line x1="376" y1="96" x2="376" y2="155" stroke="#C17A2A" stroke-width="0.5" stroke-dasharray="2 2"/>
+        <text x="376" y="165" text-anchor="middle" font-size="8" fill="#C17A2A" font-family="Inter,sans-serif">Evidence expired</text>
+
+        <!-- Advisory matched marker -->
+        <circle cx="448" cy="72" r="5" fill="#0F1628" stroke="#C13A2A" stroke-width="1.5"/>
+        <line x1="448" y1="72" x2="448" y2="155" stroke="#C13A2A" stroke-width="0.5" stroke-dasharray="2 2"/>
+        <text x="448" y="165" text-anchor="middle" font-size="8" fill="#C13A2A" font-family="Inter,sans-serif">Advisory matched</text>
+
+        <!-- Correlation detected marker -->
+        <circle cx="484" cy="60" r="5" fill="#0F1628" stroke="#8B6FE8" stroke-width="1.5"/>
+        <line x1="484" y1="60" x2="484" y2="155" stroke="#8B6FE8" stroke-width="0.5" stroke-dasharray="2 2"/>
+        <text x="484" y="165" text-anchor="middle" font-size="8" fill="#8B6FE8" font-family="Inter,sans-serif">Correlation detected</text>
+
+        <!-- Current point -->
+        <circle cx="520" cy="24" r="6" fill="#C13A2A"/>
+        <text x="520" y="18" text-anchor="middle" font-size="9" fill="#C13A2A" font-weight="700" font-family="Inter,sans-serif">19.2</text>
+
+        <!-- X labels -->
+        <text x="48" y="185" text-anchor="middle" font-size="8" fill="#3A4A62" font-family="Inter,sans-serif">Jan</text>
+        <text x="112" y="185" text-anchor="middle" font-size="8" fill="#3A4A62" font-family="Inter,sans-serif">Feb</text>
+        <text x="176" y="185" text-anchor="middle" font-size="8" fill="#3A4A62" font-family="Inter,sans-serif">Mar</text>
+        <text x="240" y="185" text-anchor="middle" font-size="8" fill="#3A4A62" font-family="Inter,sans-serif">Apr</text>
+        <text x="304" y="185" text-anchor="middle" font-size="8" fill="#3A4A62" font-family="Inter,sans-serif">May</text>
+        <text x="376" y="185" text-anchor="middle" font-size="8" fill="#C17A2A" font-family="Inter,sans-serif">May 28</text>
+        <text x="448" y="185" text-anchor="middle" font-size="8" fill="#C13A2A" font-family="Inter,sans-serif">Jun 4</text>
+        <text x="520" y="185" text-anchor="middle" font-size="8" fill="#C13A2A" font-weight="700" font-family="Inter,sans-serif">Jun 7</text>
+
+        <!-- Legend -->
+        <line x1="48" y1="197" x2="66" y2="197" stroke="#C13A2A" stroke-width="2"/>
+        <text x="70" y="200" font-size="8" fill="#5A6A82" font-family="Inter,sans-serif">Threat-adjusted</text>
+        <line x1="160" y1="197" x2="178" y2="197" stroke="#4A8FBF" stroke-width="1" stroke-dasharray="3 2"/>
+        <text x="182" y="200" font-size="8" fill="#5A6A82" font-family="Inter,sans-serif">Standard residual</text>
+      </svg>
+
+      <!-- Key events -->
+      <div class="s7-events">
+        <div class="s7-event amber">
+          <div class="s7-dot" style="background:var(--amber)"></div>
+          <div class="s7-ts">May 28</div>
+          <div class="s7-label">SIS isolation evidence expired. Hard gate fired. Control score set to zero.</div>
+          <div class="s7-val" style="color:var(--amber)">+2.8</div>
+        </div>
+        <div class="s7-event red">
+          <div class="s7-dot" style="background:var(--red)"></div>
+          <div class="s7-ts">Jun 4</div>
+          <div class="s7-label">Regulatory advisory ingested. Exact match to open findings. ×1.4 multiplier applied.</div>
+          <div class="s7-val" style="color:var(--red)">×1.4</div>
+        </div>
+        <div class="s7-event purple">
+          <div class="s7-dot" style="background:var(--purple)"></div>
+          <div class="s7-ts">Jun 7</div>
+          <div class="s7-label">87% confidence PATH correlation detected. IT and OT findings connected by Nox AI.</div>
+          <div class="s7-val" style="color:var(--red)">CRITICAL</div>
+        </div>
+      </div>
+
+      <div class="s7-ai">
+        <div class="s7-ai-star">✦</div>
+        <div class="s7-ai-text">The score did not jump without reason. <strong>Every movement has a documented cause.</strong> Three events in ten days — expired evidence, an advisory match, and a cross-environment correlation — compounded into a CRITICAL posture. Each is individually resolvable. Nox AI has prioritised them in order of impact.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="copy">
+    <div class="tag"><div class="tag-dot"></div>Risk Intelligence</div>
+    <h2>Every score<br>movement <em>explained</em>.</h2>
+    <p>The score is not a black box. Every change has a cause, a timestamp, and a plain-language explanation. Decision-makers see exactly what changed and why.</p>
+    <div class="bullets">
+      <div class="bullet"><div class="bd"></div>Score movements annotated with the event that caused them — evidence expiry, advisory match, correlation detected.</div>
+      <div class="bullet"><div class="bd"></div>Nox AI explains each movement in plain language, not technical log output.</div>
+      <div class="bullet"><div class="bd"></div>Every number is traceable. Every change is defensible to a board or a regulator.</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════
+     SCREEN 8 — ATTACK PATH MAP
+══════════════════════════════════ -->
+<div class="section ltr">
+  <div class="copy">
+    <div class="tag"><div class="tag-dot"></div>IT/OT Intelligence</div>
+    <h2>The path no one<br>saw. Until <em>now</em>.</h2>
+    <p>Nox AI maps attack paths across IT and OT environments using industrial security models. What two teams managed separately becomes one critical finding.</p>
+    <div class="bullets">
+      <div class="bullet"><div class="bd"></div>Attack paths visualised across environment boundaries — IT, OT, and Safety systems.</div>
+      <div class="bullet"><div class="bd"></div>Each node shows the finding, the control failure, and the Purdue level.</div>
+      <div class="bullet"><div class="bd"></div>87% confidence detected before any operational impact occurred.</div>
+    </div>
+  </div>
+
+  <div class="device">
+    <div class="dbar">
+      <div class="dname">IT/OT Attack Path · PATH Correlation</div>
+      <div class="dright"><div class="dclient">energy-op-001</div><div class="dlive"><div class="ldot"></div>87% confidence</div></div>
+    </div>
+    <div class="s8">
+      <!-- SVG Attack Path Map -->
+      <svg viewBox="0 0 560 280" xmlns="http://www.w3.org/2000/svg" class="s8-map">
+
+        <!-- Zone backgrounds -->
+        <rect x="8" y="8" width="160" height="264" rx="8" fill="rgba(74,143,191,0.05)" stroke="#4A8FBF" stroke-width="0.5" stroke-opacity="0.3"/>
+        <rect x="200" y="8" width="160" height="264" rx="8" fill="rgba(193,122,42,0.05)" stroke="#C17A2A" stroke-width="0.5" stroke-opacity="0.3"/>
+        <rect x="392" y="8" width="160" height="264" rx="8" fill="rgba(193,58,42,0.05)" stroke="#C13A2A" stroke-width="0.5" stroke-opacity="0.3"/>
+
+        <!-- Zone labels -->
+        <text x="88" y="26" text-anchor="middle" font-size="9" fill="#4A8FBF" font-family="Inter,sans-serif" font-weight="600" letter-spacing="1">CORPORATE IT</text>
+        <text x="280" y="26" text-anchor="middle" font-size="9" fill="#C17A2A" font-family="Inter,sans-serif" font-weight="600" letter-spacing="1">IT/OT BOUNDARY</text>
+        <text x="472" y="26" text-anchor="middle" font-size="9" fill="#C13A2A" font-family="Inter,sans-serif" font-weight="600" letter-spacing="1">OT / SAFETY</text>
+
+        <!-- Attack path line -->
+        <path d="M 88 90 L 200 140 L 280 140 L 392 168 L 472 200"
+          fill="none" stroke="#C13A2A" stroke-width="2" stroke-dasharray="6 3" opacity="0.7"/>
+
+        <!-- Attacker entry point -->
+        <circle cx="88" cy="90" r="22" fill="#0F1628" stroke="#C13A2A" stroke-width="1.5"/>
+        <text x="88" y="86" text-anchor="middle" font-size="9" font-weight="700" fill="#C13A2A" font-family="Inter,sans-serif">ENTRY</text>
+        <text x="88" y="98" text-anchor="middle" font-size="8" fill="#9AAABE" font-family="Inter,sans-serif">Phishing</text>
+
+        <!-- Node 1 — Unpatched DC -->
+        <rect x="22" y="120" width="132" height="56" rx="7" fill="#0F1628" stroke="#C13A2A" stroke-width="1" stroke-opacity="0.7"/>
+        <text x="88" y="138" text-anchor="middle" font-size="10" font-weight="700" fill="#D4DCE8" font-family="Inter,sans-serif">Unpatched DC</text>
+        <text x="88" y="152" text-anchor="middle" font-size="9" fill="#C13A2A" font-family="Inter,sans-serif">NTLM relay vuln</text>
+        <text x="88" y="164" text-anchor="middle" font-size="8" fill="#5A6A82" font-family="Inter,sans-serif">Tenable · +52d SLA</text>
+
+        <!-- Node 1 status -->
+        <rect x="22" y="192" width="132" height="28" rx="5" fill="rgba(193,58,42,0.1)" stroke="rgba(193,58,42,0.3)" stroke-width="0.5"/>
+        <text x="88" y="210" text-anchor="middle" font-size="9" fill="#C13A2A" font-family="Inter,sans-serif" font-weight="600">Control: UNPATCHED · 52 DAYS</text>
+
+        <!-- Segmentation node — centre -->
+        <rect x="210" y="108" width="140" height="64" rx="7" fill="#0F1628" stroke="#C13A2A" stroke-width="1.5" stroke-opacity="0.8"/>
+        <text x="280" y="126" text-anchor="middle" font-size="10" font-weight="700" fill="#D4DCE8" font-family="Inter,sans-serif">IT/OT Segmentation</text>
+        <text x="280" y="140" text-anchor="middle" font-size="9" fill="#C13A2A" font-family="Inter,sans-serif" font-weight="700">CRITICAL FAILURE</text>
+        <text x="280" y="154" text-anchor="middle" font-size="8" fill="#5A6A82" font-family="Inter,sans-serif">Evidence expired · CES 0%</text>
+
+        <!-- Barrier broken indicator -->
+        <rect x="210" y="184" width="140" height="28" rx="5" fill="rgba(193,58,42,0.15)" stroke="rgba(193,58,42,0.4)" stroke-width="0.5"/>
+        <text x="280" y="202" text-anchor="middle" font-size="9" fill="#C13A2A" font-family="Inter,sans-serif" font-weight="700">⚠ BARRIER NOT VERIFIED</text>
+
+        <!-- Node 3 — OT Historian -->
+        <rect x="400" y="108" width="144" height="56" rx="7" fill="#0F1628" stroke="#C17A2A" stroke-width="1" stroke-opacity="0.7"/>
+        <text x="472" y="126" text-anchor="middle" font-size="10" font-weight="700" fill="#D4DCE8" font-family="Inter,sans-serif">OT Historian</text>
+        <text x="472" y="140" text-anchor="middle" font-size="9" fill="#C17A2A" font-family="Inter,sans-serif">IT/OT bridge asset</text>
+        <text x="472" y="154" text-anchor="middle" font-size="8" fill="#5A6A82" font-family="Inter,sans-serif">Purdue Level 2 · dual env</text>
+
+        <!-- Node 4 — SIS -->
+        <rect x="400" y="180" width="144" height="60" rx="7" fill="#0F1628" stroke="#C13A2A" stroke-width="2" stroke-opacity="0.9"/>
+        <text x="472" y="200" text-anchor="middle" font-size="10" font-weight="700" fill="#C13A2A" font-family="Inter,sans-serif">Safety System</text>
+        <text x="472" y="214" text-anchor="middle" font-size="9" fill="#D4DCE8" font-family="Inter,sans-serif">SIS · Purdue L1.5</text>
+        <text x="472" y="228" text-anchor="middle" font-size="8" fill="#5A6A82" font-family="Inter,sans-serif">life_safety consequence</text>
+
+        <!-- Confidence badge -->
+        <rect x="230" y="240" width="100" height="30" rx="6" fill="rgba(193,58,42,0.15)" stroke="rgba(193,58,42,0.4)" stroke-width="0.75"/>
+        <text x="280" y="251" text-anchor="middle" font-size="9" fill="#5A6A82" font-family="Inter,sans-serif">Nox AI confidence</text>
+        <text x="280" y="264" text-anchor="middle" font-size="14" font-weight="800" fill="#C13A2A" font-family="Inter,sans-serif">87%</text>
+
+        <!-- Purdue level labels -->
+        <text x="472" y="270" text-anchor="middle" font-size="8" fill="#3A4A62" font-family="Inter,sans-serif">L5 → L4 → L3 → L2 → L1.5</text>
+      </svg>
+
+      <div class="s8-ai">
+        <div class="s8-ai-star">✦</div>
+        <div class="s8-ai-text">Two findings managed by two separate teams — combined by Nox AI into a <strong>confirmed attack path to the Safety Instrumented System at 87% confidence</strong>. The segmentation control between them has zero verified effectiveness. This path was not visible in any single monitoring tool.</div>
+      </div>
+
+      <div class="s8-footer">
+        <div class="s8-conf">
+          <div class="s8-conf-num">87%</div>
+          <div class="s8-conf-label">PATH confidence<br>Combined residual: 24.0</div>
+        </div>
+        <div class="s8-btns">
+          <button class="s8-btn s8-confirm">Confirm and escalate</button>
+          <button class="s8-btn s8-dismiss">Dismiss</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
