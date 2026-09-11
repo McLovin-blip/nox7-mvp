@@ -1,0 +1,691 @@
+{
+  "version": "1.0",
+  "approvalState": "before",
+  "organisation": {
+    "name": "Meridian International",
+    "uiLabel": "Organisation",
+    "review": {
+      "name": "Governance and compliance review",
+      "daysRemaining": 14
+    }
+  },
+  "currentUser": {
+    "id": "person-layla",
+    "name": "Layla Rahman",
+    "role": "Chief Compliance Officer"
+  },
+  "people": [
+    {
+      "id": "person-layla",
+      "name": "Layla Rahman",
+      "role": "Chief Compliance Officer"
+    },
+    {
+      "id": "person-omar",
+      "name": "Omar Haddad",
+      "role": "Head of Procurement"
+    },
+    {
+      "id": "person-nadia",
+      "name": "Nadia Chen",
+      "role": "Information Security Lead"
+    },
+    {
+      "id": "person-tomas",
+      "name": "Tomas Berg",
+      "role": "Privacy Lead"
+    },
+    {
+      "id": "person-sara",
+      "name": "Sara Al-Mutairi",
+      "role": "Regional Compliance (KSA)"
+    }
+  ],
+  "frameworks": [
+    {
+      "id": "fw-iso27001",
+      "name": "ISO 27001",
+      "coverageBefore": 78,
+      "coverageAfter": 86
+    },
+    {
+      "id": "fw-nis2",
+      "name": "NIS2",
+      "coverageBefore": 71,
+      "coverageAfter": 82
+    },
+    {
+      "id": "fw-gdpr",
+      "name": "GDPR",
+      "coverageBefore": 69,
+      "coverageAfter": 80
+    },
+    {
+      "id": "fw-nca-ecc",
+      "name": "NCA ECC",
+      "coverageBefore": 66,
+      "coverageAfter": 79
+    },
+    {
+      "id": "fw-internal",
+      "name": "Internal policy and contractual commitments",
+      "coverageBefore": 74,
+      "coverageAfter": 81
+    }
+  ],
+  "position": {
+    "before": {
+      "readinessLabel": "Needs attention",
+      "readinessValue": 64,
+      "materialGap": "Current assessment evidence is missing for several critical suppliers",
+      "supplierControlAssurance": "partial",
+      "thirdPartyRisk": "elevated",
+      "regulatoryExposure": "elevated",
+      "accountableAction": "Obtain and approve current critical-supplier assessments"
+    },
+    "after": {
+      "readinessLabel": "Improved",
+      "readinessValue": 72,
+      "materialGap": "Critical-supplier assessment gap closed for this review",
+      "supplierControlAssurance": "assured",
+      "thirdPartyRisk": "reduced",
+      "regulatoryExposure": "reduced",
+      "accountableAction": "Completed"
+    }
+  },
+  "obligations": [
+    {
+      "id": "obl-iso-a532",
+      "title": "Supplier relationships — information security",
+      "frameworkId": "fw-iso27001",
+      "supportBefore": "partial",
+      "supportAfter": "supported",
+      "policyIds": ["ev-policy-supplier"],
+      "controlIds": ["ctl-supplier-assurance"],
+      "evidenceIdsBefore": ["ev-policy-supplier", "ev-audit-findings"],
+      "evidenceIdsAfter": [
+        "ev-policy-supplier",
+        "ev-audit-findings",
+        "ev-supplier-assessments-2026"
+      ],
+      "riskIds": ["risk-third-party"],
+      "ownerId": "person-nadia"
+    },
+    {
+      "id": "obl-nis2-supply",
+      "title": "Supply-chain security measures",
+      "frameworkId": "fw-nis2",
+      "supportBefore": "partial",
+      "supportAfter": "supported",
+      "policyIds": ["ev-policy-supplier"],
+      "controlIds": ["ctl-supplier-assurance"],
+      "evidenceIdsBefore": ["ev-policy-supplier"],
+      "evidenceIdsAfter": ["ev-policy-supplier", "ev-supplier-assessments-2026"],
+      "riskIds": ["risk-third-party", "risk-regulatory"],
+      "ownerId": "person-omar"
+    },
+    {
+      "id": "obl-gdpr-processor",
+      "title": "Processor and supplier due diligence",
+      "frameworkId": "fw-gdpr",
+      "supportBefore": "partial",
+      "supportAfter": "supported",
+      "policyIds": ["ev-policy-supplier", "ev-data-retention"],
+      "controlIds": ["ctl-supplier-assurance", "ctl-data-retention"],
+      "evidenceIdsBefore": ["ev-policy-supplier", "ev-data-retention"],
+      "evidenceIdsAfter": [
+        "ev-policy-supplier",
+        "ev-data-retention",
+        "ev-supplier-assessments-2026"
+      ],
+      "riskIds": ["risk-third-party", "risk-regulatory"],
+      "ownerId": "person-tomas"
+    },
+    {
+      "id": "obl-nca-third-party",
+      "title": "Third-party and outsourcing assurance",
+      "frameworkId": "fw-nca-ecc",
+      "supportBefore": "partial",
+      "supportAfter": "supported",
+      "policyIds": ["ev-policy-supplier"],
+      "controlIds": ["ctl-supplier-assurance"],
+      "evidenceIdsBefore": ["ev-policy-supplier"],
+      "evidenceIdsAfter": ["ev-policy-supplier", "ev-supplier-assessments-2026"],
+      "riskIds": ["risk-third-party", "risk-regulatory"],
+      "ownerId": "person-sara"
+    },
+    {
+      "id": "obl-iso-isms",
+      "title": "Information security policy",
+      "frameworkId": "fw-iso27001",
+      "supportBefore": "supported",
+      "supportAfter": "supported",
+      "policyIds": ["ev-policy-isms"],
+      "controlIds": ["ctl-isms-policy"],
+      "evidenceIdsBefore": ["ev-policy-isms", "ev-attestations"],
+      "evidenceIdsAfter": ["ev-policy-isms", "ev-attestations"],
+      "riskIds": [],
+      "ownerId": "person-nadia"
+    },
+    {
+      "id": "obl-internal-contract",
+      "title": "Contractual supplier-assurance commitments",
+      "frameworkId": "fw-internal",
+      "supportBefore": "partial",
+      "supportAfter": "supported",
+      "policyIds": ["ev-policy-supplier"],
+      "controlIds": ["ctl-supplier-assurance"],
+      "evidenceIdsBefore": ["ev-policy-supplier", "ev-remediation-register"],
+      "evidenceIdsAfter": [
+        "ev-policy-supplier",
+        "ev-remediation-register",
+        "ev-supplier-assessments-2026"
+      ],
+      "riskIds": ["risk-third-party"],
+      "ownerId": "person-omar"
+    },
+    {
+      "id": "obl-iso-bc",
+      "title": "Business continuity",
+      "frameworkId": "fw-iso27001",
+      "supportBefore": "supported",
+      "supportAfter": "supported",
+      "policyIds": ["ev-bc-test"],
+      "controlIds": ["ctl-continuity"],
+      "evidenceIdsBefore": ["ev-bc-test"],
+      "evidenceIdsAfter": ["ev-bc-test"],
+      "riskIds": ["risk-continuity"],
+      "ownerId": "person-nadia"
+    }
+  ],
+  "controls": [
+    {
+      "id": "ctl-supplier-assurance",
+      "title": "Supplier assurance",
+      "assuranceBefore": "partial",
+      "assuranceAfter": "assured",
+      "ownerId": "person-nadia",
+      "frameworkIds": [
+        "fw-iso27001",
+        "fw-nis2",
+        "fw-gdpr",
+        "fw-nca-ecc",
+        "fw-internal"
+      ],
+      "obligationIds": [
+        "obl-iso-a532",
+        "obl-nis2-supply",
+        "obl-gdpr-processor",
+        "obl-nca-third-party",
+        "obl-internal-contract"
+      ],
+      "evidenceIdsBefore": ["ev-policy-supplier", "ev-audit-findings"],
+      "evidenceIdsAfter": [
+        "ev-policy-supplier",
+        "ev-audit-findings",
+        "ev-supplier-assessments-2026"
+      ],
+      "riskIds": ["risk-third-party", "risk-regulatory"],
+      "partialReason": "Policy is current. Current assessments for critical suppliers are missing."
+    },
+    {
+      "id": "ctl-isms-policy",
+      "title": "Information security policy management",
+      "assuranceBefore": "assured",
+      "assuranceAfter": "assured",
+      "ownerId": "person-nadia",
+      "frameworkIds": ["fw-iso27001"],
+      "obligationIds": ["obl-iso-isms"],
+      "evidenceIdsBefore": ["ev-policy-isms", "ev-attestations"],
+      "evidenceIdsAfter": ["ev-policy-isms", "ev-attestations"],
+      "riskIds": [],
+      "partialReason": null
+    },
+    {
+      "id": "ctl-data-retention",
+      "title": "Data retention",
+      "assuranceBefore": "assured",
+      "assuranceAfter": "assured",
+      "ownerId": "person-tomas",
+      "frameworkIds": ["fw-gdpr", "fw-internal"],
+      "obligationIds": ["obl-gdpr-processor"],
+      "evidenceIdsBefore": ["ev-data-retention"],
+      "evidenceIdsAfter": ["ev-data-retention"],
+      "riskIds": [],
+      "partialReason": null
+    },
+    {
+      "id": "ctl-continuity",
+      "title": "Business continuity testing",
+      "assuranceBefore": "assured",
+      "assuranceAfter": "assured",
+      "ownerId": "person-nadia",
+      "frameworkIds": ["fw-iso27001", "fw-nis2"],
+      "obligationIds": ["obl-iso-bc"],
+      "evidenceIdsBefore": ["ev-bc-test"],
+      "evidenceIdsAfter": ["ev-bc-test"],
+      "riskIds": ["risk-continuity"],
+      "partialReason": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-policy-isms",
+      "title": "Information security policy",
+      "fileType": "PDF",
+      "ownerId": "person-nadia",
+      "date": "2026-03-12",
+      "version": "4.1",
+      "freshness": "current",
+      "processingState": "indexed",
+      "duplicateOf": null,
+      "missingMetadata": false,
+      "usedByControlIds": ["ctl-isms-policy"],
+      "usedByObligationIds": ["obl-iso-isms"],
+      "usedByRiskIds": []
+    },
+    {
+      "id": "ev-risk-assessment",
+      "title": "Enterprise risk assessment",
+      "fileType": "PDF",
+      "ownerId": "person-layla",
+      "date": "2026-05-02",
+      "version": "2026.1",
+      "freshness": "current",
+      "processingState": "indexed",
+      "duplicateOf": null,
+      "missingMetadata": false,
+      "usedByControlIds": [],
+      "usedByObligationIds": [],
+      "usedByRiskIds": ["risk-third-party", "risk-regulatory", "risk-continuity"]
+    },
+    {
+      "id": "ev-policy-supplier",
+      "title": "Supplier assurance policy",
+      "fileType": "PDF",
+      "ownerId": "person-omar",
+      "date": "2026-01-20",
+      "version": "3.0",
+      "freshness": "current",
+      "processingState": "indexed",
+      "duplicateOf": null,
+      "missingMetadata": false,
+      "usedByControlIds": ["ctl-supplier-assurance"],
+      "usedByObligationIds": [
+        "obl-iso-a532",
+        "obl-nis2-supply",
+        "obl-gdpr-processor",
+        "obl-nca-third-party",
+        "obl-internal-contract"
+      ],
+      "usedByRiskIds": ["risk-third-party"]
+    },
+    {
+      "id": "ev-bc-test",
+      "title": "Business continuity test report",
+      "fileType": "PDF",
+      "ownerId": "person-nadia",
+      "date": "2025-11-18",
+      "version": "2.0",
+      "freshness": "expiring",
+      "processingState": "indexed",
+      "duplicateOf": null,
+      "missingMetadata": false,
+      "usedByControlIds": ["ctl-continuity"],
+      "usedByObligationIds": ["obl-iso-bc"],
+      "usedByRiskIds": ["risk-continuity"]
+    },
+    {
+      "id": "ev-data-retention",
+      "title": "Data-retention standard",
+      "fileType": "PDF",
+      "ownerId": "person-tomas",
+      "date": "2026-02-08",
+      "version": "1.4",
+      "freshness": "current",
+      "processingState": "indexed",
+      "duplicateOf": null,
+      "missingMetadata": false,
+      "usedByControlIds": ["ctl-data-retention"],
+      "usedByObligationIds": ["obl-gdpr-processor"],
+      "usedByRiskIds": []
+    },
+    {
+      "id": "ev-audit-findings",
+      "title": "Internal audit findings",
+      "fileType": "PDF",
+      "ownerId": "person-layla",
+      "date": "2026-06-21",
+      "version": "1.0",
+      "freshness": "current",
+      "processingState": "indexed",
+      "duplicateOf": null,
+      "missingMetadata": false,
+      "usedByControlIds": ["ctl-supplier-assurance"],
+      "usedByObligationIds": ["obl-iso-a532"],
+      "usedByRiskIds": ["risk-third-party", "risk-regulatory"]
+    },
+    {
+      "id": "ev-attestations",
+      "title": "Management attestations",
+      "fileType": "PDF",
+      "ownerId": "person-layla",
+      "date": "2026-07-01",
+      "version": "2026.H1",
+      "freshness": "current",
+      "processingState": "indexed",
+      "duplicateOf": null,
+      "missingMetadata": false,
+      "usedByControlIds": ["ctl-isms-policy"],
+      "usedByObligationIds": ["obl-iso-isms"],
+      "usedByRiskIds": []
+    },
+    {
+      "id": "ev-prior-assessment",
+      "title": "Previous regulatory assessment",
+      "fileType": "PDF",
+      "ownerId": "person-sara",
+      "date": "2025-09-30",
+      "version": "1.0",
+      "freshness": "current",
+      "processingState": "indexed",
+      "duplicateOf": null,
+      "missingMetadata": false,
+      "usedByControlIds": [],
+      "usedByObligationIds": ["obl-nca-third-party"],
+      "usedByRiskIds": ["risk-regulatory"]
+    },
+    {
+      "id": "ev-remediation-register",
+      "title": "Remediation action register",
+      "fileType": "XLSX",
+      "ownerId": "person-omar",
+      "date": "2026-08-15",
+      "version": "12",
+      "freshness": "current",
+      "processingState": "indexed",
+      "duplicateOf": null,
+      "missingMetadata": false,
+      "usedByControlIds": ["ctl-supplier-assurance"],
+      "usedByObligationIds": ["obl-internal-contract"],
+      "usedByRiskIds": ["risk-third-party"]
+    },
+    {
+      "id": "ev-supplier-q-duplicate",
+      "title": "2024 supplier questionnaire pack",
+      "fileType": "ZIP",
+      "ownerId": "person-omar",
+      "date": "2024-10-03",
+      "version": "1.0",
+      "freshness": "expired",
+      "processingState": "indexed",
+      "duplicateOf": "ev-supplier-assessments-2023",
+      "missingMetadata": false,
+      "usedByControlIds": [],
+      "usedByObligationIds": [],
+      "usedByRiskIds": []
+    },
+    {
+      "id": "ev-supplier-assessments-2023",
+      "title": "2023 critical-supplier assessments",
+      "fileType": "PDF",
+      "ownerId": "person-omar",
+      "date": "2023-11-11",
+      "version": "1.0",
+      "freshness": "expired",
+      "processingState": "indexed",
+      "duplicateOf": null,
+      "missingMetadata": true,
+      "usedByControlIds": [],
+      "usedByObligationIds": [],
+      "usedByRiskIds": ["risk-third-party"]
+    },
+    {
+      "id": "ev-supplier-assessments-2026",
+      "title": "2026 critical-supplier assessments",
+      "fileType": "PDF",
+      "ownerId": "person-omar",
+      "date": "2026-09-10",
+      "version": "1.0",
+      "freshness": "current",
+      "processingState": "indexed",
+      "duplicateOf": null,
+      "missingMetadata": false,
+      "usedByControlIds": ["ctl-supplier-assurance"],
+      "usedByObligationIds": [
+        "obl-iso-a532",
+        "obl-nis2-supply",
+        "obl-gdpr-processor",
+        "obl-nca-third-party",
+        "obl-internal-contract"
+      ],
+      "usedByRiskIds": ["risk-third-party", "risk-regulatory"],
+      "availableFromState": "after"
+    }
+  ],
+  "risks": [
+    {
+      "id": "risk-third-party",
+      "title": "Third-party assurance",
+      "levelBefore": "elevated",
+      "levelAfter": "reduced",
+      "ownerId": "person-omar",
+      "controlIds": ["ctl-supplier-assurance"],
+      "obligationIds": [
+        "obl-iso-a532",
+        "obl-nis2-supply",
+        "obl-gdpr-processor",
+        "obl-nca-third-party",
+        "obl-internal-contract"
+      ],
+      "evidenceIdsBefore": [
+        "ev-policy-supplier",
+        "ev-audit-findings",
+        "ev-risk-assessment"
+      ],
+      "evidenceIdsAfter": [
+        "ev-policy-supplier",
+        "ev-audit-findings",
+        "ev-risk-assessment",
+        "ev-supplier-assessments-2026"
+      ],
+      "contributingGap": "Missing current assessments for critical suppliers"
+    },
+    {
+      "id": "risk-regulatory",
+      "title": "Regulatory exposure ahead of the review",
+      "levelBefore": "elevated",
+      "levelAfter": "reduced",
+      "ownerId": "person-layla",
+      "controlIds": ["ctl-supplier-assurance"],
+      "obligationIds": [
+        "obl-nis2-supply",
+        "obl-gdpr-processor",
+        "obl-nca-third-party"
+      ],
+      "evidenceIdsBefore": ["ev-audit-findings", "ev-prior-assessment"],
+      "evidenceIdsAfter": [
+        "ev-audit-findings",
+        "ev-prior-assessment",
+        "ev-supplier-assessments-2026"
+      ],
+      "contributingGap": "The same supplier-assurance gap appears across several frameworks"
+    },
+    {
+      "id": "risk-continuity",
+      "title": "Continuity evidence approaching review",
+      "levelBefore": "watch",
+      "levelAfter": "watch",
+      "ownerId": "person-nadia",
+      "controlIds": ["ctl-continuity"],
+      "obligationIds": ["obl-iso-bc"],
+      "evidenceIdsBefore": ["ev-bc-test"],
+      "evidenceIdsAfter": ["ev-bc-test"],
+      "contributingGap": "Business continuity test report is expiring — not the primary action"
+    }
+  ],
+  "actions": [
+    {
+      "id": "act-upload-assessments",
+      "title": "Obtain and approve current critical-supplier assessments",
+      "ownerId": "person-omar",
+      "approverId": "person-layla",
+      "statusBefore": "open",
+      "statusAfter": "completed",
+      "impact": "Improves coverage across ISO 27001, NIS2, GDPR and NCA ECC; strengthens supplier-assurance control; reduces third-party and regulatory risk"
+    }
+  ],
+  "reports": [
+    {
+      "id": "rep-board-summary",
+      "title": "Board Summary",
+      "primary": true,
+      "period": "Q3 2026"
+    },
+    {
+      "id": "rep-regulator-pack",
+      "title": "Regulator pack",
+      "primary": false,
+      "period": "Q3 2026"
+    },
+    {
+      "id": "rep-audit-evidence",
+      "title": "Audit evidence pack",
+      "primary": false,
+      "period": "Q3 2026"
+    }
+  ],
+  "uploadFixtures": {
+    "demoFiles": [
+      {
+        "filename": "critical-supplier-assessment-alpha.pdf",
+        "outcome": "success",
+        "suggestedClassification": "Critical-supplier assessment",
+        "suggestedControlIds": ["ctl-supplier-assurance"],
+        "suggestedObligationIds": [
+          "obl-iso-a532",
+          "obl-nis2-supply",
+          "obl-gdpr-processor",
+          "obl-nca-third-party"
+        ]
+      },
+      {
+        "filename": "critical-supplier-assessment-beta.pdf",
+        "outcome": "success",
+        "suggestedClassification": "Critical-supplier assessment",
+        "suggestedControlIds": ["ctl-supplier-assurance"],
+        "suggestedObligationIds": [
+          "obl-iso-a532",
+          "obl-nis2-supply",
+          "obl-gdpr-processor",
+          "obl-nca-third-party"
+        ]
+      },
+      {
+        "filename": "supplier-questionnaire-2024-copy.zip",
+        "outcome": "duplicate",
+        "duplicateOf": "ev-supplier-q-duplicate"
+      },
+      {
+        "filename": "supplier-note.docx",
+        "outcome": "missing_metadata",
+        "missingFields": ["owner", "review date"]
+      }
+    ],
+    "resultingEvidenceId": "ev-supplier-assessments-2026"
+  },
+  "ai": {
+    "prompts": {
+      "hub": [
+        "What requires my attention today?",
+        "Why did compliance readiness change?",
+        "Which gap affects the most frameworks?",
+        "What is the highest-impact action before the review?",
+        "Summarise our current position for the board."
+      ],
+      "regulatory": [
+        "Where do ISO 27001, NIS2, GDPR and NCA ECC overlap?",
+        "Which obligations are not fully supported?",
+        "Which existing controls satisfy multiple requirements?",
+        "Show the evidence supporting this obligation.",
+        "Which requirements have no accountable owner?"
+      ],
+      "controls": [
+        "Which frameworks does this control support?",
+        "Why is this control only partially assured?",
+        "Which evidence is missing or outdated?",
+        "Which risks would be affected if this control weakened?",
+        "What should the owner do next?"
+      ],
+      "evidence": [
+        "Where is this evidence being used?",
+        "Is this document current and sufficient?",
+        "Can it support another compliance requirement?",
+        "What information is missing?",
+        "Is this a duplicate or a newer version?",
+        "Which controls will be affected when it expires?"
+      ],
+      "risks": [
+        "Which compliance gaps contribute to this risk?",
+        "Which controls reduce this risk?",
+        "Which missing evidence has the greatest effect?",
+        "What is the most efficient remediation?",
+        "What changes if the recommendation is approved?"
+      ],
+      "reports": [
+        "Explain the most material movement this period.",
+        "Draft an executive summary.",
+        "Which statements are supported by evidence?",
+        "What should be escalated to the board?",
+        "Show the sources behind this conclusion."
+      ],
+      "activity": [
+        "Why is this item waiting?",
+        "What will approval change?",
+        "Who last approved a related action?"
+      ]
+    },
+    "primaryHubAnswerBefore": {
+      "question": "Which gap affects the most frameworks?",
+      "screen": "Executive Hub",
+      "executiveAnswer": "The highest-impact gap is missing current assessment evidence for several critical suppliers. A supplier-assurance policy exists, but it is being counted separately in each framework and is not backed by current assessments.",
+      "sourcedFacts": [
+        {
+          "text": "The supplier assurance policy is current (version 3.0).",
+          "citationIds": ["ev-policy-supplier"]
+        },
+        {
+          "text": "Internal audit findings record that current critical-supplier assessments are missing.",
+          "citationIds": ["ev-audit-findings"]
+        },
+        {
+          "text": "The same control supports obligations in ISO 27001, NIS2, GDPR and NCA ECC.",
+          "citationIds": [
+            "ctl-supplier-assurance",
+            "obl-iso-a532",
+            "obl-nis2-supply",
+            "obl-gdpr-processor",
+            "obl-nca-third-party"
+          ]
+        }
+      ],
+      "interpretation": "Because one evidence gap sits under four international frameworks, closing it improves coverage and connected risk more than treating each framework as a separate project.",
+      "recommendedAction": "Upload current critical-supplier assessments and approve the suggested mappings before the review.",
+      "connected": {
+        "obligationIds": [
+          "obl-iso-a532",
+          "obl-nis2-supply",
+          "obl-gdpr-processor",
+          "obl-nca-third-party"
+        ],
+        "controlIds": ["ctl-supplier-assurance"],
+        "riskIds": ["risk-third-party", "risk-regulatory"]
+      },
+      "freshness": "Policy current; assessments missing; 2023 pack expired",
+      "confidence": "high",
+      "ownerId": "person-omar",
+      "approvalRequired": true,
+      "expectedImpact": "Coverage rises across the four frameworks; supplier-assurance moves from partial to assured; third-party and regulatory exposure reduce; Board Summary can cite current assessments."
+    }
+  }
+}

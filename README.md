@@ -1,6 +1,10 @@
 # Nox7 MVP handoff
 
-This repository is the Nox7 investor-demo **visual MVP**. The React + TypeScript + Vite application currently ships a starter page only. Approved product screens have not been redesigned or migrated yet.
+This repository is the Nox7 investor-demo **visual MVP**. The React + TypeScript + Vite application currently ships a starter page only.
+
+The approved product specification is in [`docs/product-specification.md`](docs/product-specification.md). Canonical mock data is in [`docs/mock/meridian-organisation.json`](docs/mock/meridian-organisation.json). Demo notes are in [`docs/demo.md`](docs/demo.md).
+
+This MVP uses in-app mock data only. Upload processing and Nox AI answers are produced from that dataset so the demo is reliable. There is no backend, database, paid service or external AI API. Do not describe that behaviour in the product UI; keep it in this README and `docs/demo.md`.
 
 ## Setup
 
@@ -35,13 +39,14 @@ npm run lint
 
 ## Important
 
-- Files inside `reference/` are preserved source references. Do not edit or overwrite them.
-- `reference/Nox7_VC_Demo_QA_Final.html` is the current primary visual and functional reference.
+- Files inside `reference/` are preserved source references. Do not edit or overwrite them. They are visual-language references only.
+- Product behaviour follows `docs/product-specification.md`.
 - Files inside `public/brand/` are the supplied Nox7 brand assets.
 - The black backgrounds are currently part of the supplied logo images. Transparent production variants can be prepared during implementation.
-- Rebuild approved screens as reusable React and TypeScript components; do not make the large reference HTML file the application architecture.
-- No backend, database, production authentication, or real customer data is required for the current visual MVP.
-- Coding agents should follow `AGENTS.md`.
+- Rebuild approved screens as reusable React and TypeScript components from `docs/product-specification.md`; do not make the large reference HTML file the application architecture.
+- In the UI, say **organisation**, never tenant. Record identifiers are secondary metadata only.
+- No backend, database, production authentication, paid service, external AI API, or real customer data is required for the current visual MVP.
+- Coding agents should follow `AGENTS.md` and the approved specification.
 
 ## Folder inventory
 
@@ -62,6 +67,11 @@ Nox7-MVP/
 │   ├── App.css
 │   ├── index.css
 │   └── main.tsx
+├── docs/
+│   ├── product-specification.md
+│   ├── demo.md
+│   └── mock/
+│       └── meridian-organisation.json
 ├── AGENTS.md
 ├── index.html
 ├── package.json
