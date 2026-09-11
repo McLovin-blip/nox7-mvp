@@ -185,7 +185,7 @@
 .shell-body {
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-columns: minmax(0, 1fr) 380px;
   overflow: hidden;
 }
 

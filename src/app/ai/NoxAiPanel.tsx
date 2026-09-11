@@ -58,14 +58,20 @@ export function NoxAiPanel({ question }: { question: string }) {
           </div>
         </section>
         <section>
-          <span>Confidence · freshness</span>
-          <p>
-            {hubAi.confidence === 'high' ? 'High' : hubAi.confidence}. {hubAi.freshness}
-          </p>
+          <span>Evidence freshness</span>
+          <p>{hubAi.freshness}</p>
+        </section>
+        <section>
+          <span>Confidence</span>
+          <p>{hubAi.confidence === 'high' ? 'High' : hubAi.confidence}</p>
         </section>
         <section>
           <span>Accountable owner</span>
           <p>{hubAi.owner}</p>
+        </section>
+        <section>
+          <span>Expected effect</span>
+          <p>{hubAi.expectedImpact}</p>
         </section>
       </div>
       <section className="ai-act">
