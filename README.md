@@ -1,6 +1,37 @@
 # Nox7 MVP handoff
 
-This folder contains the approved visual prototype and original concept files for the Nox7 investor-demo MVP.
+This repository is the Nox7 investor-demo **visual MVP**. The React + TypeScript + Vite application currently ships a starter page only. Approved product screens have not been redesigned or migrated yet.
+
+## Setup
+
+Requires **Node.js 20+** (Node 22 is recommended) and **npm**.
+
+```bash
+npm install
+```
+
+## Start the app
+
+Development server (binds to port **5173**):
+
+```bash
+npm run dev
+```
+
+Then open [http://localhost:5173](http://localhost:5173). You should see the Nox7 starter page with the supplied logos.
+
+Production build and local preview (port **4173**):
+
+```bash
+npm run build
+npm run preview
+```
+
+Lint:
+
+```bash
+npm run lint
+```
 
 ## Important
 
@@ -10,6 +41,7 @@ This folder contains the approved visual prototype and original concept files fo
 - The black backgrounds are currently part of the supplied logo images. Transparent production variants can be prepared during implementation.
 - Rebuild approved screens as reusable React and TypeScript components; do not make the large reference HTML file the application architecture.
 - No backend, database, production authentication, or real customer data is required for the current visual MVP.
+- Coding agents should follow `AGENTS.md`.
 
 ## Folder inventory
 
@@ -25,10 +57,17 @@ Nox7-MVP/
 │   ├── nox7_dashboard_v1_6_demo.html
 │   ├── nox7_expanded_concept_1.html
 │   └── nox7_screenshots_master.html
+├── src/
+│   ├── App.tsx
+│   ├── App.css
+│   ├── index.css
+│   └── main.tsx
+├── AGENTS.md
+├── index.html
+├── package.json
 └── README.md
 ```
 
 ## MVP deadline
 
 Investor presentation: Friday, September 18, 2026.
-

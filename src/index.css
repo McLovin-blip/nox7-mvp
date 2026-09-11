@@ -1,0 +1,36 @@
+:root {
+  --page: #050508;
+  --surface: #0a0a12;
+  --surface-2: #0f0f1a;
+  --border: #1a1a2e;
+  --text: #e8e8f0;
+  --text-2: #8a8aa0;
+  --purple: #8b6fe8;
+  --purple-glow: rgba(139, 111, 232, 0.15);
+  --purple-line: rgba(139, 111, 232, 0.25);
+  --sans: Inter, system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--page);
+  color: var(--text);
+  font-family: var(--sans);
+}
+
+#root {
+  min-height: 100svh;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
