@@ -528,7 +528,7 @@ export function answerFor(options: {
           : 'The material movement to explain is the missing current assessments under four frameworks, with readiness at 64 and two elevated risks.',
         after ? afterFacts : beforeFacts,
         'The summary is generated from the same position as Hub.',
-        { prompts: list, recommendedAction: after ? 'Cite the 2026 assessments in the board pack.' : hubAnswerBefore.recommendedAction },
+        { prompts: list, recommendedAction: after ? 'Cite the 2026 assessments in the board pack.' : hubAnswerBefore.recommendedAction, approval: after ? 'Already approved by Layla Rahman.' : 'Human approval required before coverage or risk changes.' },
       )
     }
     if (q === list[2] || q === list[4]) {
