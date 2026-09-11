@@ -46,7 +46,6 @@ export function AssuranceMap({
           <circle cx="400" cy="190" r="168" fill="none" stroke="rgba(139,111,232,0.12)" />
           <line x1="400" y1="190" x2="400" y2="58" stroke="rgba(139,111,232,0.35)" />
           <line x1="400" y1="190" x2="640" y2="130" stroke="rgba(139,111,232,0.35)" />
-          <line x1="400" y1="190" x2="160" y2="130" stroke="rgba(139,111,232,0.35)" />
           <line x1="400" y1="190" x2="170" y2="330" stroke="rgba(139,111,232,0.35)" />
           <line x1="400" y1="190" x2="630" y2="330" stroke="rgba(139,111,232,0.35)" />
           <line x1="400" y1="190" x2="400" y2="390" stroke="rgba(139,111,232,0.35)" />

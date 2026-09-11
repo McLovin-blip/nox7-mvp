@@ -101,16 +101,14 @@ function PositionStrip() {
       <article className="gap">
         <span>Material gaps</span>
         <strong>{positionStrip.materialGaps}</strong>
-        <em>Supplier assurance is highest impact</em>
+        <em>Supplier assurance · highest impact</em>
         <small>Executive attention</small>
       </article>
       <article>
         <span>Evidence health</span>
-        <strong>
-          {evidence.missing} missing
-        </strong>
+        <strong>Attention</strong>
         <em>
-          {evidence.expired} expired · {evidence.duplicate} duplicate · {evidence.expiring} expiring
+          {evidence.missing} missing · {evidence.expired} expired · {evidence.duplicate} duplicate · {evidence.expiring} expiring
         </em>
         <i className="bar mixed">
           <b />
