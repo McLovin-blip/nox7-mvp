@@ -97,6 +97,7 @@ function factsToCitations(answer: AiPanelModel, position: PositionState) {
 function screenLabel(ctx: ConversationContext) {
   if (ctx.module === 'gap') return 'Connected supplier-assurance gap'
   if (ctx.module === 'hub') return 'Executive Hub'
+  if (ctx.module === 'connect') return 'Nox Connect'
   if (ctx.module === 'regulatory') return 'Regulatory'
   if (ctx.module === 'controls') return 'Controls'
   if (ctx.module === 'evidence') return 'Evidence'
@@ -667,7 +668,7 @@ export function buildNoxReply(
   }
 
   const modulePrompts =
-    ctx.module === 'hub'
+    ctx.module === 'hub' || ctx.module === 'connect'
       ? prompts.hub
       : ctx.module === 'regulatory'
         ? prompts.regulatory

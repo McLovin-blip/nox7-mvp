@@ -424,6 +424,49 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
     }
   }
 
+
+  if (ctx.module === 'connect') {
+    const readiness = after ? data.position.after.readinessValue : data.position.before.readinessValue
+    return {
+      intro: after
+        ? `Nox Connect shows ${organisation.name}'s connected estate after approval. Assurance is ${readiness}%. Ask what changed or what to do next.`
+        : `Nox Connect shows how ${organisation.name}'s risks, controls, regulatory obligations, evidence and actions connect. Assurance is ${readiness}%.`,
+      actions: [
+        { id: 'connect-gap', label: 'Explore connected exposure', navigate: { type: 'gap' as const, step: 'overview' } },
+        {
+          id: 'connect-risks',
+          label: 'Review priority risks',
+          navigate: { type: 'module' as const, module: 'risks', recordId: elevated[0]?.id ?? 'risk-third-party' },
+        },
+        {
+          id: 'connect-evidence',
+          label: after ? 'Review approved evidence' : 'Review missing evidence',
+          navigate: {
+            type: 'module' as const,
+            module: 'evidence',
+            recordId: after ? 'ev-supplier-assessments-2026' : 'ev-audit-findings',
+          },
+        },
+        {
+          id: 'connect-regulatory',
+          label: 'Show regulatory gaps',
+          navigate: { type: 'module' as const, module: 'regulatory' },
+        },
+        ...(after
+          ? ([{ id: 'connect-board', label: 'Prepare board summary', navigate: { type: 'board' as const } }] as NoxActionChip[])
+          : ([{ id: 'connect-upload', label: 'Upload missing evidence', navigate: { type: 'upload' as const } }] as NoxActionChip[])),
+      ],
+      questions: [
+        'What should I focus on next?',
+        `Why is our assurance position ${readiness}%?`,
+        'Show me our biggest organisational risks',
+        'What is driving our regulatory exposure?',
+        'Which controls are creating the most exposure?',
+        'What evidence gaps have the biggest impact?',
+      ],
+    }
+  }
+
   // Executive Hub default
   return {
     intro: after
