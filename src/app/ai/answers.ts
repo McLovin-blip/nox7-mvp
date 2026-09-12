@@ -264,7 +264,7 @@ export function answerFor(options: {
   const fallback =
     module === 'gap'
       ? gapAiFor(position).overview.question
-      : module === 'hub'
+      : module === 'hub' || module === 'connect'
         ? hubAiFor(position).question
         : prompts[module][0]
   const q = options.question.trim() || fallback
@@ -320,6 +320,83 @@ export function answerFor(options: {
       return q === 'Which gap affects the most frameworks?' || !q ? hub : hub
     }
     return offScript('Executive Hub', prompts.hub)
+  }
+
+  if (module === 'connect') {
+    const readiness = after ? data.position.after.readinessValue : data.position.before.readinessValue
+    if (/why.*assurance|assurance.*why|why is our assurance/i.test(q)) {
+      return base(
+        `Nox Connect · ${org}`,
+        q,
+        after
+          ? `Assurance improved to ${readiness}% after current critical-supplier assessments were approved. That evidence strengthened supplier assurance, supported related regulatory obligations, and reduced the elevated organisational risks.`
+          : `Assurance is at ${readiness}% primarily because controls still lack sufficient evidence. The supplier-assurance control is only partially assured, which leaves related obligations partly covered and keeps the highest organisational risks elevated.`,
+        after
+          ? [
+              { text: `Readiness is ${readiness} (Improved).`, citationId: 'rep-board-summary' },
+              { text: '2026 critical-supplier assessments are current and approved.', citationId: 'ev-supplier-assessments-2026' },
+              { text: 'Supplier assurance is assured after approval.', citationId: 'ctl-supplier-assurance' },
+            ]
+          : [
+              { text: `Readiness is ${readiness} (Needs attention).`, citationId: 'rep-board-summary' },
+              { text: 'Current critical-supplier assessments are missing.', citationId: 'ev-audit-findings' },
+              { text: 'Supplier assurance remains partially assured.', citationId: 'ctl-supplier-assurance' },
+            ],
+        after
+          ? 'One evidence approval moved control, regulatory and risk position together.'
+          : 'The connected gap is concentrated on supplier evidence, not scattered unrelated issues.',
+        {
+          prompts: [
+            'What should I focus on next?',
+            'Show me our biggest organisational risks',
+            'What is driving our regulatory exposure?',
+            'Explore connected exposure',
+          ],
+          connected: connectedTitles,
+          recommendedAction: after ? 'Prepare the Board Summary from the improved position.' : 'Explore the connected supplier-assurance gap and upload the missing assessments.',
+        },
+      )
+    }
+    if (/focus|priorit|next|biggest risk|regulatory exposure|evidence gap|connect/i.test(q)) {
+      return base(
+        `Nox Connect · ${org}`,
+        q,
+        after
+          ? 'The estate is more connected after approval. Review residual watch items, then prepare the Board Summary.'
+          : 'Focus on the supplier evidence gap first — it links the highest risks, partially assured control, and regulatory obligations with insufficient coverage.',
+        after
+          ? [
+              { text: 'Third-party and regulatory exposure are reduced.', citationId: 'risk-third-party' },
+              { text: 'International obligations are supported by the approved assessments.', citationId: 'ctl-supplier-assurance' },
+            ]
+          : [
+              { text: 'Missing current assessments keep supplier assurance partial.', citationId: 'ctl-supplier-assurance' },
+              { text: 'Two organisational risks remain elevated on the same gap.', citationId: 'risk-third-party' },
+            ],
+        'Nox Connect summarises the estate so executives see exposure, cause and next action without opening every module.',
+        {
+          prompts: [
+            after ? 'Why is our assurance position 72%?' : 'Why is our assurance position 64%?',
+            'Show me our biggest organisational risks',
+            'What is driving our regulatory exposure?',
+          ],
+          connected: connectedTitles,
+          recommendedAction: after ? 'Open Board Summary.' : 'Open the connected supplier-assurance gap.',
+        },
+      )
+    }
+    return base(
+      `Nox Connect · ${org}`,
+      q,
+      after
+        ? `Nox Connect shows the organisation estate after approval. Overall assurance is ${readiness}%.`
+        : `Nox Connect shows where ${org} is exposed across risks, controls, regulatory obligations, evidence and actions. Overall assurance is ${readiness}%.`,
+      [
+        { text: after ? 'The material supplier-assurance gap is closed for this review.' : 'The material gap is missing current critical-supplier assessments.', citationId: after ? 'ev-supplier-assessments-2026' : 'ctl-supplier-assurance' },
+      ],
+      'Ask about assurance, priorities, regulatory exposure, or connected gaps.',
+      { prompts: prompts.hub, connected: connectedTitles },
+    )
   }
 
   if (module === 'regulatory') {

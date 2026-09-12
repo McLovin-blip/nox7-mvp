@@ -1,4 +1,5 @@
 import type { ModuleId, PositionState, RecordRow, Tone } from './types.ts'
+import { buildConnectView } from './connectModel.ts'
 import { buildHubView } from './hubModel.ts'
 import {
   coverageOf,
@@ -148,11 +149,12 @@ export function buildAppView(position: PositionState) {
   const elevatedCount = risks.filter((item) => item.status === 'Elevated').length
 
   const nav: { id: ModuleId; label: string; badge?: number }[] = [
-    { id: 'hub', label: 'Hub' },
-    { id: 'regulatory', label: 'Regulatory' },
-    { id: 'controls', label: 'Controls' },
-    { id: 'evidence', label: 'Evidence', badge: missing + expired + duplicate + expiring + superseded },
+    { id: 'hub', label: 'Executive Hub' },
+    { id: 'connect', label: 'Nox Connect' },
     { id: 'risks', label: 'Risks', badge: elevatedCount || undefined },
+    { id: 'controls', label: 'Controls' },
+    { id: 'regulatory', label: 'Regulatory' },
+    { id: 'evidence', label: 'Evidence', badge: missing + expired + duplicate + expiring + superseded },
     { id: 'reports', label: 'Reports' },
     { id: 'activity', label: 'Activity' },
   ]
@@ -264,6 +266,7 @@ export function buildAppView(position: PositionState) {
     mapNodes,
     mapCentre,
     gap,
+    connect: buildConnectView(position),
     obligations,
     controls,
     evidence,

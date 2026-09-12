@@ -9,6 +9,7 @@ import {
 } from '../mock/data.ts'
 import type { AiPanelModel, GapStepId, HubFocus, ModuleId, PositionState } from '../mock/types.ts'
 import { answerFor, gapAiFor, hubAiFor } from './answers.ts'
+import { contextualQuestions } from './suggestions.ts'
 
 export type ChatCitation = {
   id: string
@@ -42,6 +43,7 @@ export type ConversationContext = {
   selectedTitle?: string
   hubFocus?: HubFocus | null
   gapStep?: GapStepId
+  riskDrill?: { label: string; questions: string[] } | null
 }
 
 export const EMPTY_SUGGESTIONS = [
@@ -52,6 +54,12 @@ export const EMPTY_SUGGESTIONS = [
   'Why is our assurance position low?',
   'Summarise this for the board.',
 ]
+
+function suggestionsFor(ctx: ConversationContext, fallback?: string[]) {
+  const contextual = contextualQuestions(ctx, 4)
+  if (contextual.length > 0) return contextual
+  return fallback ?? EMPTY_SUGGESTIONS.slice(0, 4)
+}
 
 type Reply = Omit<ChatMessage, 'id' | 'role'>
 
@@ -90,6 +98,7 @@ function factsToCitations(answer: AiPanelModel, position: PositionState) {
 function screenLabel(ctx: ConversationContext) {
   if (ctx.module === 'gap') return 'Connected supplier-assurance gap'
   if (ctx.module === 'hub') return 'Executive Hub'
+  if (ctx.module === 'connect') return 'Nox Connect'
   if (ctx.module === 'regulatory') return 'Regulatory'
   if (ctx.module === 'controls') return 'Controls'
   if (ctx.module === 'evidence') return 'Evidence'
@@ -120,7 +129,7 @@ function composeFromAnswer(
     return {
       text: answer.executiveAnswer,
       citations: factsToCitations(answer, ctx.position),
-      suggestions: answer.prompts.slice(0, 3),
+      suggestions: suggestionsFor(ctx, answer.prompts.slice(0, 3)),
       topic,
     }
   }
@@ -140,7 +149,7 @@ function composeFromAnswer(
   return {
     text: parts.join('\n'),
     citations: factsToCitations(answer, ctx.position),
-    suggestions: answer.prompts.slice(0, 4),
+    suggestions: suggestionsFor(ctx, answer.prompts.slice(0, 4)),
     topic,
   }
 }
@@ -367,20 +376,41 @@ function recordWhyReply(ctx: ConversationContext): Reply | null {
 
   if (ctx.selectedId.startsWith('risk-')) {
     const risk = data.risks.find((item) => item.id === ctx.selectedId)
-    const level = after ? risk?.levelAfter : risk?.levelBefore
+    const residual = after ? risk?.residualAfter : risk?.residualBefore
+    const appetite = after ? risk?.appetiteStatusAfter : risk?.appetiteStatusBefore
+    const coverage = after ? risk?.controlCoverageAfter : risk?.controlCoverageBefore
+    const treatment = after ? risk?.treatment.statusAfter : risk?.treatment.statusBefore
+    const controlId = risk?.controlIds[0] ?? 'ctl-supplier-assurance'
     return {
       text: [
-        `${title} is on the executive radar because it is linked to the same supplier-assurance story.`,
+        '### Fact',
+        `${title} currently has residual risk ${residual?.score ?? 'n/a'} (${residual?.rating ?? 'n/a'}).`,
+        risk
+          ? `Appetite is ${appetite}; control coverage is ${coverage}; treatment is ${treatment}.`
+          : '',
+        risk ? `Linked controls: ${risk.controlIds.length}. Linked obligations: ${risk.obligationIds.length}.` : '',
         '',
-        `Current level: ${level}.`,
-        risk ? `Contributing gap: ${risk.contributingGap}.` : '',
+        '### Why it matters',
+        risk?.contributingGap
+          ? risk.contributingGap
+          : `${title} remains on the executive radar because of connected control and compliance exposure.`,
         '',
-        `Recommendation: ${after ? 'Keep monitoring, and cite the improved evidence in reporting.' : 'Close the missing assessments to reduce this exposure before the review.'}`,
+        '### Recommended action',
+        after
+          ? 'Keep monitoring residual exposure and cite the improved evidence in reporting.'
+          : treatment === 'overdue' || treatment === 'at-risk'
+            ? 'Bring the treatment plan back on track and close the linked evidence gaps before the review.'
+            : 'Strengthen the linked controls and evidence so residual risk can move toward target.',
       ]
         .filter(Boolean)
         .join('\n'),
-      citations: citationsFrom([ctx.selectedId, 'ctl-supplier-assurance'], ctx.position),
-      suggestions: ['What should I prioritise?', 'Show me our supplier assurance gaps.'],
+      citations: citationsFrom([ctx.selectedId, controlId, ...(risk?.obligationIds.slice(0, 2) ?? [])], ctx.position),
+      suggestions: [
+        'Which controls are ineffective?',
+        'Which evidence is missing?',
+        'Is the treatment plan on track?',
+        'What should I do next?',
+      ],
       topic: 'risk',
     }
   }
@@ -397,10 +427,10 @@ function recordWhyReply(ctx: ConversationContext): Reply | null {
       .filter(Boolean)
       .join('\n'),
     citations: citationsFrom([ctx.selectedId], ctx.position),
-    suggestions: EMPTY_SUGGESTIONS.slice(0, 4),
-    topic: 'general',
+      suggestions: suggestionsFor(ctx),
+      topic: 'general',
+    }
   }
-}
 
 function controlAndEvidenceReply(ctx: ConversationContext): Reply {
   const control = supplierControl
@@ -660,7 +690,7 @@ export function buildNoxReply(
   }
 
   const modulePrompts =
-    ctx.module === 'hub'
+    ctx.module === 'hub' || ctx.module === 'connect'
       ? prompts.hub
       : ctx.module === 'regulatory'
         ? prompts.regulatory
@@ -715,7 +745,7 @@ export function buildNoxReply(
           : ['ctl-supplier-assurance', 'ev-audit-findings'],
         ctx.position,
       ),
-      suggestions: EMPTY_SUGGESTIONS,
+      suggestions: suggestionsFor(ctx),
       topic: 'general',
     }
   }
@@ -744,18 +774,22 @@ export function contextBanner(ctx: ConversationContext) {
   ]
   if (ctx.hubFocus?.title) bits.push(ctx.hubFocus.title)
   else if (ctx.selectedTitle) bits.push(ctx.selectedTitle)
+  else if (ctx.riskDrill?.label) bits.push(ctx.riskDrill.label)
   return bits.join(' · ')
 }
 
 export function welcomeText(ctx: ConversationContext) {
   const firstFact = hubAnswerBefore.sourcedFacts?.[0]?.text
+  const focus = ctx.selectedTitle ? ` “${ctx.selectedTitle}” is selected.` : ''
   return [
-    `Hi, I'm Nox. Ask me anything about ${organisation.name}'s risks, controls, compliance, evidence or assurance position.`,
+    `Hi — I'm Nox, your GRC colleague for ${organisation.name}.`,
     '',
-    `You're on ${screenLabel(ctx)}. ${
+    `You're on ${screenLabel(ctx)}.${focus} ${
       ctx.position === 'after'
         ? 'The material supplier-assurance gap is closed for this review.'
         : `The open material gap is still about ${firstFact ? firstFact.replace(/\.$/, '') : 'missing current critical-supplier assessments'}.`
     }`,
+    '',
+    'Ask me what is happening, why it matters, or what to do next.',
   ].join('\n')
 }

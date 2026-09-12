@@ -1,57 +1,218 @@
-.ai-panel {
-  min-height: 0;
+/* Closed: bottom-center Ask Nox launcher only (parked out of shell flow).
+   Open (desktop): right-rail panel that occupies the shell's third column. */
+
+.nox-dock:not(.is-open) {
+  position: fixed;
+  inset: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 70;
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.nox-dock.is-open {
+  display: contents;
+}
+
+.nox-fab,
+.nox-chat {
+  pointer-events: auto;
+}
+
+.nox-fab {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  z-index: 70;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto auto;
-  border-left: 1px solid var(--border);
-  background: #0a0a10;
+  place-items: center;
+  transition:
+    opacity 220ms ease,
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 220ms ease;
 }
 
-.ai-head {
-  padding: 14px 16px 12px;
-  border-bottom: 1px solid var(--border);
+.nox-fab-pulse {
+  position: absolute;
+  inset: -8px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(139, 111, 232, 0.3) 0%, rgba(139, 111, 232, 0) 70%);
+  animation: nox-breathe 3.2s ease-in-out infinite;
+  pointer-events: none;
 }
 
-.ai-kicker {
-  margin: 0;
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #b7a8f2;
+.nox-fab-core {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 8px 16px 8px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--accent-line);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-fab);
+  color: var(--text-primary);
 }
 
-.ai-head h2 {
-  margin: 2px 0 6px;
-  font-size: 16px;
-  letter-spacing: -0.03em;
+.nox-fab-owl {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.nox-fab-label {
+  font-family: 'Space Grotesk', Inter, sans-serif;
+  font-size: 14px;
   font-weight: 650;
+  letter-spacing: -0.02em;
+  padding-right: 4px;
 }
 
-.ai-ctx {
+.nox-chat {
+  display: none;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  min-height: 0;
+  height: 100%;
+  border-left: 1px solid var(--border-default);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-panel);
+  overflow: hidden;
+  transform: translateX(18px);
+  opacity: 0;
+  transition:
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease;
+}
+
+.nox-dock.is-open .nox-fab {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate(-50%, 12px) scale(0.9);
+}
+
+.nox-dock.is-open .nox-chat {
+  display: grid;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.shell.is-ai-open .nox-dock.is-open .nox-chat {
+  /* Fills the shell's third grid column via display:contents parent */
+  grid-column: 3;
+  grid-row: 1 / -1;
+}
+
+.nox-chat-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-surface);
+}
+
+.nox-chat-brand {
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+}
+
+.nox-chat-owl {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+
+.nox-chat-title {
   margin: 0;
-  color: var(--text-2);
-  font-size: 11px;
-  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Space Grotesk', Inter, sans-serif;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
 }
 
-.ai-thread {
+.nox-online {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: Inter, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--status-success);
+}
+
+.nox-online i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--status-success);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--status-success) 22%, transparent);
+}
+
+.nox-chat-ctx {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.nox-chat-actions {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.nox-minimize,
+.nox-close {
+  appearance: none;
+  border: 1px solid var(--border-default);
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 8px;
+  height: 30px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.nox-minimize:hover,
+.nox-close:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-line);
+}
+
+.nox-thread {
   min-height: 0;
   overflow: auto;
-  padding: 14px 14px 8px;
+  padding: 12px 12px 6px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-}
-
-.ai-empty {
-  padding: 8px 4px;
-  color: var(--text-2);
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-.ai-empty p {
-  margin: 0;
-  white-space: pre-wrap;
+  background: var(--bg-app);
 }
 
 .ai-msg {
@@ -70,16 +231,13 @@
   max-width: 94%;
   border-radius: 14px;
   padding: 10px 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
 }
 
 .ai-msg.user .ai-bubble {
-  background: rgba(139, 111, 232, 0.16);
-  border-color: rgba(139, 111, 232, 0.28);
-}
-
-.ai-msg.nox .ai-bubble {
-  background: #101018;
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
 }
 
 .ai-bubble.thinking {
@@ -91,7 +249,7 @@
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-2);
+  color: var(--text-muted);
 }
 
 .ai-text {
@@ -104,12 +262,13 @@
   font-size: 13px;
   line-height: 1.5;
   white-space: pre-wrap;
+  color: var(--text-primary);
 }
 
 .ai-thinking {
   margin: 0;
   font-size: 13px;
-  color: var(--text-2);
+  color: var(--text-secondary);
   font-style: italic;
 }
 
@@ -122,9 +281,9 @@
 
 .ai-cites button {
   appearance: none;
-  border: 1px solid rgba(139, 111, 232, 0.28);
-  background: rgba(139, 111, 232, 0.08);
-  color: var(--text);
+  border: 1px solid var(--accent-line);
+  background: var(--accent-soft);
+  color: var(--text-primary);
   border-radius: 999px;
   padding: 5px 8px;
   font-size: 11px;
@@ -135,34 +294,65 @@
 
 .ai-cites button span {
   display: block;
-  color: #b7a8f2;
+  color: var(--accent-secondary);
   font-size: 9px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-bottom: 1px;
 }
 
-.ai-suggestions {
+.nox-guides {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--border-default);
+  background: var(--bg-surface);
+}
+
+.nox-guide-label {
+  margin: 0 0 2px;
+  width: 100%;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 650;
+}
+
+.nox-actions,
+.nox-asks {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  padding: 0 14px 10px;
 }
 
-.ai-suggestions button {
+.nox-action,
+.nox-ask {
   appearance: none;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text-2);
   border-radius: 999px;
   padding: 6px 10px;
   font-size: 11px;
   cursor: pointer;
+  text-align: left;
 }
 
-.ai-suggestions button:hover {
-  color: var(--text);
-  border-color: rgba(139, 111, 232, 0.35);
+.nox-action {
+  border: 1px solid var(--accent-line);
+  background: var(--accent-soft);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.nox-ask {
+  border: 1px solid var(--border-default);
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.nox-action:hover,
+.nox-ask:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-line);
 }
 
 .ai-composer {
@@ -170,26 +360,26 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px;
   align-items: end;
-  padding: 10px 14px 14px;
-  border-top: 1px solid var(--border);
-  background: #0c0c14;
+  padding: 10px 12px 12px;
+  border-top: 1px solid var(--border-default);
+  background: var(--bg-surface);
 }
 
 .ai-composer textarea {
   resize: none;
-  border: 1px solid var(--border);
-  background: #101018;
-  color: var(--text);
+  border: 1px solid var(--border-default);
+  background: var(--bg-app);
+  color: var(--text-primary);
   border-radius: 12px;
   padding: 10px 12px;
   font-size: 13px;
   line-height: 1.4;
-  min-height: 64px;
+  min-height: 56px;
 }
 
 .ai-composer textarea:focus {
-  outline: 1px solid rgba(139, 111, 232, 0.45);
-  border-color: rgba(139, 111, 232, 0.45);
+  outline: 1px solid var(--accent-line);
+  border-color: var(--accent-line);
 }
 
 .ai-composer button {
@@ -197,7 +387,7 @@
   padding: 0 14px;
   border: 0;
   border-radius: 10px;
-  background: var(--purple);
+  background: var(--accent-primary);
   color: #fff;
   font-weight: 650;
   font-size: 12px;
@@ -219,4 +409,56 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+@keyframes nox-breathe {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+/* Narrow / tablet: overlay drawer instead of splitting the workspace */
+@media (max-width: 1100px) {
+  .shell.is-ai-open {
+    grid-template-columns: 1fr;
+  }
+
+  .nox-dock.is-open {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    background: color-mix(in srgb, #000 35%, transparent);
+    pointer-events: auto;
+  }
+
+  .nox-dock.is-open .nox-chat {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(420px, 100vw);
+    border-left: 1px solid var(--border-default);
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 720px) {
+  .nox-fab {
+    bottom: 12px;
+  }
+
+  .nox-dock.is-open .nox-chat {
+    width: 100vw;
+  }
+
+  .nox-fab-label {
+    font-size: 13px;
+  }
 }

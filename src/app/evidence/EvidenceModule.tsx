@@ -52,7 +52,7 @@ export function EvidenceModule({
               ) : null}
               {phase === 'review' && item.outcome === 'success' ? (
                 <>
-                  <p style={{ margin: 0, color: '#c9c9d6', fontSize: 13 }}>
+                  <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: 13 }}>
                     Suggested classification · {item.classification}
                   </p>
                   <div className="chips">
@@ -66,13 +66,13 @@ export function EvidenceModule({
                 </>
               ) : null}
               {phase === 'review' && item.outcome === 'duplicate' ? (
-                <p style={{ margin: 0, color: '#c9c9d6', fontSize: 13 }}>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: 13 }}>
                   Duplicate of {item.duplicateOfTitle}. Not used to close the gap.
                 </p>
               ) : null}
               {phase === 'review' && item.outcome === 'missing_metadata' ? (
                 <>
-                  <p style={{ margin: 0, color: '#c9c9d6', fontSize: 13 }}>
+                  <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: 13 }}>
                     Owner and review date are missing. Complete them to include this note, or leave it out of the
                     approval.
                   </p>

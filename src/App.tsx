@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ActivityModule } from './app/activity/ActivityModule.tsx'
 import { NoxAiPanel } from './app/ai/NoxAiPanel.tsx'
+import type { NoxNavigateTarget } from './app/ai/suggestions.ts'
 import { AppShell } from './app/chrome/AppShell.tsx'
+import { NoxConnect } from './app/connect/NoxConnect.tsx'
 import { ControlsModule } from './app/controls/ControlsModule.tsx'
 import { EvidenceModule } from './app/evidence/EvidenceModule.tsx'
 import { ConnectedGapView } from './app/gap/ConnectedGapView.tsx'
@@ -14,12 +16,15 @@ import { RegulatoryModule } from './app/regulatory/RegulatoryModule.tsx'
 import { ReportsModule } from './app/reports/ReportsModule.tsx'
 import { RisksModule } from './app/risks/RisksModule.tsx'
 import { SessionProvider, useSession } from './app/state/SessionProvider.tsx'
+import { ThemeProvider } from './app/state/ThemeProvider.tsx'
 
 export default function App() {
   return (
-    <SessionProvider>
-      <AuthenticatedApp />
-    </SessionProvider>
+    <ThemeProvider>
+      <SessionProvider>
+        <AuthenticatedApp />
+      </SessionProvider>
+    </ThemeProvider>
   )
 }
 
@@ -28,7 +33,7 @@ function AuthenticatedApp() {
   const [signedIn, setSignedIn] = useState(false)
   const [module, setModule] = useState<ModuleId>('hub')
   const [canvas, setCanvas] = useState<AuthenticatedView>('hub')
-  const [aiOpen, setAiOpen] = useState(() => window.matchMedia('(min-width: 1101px)').matches)
+  const [aiOpen, setAiOpen] = useState(false)
   const [mapOpen, setMapOpen] = useState(false)
   const [mapFilter, setMapFilter] = useState<MapFilter>('all')
   const [selectedNode, setSelectedNode] = useState<MapNodeId>('centre')
@@ -37,6 +42,7 @@ function AuthenticatedApp() {
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null)
   const [hubFocus, setHubFocus] = useState<HubFocus | null>(null)
   const [openAction, setOpenAction] = useState<HubAction | null>(null)
+  const [riskDrill, setRiskDrill] = useState<{ label: string; questions: string[] } | null>(null)
 
   const selectedTitle = useMemo(() => {
     if (hubFocus?.title) return hubFocus.title
@@ -66,9 +72,8 @@ function AuthenticatedApp() {
     setModule(id)
     setCanvas('hub')
     setSelectedId(recordId ?? null)
-    if (id !== 'hub') {
-      setOpenAction(null)
-    }
+    if (id !== 'risks') setRiskDrill(null)
+    if (id !== 'hub') setOpenAction(null)
   }
 
   const applyFocus = (focus: HubFocus, prompt: string) => {
@@ -109,6 +114,22 @@ function AuthenticatedApp() {
     startUpload()
   }
 
+  const navigateFromNox = (target: NoxNavigateTarget) => {
+    if (target.type === 'gap') {
+      openGap(target.step ?? 'overview')
+      return
+    }
+    if (target.type === 'upload') {
+      startEvidenceUpload()
+      return
+    }
+    if (target.type === 'board') {
+      go('reports', 'rep-board-summary')
+      return
+    }
+    go(target.module, target.recordId)
+  }
+
   if (!signedIn) {
     return (
       <LoginScreen
@@ -123,15 +144,32 @@ function AuthenticatedApp() {
   return (
     <AppShell
       module={module}
-      aiOpen={aiOpen}
       onModule={(id) => go(id)}
-      onToggleAi={() => setAiOpen((value) => !value)}
       onNotification={(item) => {
         if (item.target === 'gap') openGap('overview')
         else if (item.target === 'board') go('reports', 'rep-board-summary')
         else if (item.target === 'evidence') go('evidence', item.recordId)
         else go('hub')
       }}
+      aiOpen={aiOpen}
+      ai={
+        <NoxAiPanel
+        open={aiOpen}
+        onOpen={() => setAiOpen(true)}
+        onClose={() => setAiOpen(false)}
+        position={position}
+        module={canvas === 'gap' ? 'gap' : module}
+        selectedId={selectedId}
+        selectedTitle={selectedTitle}
+        hubFocus={hubFocus}
+        gapStep={gapStep}
+        riskDrill={module === 'risks' ? riskDrill : null}
+        pendingPrompt={pendingPrompt}
+        onConsumePrompt={() => setPendingPrompt(null)}
+        onOpenSource={openSource}
+        onNavigate={navigateFromNox}
+      />
+      }
     >
       {module === 'hub' && canvas === 'gap' ? (
         <ConnectedGapView
@@ -162,6 +200,8 @@ function AuthenticatedApp() {
           onOpenAction={setOpenAction}
           onCloseAction={() => setOpenAction(null)}
         />
+      ) : module === 'connect' ? (
+        <NoxConnect onAsk={openAi} onNavigate={navigateFromNox} />
       ) : module === 'regulatory' ? (
         <RegulatoryModule selectedId={selectedId} onSelect={(id) => go('regulatory', id)} />
       ) : module === 'controls' ? (
@@ -180,25 +220,24 @@ function AuthenticatedApp() {
           }}
         />
       ) : module === 'risks' ? (
-        <RisksModule selectedId={selectedId} onSelect={(id) => go('risks', id)} />
+        <RisksModule
+          selectedId={selectedId}
+          onSelect={(id) => go('risks', id)}
+          onNavigate={(target) => {
+            if (target.type === 'risk') {
+              go('risks', target.riskId)
+              return
+            }
+            go(target.module, target.recordId)
+          }}
+          onAskNox={openAi}
+          onDrillContextChange={setRiskDrill}
+        />
       ) : module === 'reports' ? (
         <ReportsModule selectedId={selectedId} onOpenSource={openSource} />
       ) : (
         <ActivityModule />
       )}
-      {aiOpen ? (
-        <NoxAiPanel
-          position={position}
-          module={canvas === 'gap' ? 'gap' : module}
-          selectedId={selectedId}
-          selectedTitle={selectedTitle}
-          hubFocus={hubFocus}
-          gapStep={gapStep}
-          pendingPrompt={pendingPrompt}
-          onConsumePrompt={() => setPendingPrompt(null)}
-          onOpenSource={openSource}
-        />
-      ) : null}
-    </AppShell>
+          </AppShell>
   )
 }
