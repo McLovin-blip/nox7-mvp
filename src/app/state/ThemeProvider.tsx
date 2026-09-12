@@ -23,7 +23,8 @@ function resolveInitialTheme(): ThemeMode {
   if (typeof window === 'undefined') return 'dark'
   const stored = window.localStorage.getItem(STORAGE_KEY)
   if (stored === 'light' || stored === 'dark') return stored
-  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+  // Default to Nox7 dark when the user has not chosen a preference yet.
+  return 'dark'
 }
 
 function applyTheme(theme: ThemeMode) {
