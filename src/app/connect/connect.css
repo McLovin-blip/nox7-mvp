@@ -67,11 +67,12 @@
 .connect-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px;
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
   display: grid;
   gap: 14px;
   align-content: start;
+  box-shadow: var(--shadow-card);
 }
 
 .connect-card-head,
@@ -117,7 +118,7 @@
 }
 
 .connect-trend.up {
-  color: #9be7b8;
+  color: var(--status-success);
 }
 
 .connect-assurance {
@@ -192,7 +193,7 @@
   bottom: 0;
   height: 4px;
   border-radius: 99px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--border-subtle);
 }
 
 .connect-score-list i,
@@ -229,7 +230,7 @@
 .connect-bar {
   height: 4px;
   border-radius: 99px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--border-subtle);
   overflow: hidden;
 }
 
@@ -322,7 +323,7 @@
   width: 100%;
   min-width: 0;
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--bg-surface-2);
   color: inherit;
   border-radius: 12px;
   padding: 14px 12px;
@@ -384,7 +385,7 @@
   width: 100%;
   appearance: none;
   border: 1px solid transparent;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-surface-2);
   color: inherit;
   border-radius: 12px;
   padding: 10px;
@@ -442,18 +443,18 @@
 }
 
 .connect-risk-list .sev.elevated {
-  color: #f0b4a8;
-  border-color: rgba(232, 90, 69, 0.35);
+  color: var(--status-critical);
+  border-color: color-mix(in srgb, var(--status-critical) 35%, var(--border));
 }
 
 .connect-risk-list .sev.watch {
-  color: #e6c98a;
-  border-color: rgba(214, 168, 74, 0.35);
+  color: var(--status-warning);
+  border-color: color-mix(in srgb, var(--status-warning) 35%, var(--border));
 }
 
 .connect-risk-list .sev.reduced {
-  color: #9be7b8;
-  border-color: rgba(110, 219, 152, 0.35);
+  color: var(--status-success);
+  border-color: color-mix(in srgb, var(--status-success) 35%, var(--border));
 }
 
 .connect-risk-list u {
@@ -476,8 +477,8 @@
   font-weight: 650;
   padding: 4px 7px;
   border-radius: 999px;
-  border: 1px solid rgba(139, 111, 232, 0.28);
-  color: #b7a8f2;
+  border: 1px solid var(--accent-line);
+  color: var(--accent-secondary);
 }
 
 .connect-ai-strip {
@@ -501,8 +502,8 @@
 .connect-ai-chips button,
 .connect-page .primary {
   appearance: none;
-  border: 1px solid rgba(139, 111, 232, 0.35);
-  background: rgba(10, 10, 16, 0.55);
+  border: 1px solid var(--accent-line);
+  background: var(--bg-surface);
   color: var(--text);
   border-radius: 999px;
   padding: 8px 12px;

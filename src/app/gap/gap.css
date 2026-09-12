@@ -131,8 +131,8 @@
 }
 
 .gap-step.assured i {
-  color: #9be7b8;
-  border-color: rgba(155, 231, 184, 0.28);
+  color: var(--status-success);
+  border-color: color-mix(in srgb, var(--status-success) 35%, var(--border));
 }
 
 .gap-step.partial i,
@@ -143,8 +143,8 @@
 
 .gap-step.attention i,
 .gap-detail i.attention {
-  color: #ffb4a8;
-  border-color: rgba(232, 90, 69, 0.35);
+  color: var(--status-critical);
+  border-color: color-mix(in srgb, var(--status-critical) 35%, var(--border));
 }
 
 .gap-step.on {
@@ -187,8 +187,8 @@
 }
 
 .gap-detail i.assured {
-  color: #9be7b8;
-  border-color: rgba(155, 231, 184, 0.28);
+  color: var(--status-success);
+  border-color: color-mix(in srgb, var(--status-success) 35%, var(--border));
 }
 
 .gap-detail h2 {
@@ -199,7 +199,7 @@
 
 .gap-detail p {
   margin: 0 0 14px;
-  color: #c9c9d6;
+  color: var(--text-secondary);
   font-size: 13px;
   line-height: 1.55;
 }

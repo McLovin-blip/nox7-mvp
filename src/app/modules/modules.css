@@ -125,18 +125,18 @@
 }
 
 .pill.assured {
-  color: #9be7b8;
-  border-color: rgba(155, 231, 184, 0.28);
+  color: var(--status-success);
+  border-color: color-mix(in srgb, var(--status-success) 35%, var(--border));
 }
 
 .pill.partial {
-  color: #d5ccff;
+  color: var(--accent-secondary);
   border-color: var(--purple-line);
 }
 
 .pill.attention {
-  color: #ffb4a8;
-  border-color: rgba(232, 90, 69, 0.35);
+  color: var(--status-critical);
+  border-color: color-mix(in srgb, var(--status-critical) 35%, var(--border));
 }
 
 .mod-detail {
@@ -164,7 +164,7 @@
 
 .mod-detail p {
   margin: 0 0 14px;
-  color: #c9c9d6;
+  color: var(--text-2);
   font-size: 13px;
   line-height: 1.55;
 }
@@ -233,7 +233,7 @@
 .danger {
   border: 1px solid rgba(232, 90, 69, 0.35);
   background: transparent;
-  color: #ffb4a8;
+  color: var(--status-critical);
 }
 
 .ghost {
@@ -287,7 +287,7 @@
   display: block;
   height: 4px;
   border-radius: 99px;
-  background: #171728;
+  background: var(--bg-surface-2);
   overflow: hidden;
 }
 
@@ -406,13 +406,13 @@
 }
 
 .feed .ok b {
-  color: #9be7b8;
+  color: var(--status-success);
 }
 .feed .wait b {
   color: #d5ccff;
 }
 .feed .warn b {
-  color: #ffb4a8;
+  color: var(--status-critical);
 }
 
 @media (max-width: 1180px) {

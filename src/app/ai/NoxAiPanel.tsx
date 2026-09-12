@@ -183,9 +183,14 @@ export function NoxAiPanel({
               <p className="nox-chat-ctx">{contextBanner(ctx)}</p>
             </div>
           </div>
-          <button type="button" className="nox-minimize" onClick={onClose} aria-label="Minimize Nox AI">
-            Minimize
-          </button>
+          <div className="nox-chat-actions">
+            <button type="button" className="nox-minimize" onClick={onClose} aria-label="Minimize Nox AI">
+              Minimize
+            </button>
+            <button type="button" className="nox-close" onClick={onClose} aria-label="Close Nox AI">
+              Close
+            </button>
+          </div>
         </header>
 
         <div className="nox-thread" ref={scrollerRef}>
