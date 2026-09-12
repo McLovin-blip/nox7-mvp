@@ -275,7 +275,7 @@ export function buildHubView(position: PositionState) {
           approvalStatus: `Approval required · ${layla?.name}`,
           primary: true,
           askPrompt: 'What is the highest-impact action before the review?',
-          cta: 'Open action detail',
+          cta: 'Upload current assessments',
           target: 'upload' as const,
         },
         {

@@ -28,7 +28,7 @@ function AuthenticatedApp() {
   const [signedIn, setSignedIn] = useState(false)
   const [module, setModule] = useState<ModuleId>('hub')
   const [canvas, setCanvas] = useState<AuthenticatedView>('hub')
-  const [aiOpen, setAiOpen] = useState(true)
+  const [aiOpen, setAiOpen] = useState(() => window.matchMedia('(min-width: 1101px)').matches)
   const [mapOpen, setMapOpen] = useState(false)
   const [mapFilter, setMapFilter] = useState<MapFilter>('all')
   const [selectedNode, setSelectedNode] = useState<MapNodeId>('centre')

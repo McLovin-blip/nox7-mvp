@@ -1,6 +1,7 @@
 .hub {
   min-height: 0;
   overflow: auto;
+  overflow-x: hidden;
   padding: 20px 22px 32px;
   display: grid;
   gap: 14px;
@@ -202,6 +203,7 @@
   gap: 6px;
   justify-items: end;
   flex-shrink: 0;
+  max-width: 240px;
 }
 
 .briefing-meta em,
@@ -217,7 +219,7 @@
 .briefing-meta small {
   color: var(--text-2);
   border-color: var(--border);
-  max-width: 280px;
+  line-height: 1.35;
   text-align: right;
 }
 
@@ -437,26 +439,26 @@
 .connect-chain {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 0;
+  gap: 8px;
 }
 
 .connect-step {
-  display: grid;
-  grid-template-columns: 12px minmax(0, 1fr);
+  display: flex;
   align-items: stretch;
+  min-width: 0;
 }
 
 .connect-step:first-child {
-  grid-template-columns: minmax(0, 1fr);
+  display: flex;
 }
 
 .connect-line {
-  align-self: center;
-  height: 1px;
-  background: var(--purple-line);
+  display: none;
 }
 
 .connect-node {
+  flex: 1;
+  min-width: 0;
   min-height: 92px;
   text-align: left;
   border: 1px solid var(--border);
@@ -727,11 +729,7 @@
 
   .connect-step,
   .connect-step:first-child {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .connect-line {
-    display: none;
+    display: flex;
   }
 
   .change-row,
