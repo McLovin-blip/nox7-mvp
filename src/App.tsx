@@ -16,12 +16,15 @@ import { RegulatoryModule } from './app/regulatory/RegulatoryModule.tsx'
 import { ReportsModule } from './app/reports/ReportsModule.tsx'
 import { RisksModule } from './app/risks/RisksModule.tsx'
 import { SessionProvider, useSession } from './app/state/SessionProvider.tsx'
+import { ThemeProvider } from './app/state/ThemeProvider.tsx'
 
 export default function App() {
   return (
-    <SessionProvider>
-      <AuthenticatedApp />
-    </SessionProvider>
+    <ThemeProvider>
+      <SessionProvider>
+        <AuthenticatedApp />
+      </SessionProvider>
+    </ThemeProvider>
   )
 }
 
@@ -146,6 +149,24 @@ function AuthenticatedApp() {
         else if (item.target === 'evidence') go('evidence', item.recordId)
         else go('hub')
       }}
+      aiOpen={aiOpen}
+      ai={
+        <NoxAiPanel
+        open={aiOpen}
+        onOpen={() => setAiOpen(true)}
+        onClose={() => setAiOpen(false)}
+        position={position}
+        module={canvas === 'gap' ? 'gap' : module}
+        selectedId={selectedId}
+        selectedTitle={selectedTitle}
+        hubFocus={hubFocus}
+        gapStep={gapStep}
+        pendingPrompt={pendingPrompt}
+        onConsumePrompt={() => setPendingPrompt(null)}
+        onOpenSource={openSource}
+        onNavigate={navigateFromNox}
+      />
+      }
     >
       {module === 'hub' && canvas === 'gap' ? (
         <ConnectedGapView
@@ -202,21 +223,6 @@ function AuthenticatedApp() {
       ) : (
         <ActivityModule />
       )}
-      <NoxAiPanel
-        open={aiOpen}
-        onOpen={() => setAiOpen(true)}
-        onClose={() => setAiOpen(false)}
-        position={position}
-        module={canvas === 'gap' ? 'gap' : module}
-        selectedId={selectedId}
-        selectedTitle={selectedTitle}
-        hubFocus={hubFocus}
-        gapStep={gapStep}
-        pendingPrompt={pendingPrompt}
-        onConsumePrompt={() => setPendingPrompt(null)}
-        onOpenSource={openSource}
-        onNavigate={navigateFromNox}
-      />
-    </AppShell>
+          </AppShell>
   )
 }

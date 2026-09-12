@@ -80,7 +80,8 @@
 .map {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
 }
 
 .strip-card,
@@ -134,16 +135,16 @@
 }
 
 .dir-improved {
-  color: #9be7b8;
+  color: var(--status-success);
 }
 
 .dir-requires-attention,
 .dir-deteriorated {
-  color: #f0b4a8;
+  color: var(--status-critical);
 }
 
 .dir-held {
-  color: #c9c9d6;
+  color: var(--text-muted);
 }
 
 .strip-card.on,
@@ -158,8 +159,12 @@
   box-shadow: 0 0 0 1px rgba(139, 111, 232, 0.35);
 }
 
-.tone-attention {
-  border-color: rgba(232, 90, 69, 0.28);
+.tone-attention,
+.tone-assured,
+.tone-partial {
+  /* Keep metric cards neutral; status is carried by direction text / pills */
+  border-color: var(--border);
+  box-shadow: var(--shadow-card);
 }
 
 .bar {
@@ -167,7 +172,7 @@
   height: 4px;
   margin-top: 12px;
   border-radius: 99px;
-  background: #171728;
+  background: var(--bg-surface-2);
   overflow: hidden;
 }
 
@@ -210,7 +215,7 @@
 .briefing-meta small {
   font-style: normal;
   font-size: 11px;
-  color: #9be7b8;
+  color: var(--status-success);
   border: 1px solid rgba(155, 231, 184, 0.25);
   padding: 3px 8px;
   border-radius: 999px;
