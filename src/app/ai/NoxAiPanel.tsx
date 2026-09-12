@@ -143,11 +143,9 @@ export function NoxAiPanel({
     }, 420 + Math.min(480, text.length * 7))
   }
 
-  const latestSuggestions =
-    [...messages].reverse().find((item) => item.role === 'nox' && item.suggestions?.length)?.suggestions ??
-    guidance.questions
-
-  const showStarter = messages.length <= 1 && !thinking
+  // Prefer live page/record context for chips so suggestions stay relevant while chat history persists.
+  const askSuggestions = guidance.questions
+  const showActions = !thinking
 
   return (
     <div className={`nox-dock${open ? ' is-open' : ''}`} aria-live="polite">
@@ -223,28 +221,26 @@ export function NoxAiPanel({
           ) : null}
         </div>
 
-        {!thinking ? (
+        {showActions ? (
           <div className="nox-guides">
-            {showStarter ? (
-              <div className="nox-actions" aria-label="Suggested actions">
-                <p className="nox-guide-label">You may want to</p>
-                {guidance.actions.slice(0, 4).map((action) => (
-                  <button
-                    key={action.id}
-                    type="button"
-                    className="nox-action"
-                    onClick={() => {
-                      onNavigate(action.navigate)
-                    }}
-                  >
-                    {action.label}
-                  </button>
-                ))}
-              </div>
-            ) : null}
+            <div className="nox-actions" aria-label="Suggested actions">
+              <p className="nox-guide-label">You may want to</p>
+              {guidance.actions.slice(0, 4).map((action) => (
+                <button
+                  key={action.id}
+                  type="button"
+                  className="nox-action"
+                  onClick={() => {
+                    onNavigate(action.navigate)
+                  }}
+                >
+                  {action.label}
+                </button>
+              ))}
+            </div>
             <div className="nox-asks" aria-label="Ask Nox">
               <p className="nox-guide-label">Ask Nox</p>
-              {(showStarter ? guidance.questions : latestSuggestions).slice(0, 4).map((item) => (
+              {askSuggestions.slice(0, 4).map((item) => (
                 <button key={item} type="button" className="nox-ask" onClick={() => send(item)}>
                   {item}
                 </button>

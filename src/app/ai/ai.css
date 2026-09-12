@@ -1,8 +1,9 @@
 .nox-dock {
   position: fixed;
-  left: 50%;
+  left: 0;
+  right: 0;
   bottom: 18px;
-  transform: translateX(-50%);
+  margin-inline: auto;
   z-index: 60;
   width: min(430px, calc(100vw - 24px));
   pointer-events: none;
