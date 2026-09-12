@@ -7,9 +7,22 @@ export type ModuleId =
   | 'reports'
   | 'activity'
 
-export type MapFilter = 'all' | 'frameworks' | 'evidence' | 'risks'
+export type MapFilter = 'all' | 'frameworks' | 'obligations' | 'evidence' | 'risks'
 
-export type MapNodeId = 'centre' | 'frameworks' | 'controls' | 'evidence' | 'risks' | 'owners'
+export type MapNodeId = 'centre' | 'frameworks' | 'obligations' | 'controls' | 'evidence' | 'risks' | 'owners'
+
+export type HubFocusKind = 'indicator' | 'framework' | 'action' | 'map' | 'change' | 'briefing'
+
+export type HubFocus = {
+  kind: HubFocusKind
+  id: string
+  title: string
+  recordId?: string
+}
+
+export type IndicatorDirection = 'improved' | 'deteriorated' | 'held' | 'requires-attention'
+
+export type NotificationTarget = 'hub' | 'gap' | 'evidence' | 'action' | 'board'
 
 export type GapStepId = 'overview' | 'policy' | 'obligations' | 'control' | 'evidence' | 'risks'
 

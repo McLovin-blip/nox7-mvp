@@ -1,203 +1,99 @@
-import type { MapFilter, MapNodeId } from '../mock/types.ts'
+import type { HubAction } from '../mock/hubModel.ts'
+import type { HubFocus, MapFilter, MapNodeId } from '../mock/types.ts'
 import { useSession } from '../state/SessionProvider.tsx'
-import { AssuranceMap } from './AssuranceMap.tsx'
+import { ActionDetail } from './ActionDetail.tsx'
+import { AiBriefing } from './AiBriefing.tsx'
+import { ConnectedAssurance } from './ConnectedAssurance.tsx'
+import { FrameworkCoverage } from './FrameworkCoverage.tsx'
+import { HubGreeting } from './HubGreeting.tsx'
+import { PositionStrip } from './PositionStrip.tsx'
+import { PriorityActions } from './PriorityActions.tsx'
+import { RecentChanges } from './RecentChanges.tsx'
 import './hub.css'
 
 export function ExecutiveHub({
   mapOpen,
   mapFilter,
   selectedNode,
+  hubFocus,
+  openAction,
   onToggleMap,
   onFilter,
   onSelectNode,
+  onFocus,
   onAsk,
   onOpenGap,
   onOpenBoard,
   onUpload,
+  onOpenSource,
+  onOpenAction,
+  onCloseAction,
 }: {
   mapOpen: boolean
   mapFilter: MapFilter
   selectedNode: MapNodeId
+  hubFocus: HubFocus | null
+  openAction: HubAction | null
   onToggleMap: () => void
   onFilter: (filter: MapFilter) => void
-  onSelectNode: (id: MapNodeId) => void
+  onSelectNode: (id: MapNodeId, focus: HubFocus, prompt: string) => void
+  onFocus: (focus: HubFocus, prompt: string) => void
   onAsk: (prompt?: string) => void
   onOpenGap: (step?: 'overview' | 'evidence') => void
   onOpenBoard: () => void
   onUpload: () => void
+  onOpenSource: (id: string) => void
+  onOpenAction: (action: HubAction) => void
+  onCloseAction: () => void
 }) {
   const { view } = useSession()
   const closed = view.position === 'after'
+  const indicatorId = hubFocus?.kind === 'indicator' ? hubFocus.id : null
+  const frameworkId = hubFocus?.kind === 'framework' ? hubFocus.id : null
+  const actionId = hubFocus?.kind === 'action' ? hubFocus.id : openAction?.id
+  const changeId = hubFocus?.kind === 'change' ? hubFocus.id : null
 
   return (
     <div className="hub">
-      <header className="hub-head">
-        <div>
-          <p className="hub-kicker">{view.greeting.kicker}</p>
-          <h1>
-            {hello()}, {view.currentUser.name.split(' ')[0]}.
-          </h1>
-          <p className="hub-lede">{view.greeting.lede}</p>
-        </div>
-        <div className="hub-head-actions">
-          <button className="ghost" type="button" onClick={onToggleMap}>
-            {mapOpen ? 'Hide assurance map' : 'Assurance map'}
-          </button>
-          <button
-            className="ghost"
-            type="button"
-            onClick={() => (closed ? onOpenBoard() : onAsk())}
-          >
-            {view.greeting.reviewPlan}
-          </button>
-        </div>
-      </header>
-      {mapOpen ? (
-        <AssuranceMap
-          filter={mapFilter}
-          selectedNode={selectedNode}
-          onFilter={onFilter}
-          onSelectNode={onSelectNode}
-          onOpenGap={() => (closed ? onOpenGap('overview') : onOpenGap('overview'))}
+      <HubGreeting />
+      <PositionStrip selectedId={indicatorId} onSelect={onFocus} />
+      <AiBriefing
+        selected={hubFocus?.kind === 'briefing'}
+        onSelect={(prompt) => onFocus({ kind: 'briefing', id: 'briefing', title: 'Nox AI briefing' }, prompt)}
+        onOpenSource={onOpenSource}
+        onPrimary={closed ? onOpenBoard : () => onOpenGap('overview')}
+      />
+      <PriorityActions
+        selectedId={actionId}
+        onSelect={(action, focus) => {
+          onOpenAction(action)
+          onFocus(focus, action.askPrompt)
+        }}
+      />
+      <FrameworkCoverage selectedId={frameworkId} onSelect={onFocus} />
+      <ConnectedAssurance
+        expanded={mapOpen}
+        filter={mapFilter}
+        selectedNode={selectedNode}
+        onToggle={onToggleMap}
+        onFilter={onFilter}
+        onSelectNode={onSelectNode}
+        onOpenGap={() => onOpenGap('overview')}
+      />
+      <RecentChanges selectedId={changeId} onSelect={onFocus} onOpenSource={onOpenSource} />
+      {openAction ? (
+        <ActionDetail
+          action={openAction}
+          onClose={onCloseAction}
+          onAsk={() => onAsk(openAction.askPrompt)}
+          onContinue={() => {
+            if (openAction.target === 'board') onOpenBoard()
+            else if (openAction.target === 'upload') onUpload()
+            else if (openAction.recordId) onOpenSource(openAction.recordId)
+            onCloseAction()
+          }}
         />
-      ) : (
-        <PositionStrip onOpenGap={() => onOpenGap('overview')} />
-      )}
-      <div className="hub-lower">
-        <AiBriefing
-          onAsk={onAsk}
-          onPrimary={closed ? onOpenBoard : () => onOpenGap('overview')}
-        />
-        <PriorityActions onPrimary={closed ? onOpenBoard : onUpload} />
-      </div>
+      ) : null}
     </div>
-  )
-}
-
-function hello() {
-  const hour = new Date().getHours()
-  return hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
-}
-
-function PositionStrip({ onOpenGap }: { onOpenGap: () => void }) {
-  const { view } = useSession()
-  const evidence = view.strip.evidenceHealth
-  const lead = view.strip.leadingFramework
-  const closed = view.position === 'after'
-
-  return (
-    <section className="strip" aria-label="Current position">
-      <article>
-        <span>Compliance readiness</span>
-        <strong>{view.strip.readinessValue}</strong>
-        <em>{view.strip.readinessLabel}</em>
-        <i className="bar">
-          <b style={{ width: `${view.strip.readinessValue}%` }} />
-        </i>
-      </article>
-      <article>
-        <span>Framework coverage</span>
-        <strong>{view.strip.frameworkCount}</strong>
-        <em>
-          {view.strip.coverageAverage}% avg · {lead?.name} leads at {lead?.coverage}%
-        </em>
-        <div className="pips" aria-hidden="true">
-          {view.strip.frameworks.map((item) => (
-            <i key={item.id} style={{ width: `${Math.max(18, item.coverage / 5)}%` }} />
-          ))}
-        </div>
-      </article>
-      <button className="gap" type="button" onClick={onOpenGap}>
-        <span>Material gaps</span>
-        <strong>{view.strip.materialGaps}</strong>
-        <em>{closed ? 'Closed for this review' : 'Supplier assurance · highest impact'}</em>
-        <small>{closed ? 'Open connected view' : 'Open connected gap'}</small>
-      </button>
-      <article>
-        <span>Evidence health</span>
-        <strong>{view.strip.evidenceLabel}</strong>
-        <em>
-          {closed
-            ? `${evidence.missing} missing · ${evidence.superseded} superseded · ${evidence.duplicate} duplicate · ${evidence.expiring} expiring`
-            : `${evidence.missing} missing · ${evidence.expired} expired · ${evidence.duplicate} duplicate · ${evidence.expiring} expiring`}
-        </em>
-        <i className={`bar${closed ? '' : ' mixed'}`}>
-          <b style={{ width: closed ? '78%' : undefined }} />
-        </i>
-      </article>
-    </section>
-  )
-}
-
-function AiBriefing({
-  onAsk,
-  onPrimary,
-}: {
-  onAsk: (prompt?: string) => void
-  onPrimary: () => void
-}) {
-  const { view } = useSession()
-  const closed = view.position === 'after'
-  return (
-    <section className="briefing">
-      <header>
-        <span>Position briefing</span>
-        <em>{view.briefing.confidence === 'high' ? 'High confidence' : view.briefing.confidence}</em>
-      </header>
-      <h2>{view.briefing.title}</h2>
-      <p>{view.briefing.body}</p>
-      <div className="briefing-actions">
-        <button className="primary" type="button" onClick={onPrimary}>
-          {closed ? 'Open Board Summary' : 'Open connected gap'}
-        </button>
-        <button
-          className="follow"
-          type="button"
-          onClick={() => onAsk(closed ? 'Has our position improved?' : 'What is our biggest supplier assurance gap?')}
-        >
-          Ask Nox
-        </button>
-      </div>
-    </section>
-  )
-}
-
-function PriorityActions({ onPrimary }: { onPrimary: () => void }) {
-  const { view } = useSession()
-  return (
-    <section className="actions">
-      <header>
-        <span>Priority actions</span>
-      </header>
-      <ol>
-        {view.actions.map((item, index) => (
-          <li key={item.id}>
-            {item.primary ? (
-              <button type="button" className="action-open" onClick={onPrimary}>
-                <b>{String(index + 1).padStart(2, '0')}</b>
-                <div>
-                  <strong>{item.title}</strong>
-                  <em>
-                    {item.owner} · {item.due}
-                  </em>
-                </div>
-                <small>{item.impact}</small>
-              </button>
-            ) : (
-              <>
-                <b>{String(index + 1).padStart(2, '0')}</b>
-                <div>
-                  <strong>{item.title}</strong>
-                  <em>
-                    {item.owner} · {item.due}
-                  </em>
-                </div>
-                <small>{item.impact}</small>
-              </>
-            )}
-          </li>
-        ))}
-      </ol>
-    </section>
   )
 }

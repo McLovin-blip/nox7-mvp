@@ -7,7 +7,7 @@ import {
   prompts,
   supplierControl,
 } from '../mock/data.ts'
-import type { AiPanelModel, GapStepId, ModuleId, PositionState } from '../mock/types.ts'
+import type { AiPanelModel, GapStepId, HubFocus, ModuleId, PositionState } from '../mock/types.ts'
 import { answerFor, gapAiFor, hubAiFor } from './answers.ts'
 
 export type ChatCitation = {
@@ -40,6 +40,7 @@ export type ConversationContext = {
   module: ModuleId | 'gap'
   selectedId?: string | null
   selectedTitle?: string
+  hubFocus?: HubFocus | null
   gapStep?: GapStepId
 }
 
@@ -474,7 +475,106 @@ function followUpReply(question: string, ctx: ConversationContext, history: Chat
   return null
 }
 
+function frameworkCompareReply(ctx: ConversationContext): Reply {
+  const after = ctx.position === 'after'
+  return {
+    text: after
+      ? [
+          'All four international frameworks improved after the same approval.',
+          '',
+          'ISO 27001 86% · NIS2 82% · GDPR 80% · NCA ECC 79%.',
+          '',
+          'Why it matters: they were never four separate projects. Current assessments support the shared supplier-assurance control, so coverage moved together.',
+          '',
+          'Recommendation: Cite this comparison in the Board Summary. A duplicate questionnaire remains a catalogue watch item.',
+        ].join('\n')
+      : [
+          'Four international frameworks are in scope: ISO 27001 78%, NIS2 71%, GDPR 69% and NCA ECC 66%. Average coverage is 71%.',
+          '',
+          'Why it matters: each is limited by the same missing critical-supplier assessments. ISO 27001 still has two of three obligations supported; NIS2, GDPR and NCA ECC each have their supplier obligation only partly supported.',
+          '',
+          'Recommendation: Close the supplier evidence package once. That is more efficient than treating each framework as a separate gap.',
+        ].join('\n'),
+    citations: citationsFrom(
+      after
+        ? ['ev-supplier-assessments-2026', 'ctl-supplier-assurance', 'obl-iso-a532']
+        : ['ctl-supplier-assurance', 'obl-iso-a532', 'obl-nis2-supply', 'obl-gdpr-processor', 'obl-nca-third-party'],
+      ctx.position,
+    ),
+    suggestions: after
+      ? ['Has our position improved?', 'Summarise this for the board.']
+      : ['Which gap affects the most frameworks?', 'What should I do next?'],
+    topic: 'supplier-gap',
+  }
+}
+
+function frameworkDetailReply(name: string, ctx: ConversationContext): Reply {
+  const after = ctx.position === 'after'
+  const framework = data.frameworks.find((item) => item.name.toLowerCase() === name.toLowerCase())
+  const coverage = after ? framework?.coverageAfter : framework?.coverageBefore
+  const obligation = data.obligations.find((item) => item.frameworkId === framework?.id && item.supportBefore === 'partial')
+  return {
+    text: after
+      ? [
+          `${framework?.name ?? name} coverage is now ${coverage}%, up from ${framework?.coverageBefore}%.`,
+          '',
+          `Why it matters: the supplier-related obligation is supported by current assessments, not by a separate ${framework?.name ?? name} workstream.`,
+          '',
+          'Recommendation: Keep this movement in the Board Summary narrative.',
+        ].join('\n')
+      : [
+          `${framework?.name ?? name} is at ${coverage}% coverage.`,
+          '',
+          `Why it is only partly covered: ${obligation?.title ?? 'the supplier-related obligation'} is supported by a current policy, but current critical-supplier assessments are missing.`,
+          '',
+          'The same gap also limits NIS2, GDPR and NCA ECC. Closing one evidence package is the action.',
+        ].join('\n'),
+    citations: citationsFrom(
+      [obligation?.id, 'ctl-supplier-assurance', after ? 'ev-supplier-assessments-2026' : 'ev-audit-findings'],
+      ctx.position,
+    ),
+    suggestions: ['How do the four frameworks compare?', 'What should I do next?'],
+    topic: 'supplier-gap',
+  }
+}
+
+function hubObjectReply(question: string, ctx: ConversationContext): Reply | null {
+  const q = norm(question)
+  const focus = ctx.hubFocus
+  if (/how do the four frameworks compare|frameworks compare|framework coverage/.test(q)) {
+    return frameworkCompareReply(ctx)
+  }
+  const named = ['ISO 27001', 'NIS2', 'GDPR', 'NCA ECC'].find((name) => q.includes(name.toLowerCase()))
+  if (named && /cover|gap|partial|oblig/.test(q)) {
+    return frameworkDetailReply(named, ctx)
+  }
+  if (focus?.kind === 'framework' && (/why is|partly covered|coverage change/.test(q) || q.includes(focus.title.toLowerCase()))) {
+    return frameworkDetailReply(focus.title, ctx)
+  }
+  if (focus?.kind === 'map' && /explain|connected|this layer|this node/.test(q)) {
+    if (focus.id === 'frameworks') return frameworkCompareReply(ctx)
+    if (focus.id === 'obligations') {
+      return {
+        text: ctx.position === 'after'
+          ? 'The four international supplier-related obligations are now supported by the same current assessments.'
+          : 'Four international obligations are only partly supported. They share the supplier-assurance policy and control, and none is fully supported until current assessments exist.',
+        citations: citationsFrom(
+          ['obl-iso-a532', 'obl-nis2-supply', 'obl-gdpr-processor', 'obl-nca-third-party'],
+          ctx.position,
+        ),
+        suggestions: ['Which gap affects the most frameworks?', 'What should I do next?'],
+        topic: 'supplier-gap',
+      }
+    }
+    if (focus.id === 'owners') return nextActionReply(ctx)
+  }
+  return null
+}
+
 function intentReply(question: string, ctx: ConversationContext): Reply | null {
+  const focused = hubObjectReply(question, ctx)
+  if (focused) return focused
+
   const q = norm(question)
 
   if ((/biggest (current )?risk|top risk|largest risk/.test(q) || /what is our biggest/.test(q)) && /risk/.test(q)) {
@@ -642,7 +742,8 @@ export function contextBanner(ctx: ConversationContext) {
     screenLabel(ctx),
     ctx.position === 'after' ? 'Position improved' : 'Position needs attention',
   ]
-  if (ctx.selectedTitle) bits.push(ctx.selectedTitle)
+  if (ctx.hubFocus?.title) bits.push(ctx.hubFocus.title)
+  else if (ctx.selectedTitle) bits.push(ctx.selectedTitle)
   return bits.join(' · ')
 }
 

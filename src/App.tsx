@@ -8,7 +8,8 @@ import { ConnectedGapView } from './app/gap/ConnectedGapView.tsx'
 import { ExecutiveHub } from './app/hub/ExecutiveHub.tsx'
 import { LoginScreen } from './app/login/LoginScreen.tsx'
 import { lookupSource } from './app/mock/data.ts'
-import type { AuthenticatedView, GapStepId, MapFilter, MapNodeId, ModuleId } from './app/mock/types.ts'
+import type { HubAction } from './app/mock/hubModel.ts'
+import type { AuthenticatedView, GapStepId, HubFocus, MapFilter, MapNodeId, ModuleId } from './app/mock/types.ts'
 import { RegulatoryModule } from './app/regulatory/RegulatoryModule.tsx'
 import { ReportsModule } from './app/reports/ReportsModule.tsx'
 import { RisksModule } from './app/risks/RisksModule.tsx'
@@ -34,13 +35,16 @@ function AuthenticatedApp() {
   const [gapStep, setGapStep] = useState<GapStepId>('overview')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null)
+  const [hubFocus, setHubFocus] = useState<HubFocus | null>(null)
+  const [openAction, setOpenAction] = useState<HubAction | null>(null)
 
   const selectedTitle = useMemo(() => {
+    if (hubFocus?.title) return hubFocus.title
     if (!selectedId) return undefined
     return [...view.obligations, ...view.controls, ...view.evidence, ...view.risks, ...view.reports].find(
       (item) => item.id === selectedId,
     )?.title
-  }, [selectedId, view])
+  }, [hubFocus, selectedId, view])
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -62,9 +66,29 @@ function AuthenticatedApp() {
     setModule(id)
     setCanvas('hub')
     setSelectedId(recordId ?? null)
+    if (id !== 'hub') {
+      setOpenAction(null)
+    }
+  }
+
+  const applyFocus = (focus: HubFocus, prompt: string) => {
+    setHubFocus(focus)
+    setSelectedId(focus.recordId ?? null)
+    openAi(prompt)
   }
 
   const openSource = (id: string) => {
+    const action = view.hub.actions.find((item) => item.id === id)
+    if (action) {
+      setModule('hub')
+      setCanvas('hub')
+      setOpenAction(action)
+      applyFocus(
+        { kind: 'action', id: action.id, title: action.title, recordId: action.recordId },
+        action.askPrompt,
+      )
+      return
+    }
     if (id.startsWith('rep-')) {
       go('reports', id)
       return
@@ -77,6 +101,7 @@ function AuthenticatedApp() {
     setModule('hub')
     setCanvas('gap')
     setGapStep(step)
+    setOpenAction(null)
   }
 
   const startEvidenceUpload = () => {
@@ -101,6 +126,12 @@ function AuthenticatedApp() {
       aiOpen={aiOpen}
       onModule={(id) => go(id)}
       onToggleAi={() => setAiOpen((value) => !value)}
+      onNotification={(item) => {
+        if (item.target === 'gap') openGap('overview')
+        else if (item.target === 'board') go('reports', 'rep-board-summary')
+        else if (item.target === 'evidence') go('evidence', item.recordId)
+        else go('hub')
+      }}
     >
       {module === 'hub' && canvas === 'gap' ? (
         <ConnectedGapView
@@ -114,16 +145,22 @@ function AuthenticatedApp() {
           mapOpen={mapOpen}
           mapFilter={mapFilter}
           selectedNode={selectedNode}
+          hubFocus={hubFocus}
+          openAction={openAction}
           onToggleMap={() => setMapOpen((value) => !value)}
           onFilter={setMapFilter}
-          onSelectNode={(id) => {
+          onSelectNode={(id, focus, prompt) => {
             setSelectedNode(id)
-            setAiOpen(true)
+            applyFocus(focus, prompt)
           }}
+          onFocus={applyFocus}
           onAsk={openAi}
           onOpenGap={(step) => openGap(step ?? 'overview')}
           onOpenBoard={() => go('reports', 'rep-board-summary')}
           onUpload={startEvidenceUpload}
+          onOpenSource={openSource}
+          onOpenAction={setOpenAction}
+          onCloseAction={() => setOpenAction(null)}
         />
       ) : module === 'regulatory' ? (
         <RegulatoryModule selectedId={selectedId} onSelect={(id) => go('regulatory', id)} />
@@ -137,6 +174,7 @@ function AuthenticatedApp() {
             setModule('hub')
             setCanvas('hub')
             setSelectedId(null)
+            setHubFocus(null)
             setAiOpen(true)
             setPendingPrompt('Has our position improved?')
           }}
@@ -154,6 +192,7 @@ function AuthenticatedApp() {
           module={canvas === 'gap' ? 'gap' : module}
           selectedId={selectedId}
           selectedTitle={selectedTitle}
+          hubFocus={hubFocus}
           gapStep={gapStep}
           pendingPrompt={pendingPrompt}
           onConsumePrompt={() => setPendingPrompt(null)}

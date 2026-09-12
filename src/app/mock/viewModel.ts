@@ -1,17 +1,11 @@
-import type {
-  MapNodeId,
-  ModuleId,
-  PositionState,
-  RecordRow,
-  Tone,
-} from './types.ts'
+import type { ModuleId, PositionState, RecordRow, Tone } from './types.ts'
+import { buildHubView } from './hubModel.ts'
 import {
   coverageOf,
   currentUser,
   data,
   evidenceFor,
   frameworkName,
-  hubAnswerBefore,
   internationalFrameworks,
   layla,
   nadia,
@@ -176,125 +170,16 @@ export function buildAppView(position: PositionState) {
     frameworks,
   }
 
-  const greeting = {
-    kicker: 'Executive Hub',
-    lede: after
-      ? 'The supplier-assurance gap is closed for this review. Coverage, control assurance and connected risk have moved together.'
-      : 'One material gap requires attention before the governance review.',
-    reviewPlan: after ? 'Open Board Summary' : 'View review plan',
-  }
-
-  const briefing = after
-    ? {
-        title: 'Current assessments are now in place across four frameworks.',
-        body: 'Layla Rahman approved the 2026 critical-supplier assessments. Supplier assurance is assured, third-party and regulatory exposure are reduced, and the Board Summary can cite current evidence. A duplicate questionnaire pack remains flagged.',
-        confidence: 'high' as const,
-        chips: ['Gap closed for this review', `${frameworks.length} frameworks improved`, '1 duplicate still flagged'],
-        prompts: prompts.hub,
-      }
-    : {
-        title: 'Supplier assurance is the highest-impact gap before your review.',
-        body: 'The policy is current, but current assessment evidence is missing for several critical suppliers. Closing this gap improves assurance across four international frameworks and reduces two connected risks.',
-        confidence: hubAnswerBefore.confidence,
-        chips: [
-          `${frameworks.length} frameworks affected`,
-          `${partialInternational.length} obligations partially assured`,
-          `${missing} evidence pack missing`,
-        ],
-        prompts: prompts.hub.slice(0, 3),
-      }
-
-  const actions = after
-    ? [
-        {
-          id: data.actions[0].id,
-          title: 'Current critical-supplier assessments approved',
-          owner: `${layla?.name}, ${layla?.role}`,
-          due: 'Completed',
-          impact: 'Closed',
-          primary: true,
-        },
-        {
-          id: 'act-duplicate-pack',
-          title: 'Resolve duplicate 2024 supplier questionnaire pack',
-          owner: `${omar?.name}, ${omar?.role}`,
-          due: 'Still flagged',
-          impact: 'Medium',
-          primary: false,
-        },
-        {
-          id: 'act-continuity-watch',
-          title: 'Review expiring business continuity test report',
-          owner: `${nadia?.name}, ${nadia?.role}`,
-          due: 'Watch · not the primary action',
-          impact: 'Medium',
-          primary: false,
-        },
-      ]
-    : [
-        {
-          id: data.actions[0].id,
-          title: data.actions[0].title,
-          owner: `${omar?.name}, ${omar?.role}`,
-          due: `Due in ${organisation.review.daysRemaining} days`,
-          impact: 'High impact',
-          primary: true,
-        },
-        {
-          id: 'act-continuity-watch',
-          title: 'Review expiring business continuity test report',
-          owner: `${nadia?.name}, ${nadia?.role}`,
-          due: 'Watch · not the primary action',
-          impact: 'Medium',
-          primary: false,
-        },
-        {
-          id: 'act-duplicate-pack',
-          title: 'Resolve duplicate 2024 supplier questionnaire pack',
-          owner: `${omar?.name}, ${omar?.role}`,
-          due: 'Flagged in the evidence set',
-          impact: 'Medium',
-          primary: false,
-        },
-      ]
-
-  const mapNodes: {
-    id: MapNodeId
-    title: string
-    detail: string
-    status: Tone
-  }[] = [
-    {
-      id: 'frameworks',
-      title: 'Frameworks',
-      detail: after ? `${coverageAverage}% avg coverage` : `${frameworks.length} in scope`,
-      status: after ? 'assured' : 'partial',
-    },
-    {
-      id: 'controls',
-      title: 'Controls',
-      detail: after ? 'Supplier assurance assured' : '1 partially assured',
-      status: after ? 'assured' : 'partial',
-    },
-    {
-      id: 'evidence',
-      title: 'Evidence',
-      detail: after ? 'Critical pack current' : `${missing} missing · ${expired} expired`,
-      status: after ? 'partial' : 'attention',
-    },
-    {
-      id: 'risks',
-      title: 'Risks',
-      detail: after ? 'Exposure reduced' : `${elevatedCount} elevated`,
-      status: after ? 'assured' : 'attention',
-    },
-    {
-      id: 'owners',
-      title: 'Owners',
-      detail: after ? `${layla?.name} approved` : `${omar?.name} accountable`,
-      status: after ? 'assured' : 'partial',
-    },
-  ]
+  const hub = buildHubView(position)
+  const greeting = hub.greeting
+  const briefing = hub.briefing
+  const actions = hub.actions
+  const mapNodes = hub.layers.map((item) => ({
+    id: item.id,
+    title: item.title,
+    detail: item.detail,
+    status: item.status,
+  }))
 
   const mapCentre = after
     ? {
@@ -372,6 +257,7 @@ export function buildAppView(position: PositionState) {
     reportingPeriod,
     nav,
     strip,
+    hub,
     greeting,
     briefing,
     actions,

@@ -124,6 +124,10 @@
   grid-template-rows: 56px minmax(0, 1fr);
 }
 
+.mobile-nav {
+  display: none;
+}
+
 .top {
   display: flex;
   align-items: center;
@@ -181,6 +185,88 @@
   border-radius: 4px;
 }
 
+.note-wrap {
+  position: relative;
+}
+
+.note-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.note-btn b {
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: rgba(139, 111, 232, 0.2);
+  color: #d5ccff;
+  font-size: 10px;
+  display: grid;
+  place-items: center;
+}
+
+.note-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  width: min(360px, 72vw);
+  background: #0c0c16;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px;
+  display: grid;
+  gap: 4px;
+  z-index: 30;
+}
+
+.note-menu button {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.note-menu button:hover,
+.note-btn:hover,
+.ask:hover,
+.rail-item:hover {
+  background: rgba(139, 111, 232, 0.1);
+}
+
+.note-menu strong,
+.note-menu em {
+  display: block;
+}
+
+.note-menu em {
+  margin-top: 4px;
+  color: var(--text-2);
+  font-style: normal;
+  font-size: 12px;
+}
+
+.top button:focus-visible,
+.rail-item:focus-visible,
+.mobile-nav button:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: 2px;
+}
+
 .shell-body {
   min-height: 0;
   display: grid;
@@ -201,7 +287,47 @@
     display: none;
   }
 
+  .shell-main {
+    grid-template-rows: 56px auto minmax(0, 1fr);
+  }
+
+  .mobile-nav {
+    display: flex;
+    gap: 6px;
+    overflow: auto;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mobile-nav button {
+    flex: 0 0 auto;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-2);
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .mobile-nav button[aria-current='page'] {
+    border-color: var(--purple-line);
+    color: var(--text);
+    background: rgba(139, 111, 232, 0.12);
+    font-weight: 600;
+  }
+
   .shell-body {
     grid-template-columns: 1fr;
+  }
+
+  .top {
+    padding: 0 14px;
+    gap: 10px;
+  }
+
+  .top-meta {
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 }

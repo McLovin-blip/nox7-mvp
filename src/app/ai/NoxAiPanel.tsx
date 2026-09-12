@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { GapStepId, ModuleId, PositionState } from '../mock/types.ts'
+import type { GapStepId, HubFocus, ModuleId, PositionState } from '../mock/types.ts'
 import {
   EMPTY_SUGGESTIONS,
   buildNoxReply,
@@ -16,6 +16,7 @@ export function NoxAiPanel({
   module,
   selectedId,
   selectedTitle,
+  hubFocus,
   gapStep,
   pendingPrompt,
   onConsumePrompt,
@@ -25,6 +26,7 @@ export function NoxAiPanel({
   module: ModuleId | 'gap'
   selectedId?: string | null
   selectedTitle?: string
+  hubFocus?: HubFocus | null
   gapStep?: GapStepId
   pendingPrompt?: string | null
   onConsumePrompt?: () => void
@@ -35,6 +37,7 @@ export function NoxAiPanel({
     module,
     selectedId,
     selectedTitle,
+    hubFocus,
     gapStep,
   }
 
