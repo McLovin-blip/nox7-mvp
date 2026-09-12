@@ -197,56 +197,56 @@ export function NoxConnect
         </article>
       </section>
 
-      <section className="connect-card connect-chain" aria-label="Connected GRC view">
+      <section className="connect-card connect-pipeline" aria-label="Connected GRC view">
         <header className="connect-section-head">
           <div>
             <h2>Connected GRC view</h2>
             <p>See how risks, controls, regulatory obligations, evidence and actions connect across your organisation.</p>
           </div>
-          <button type="button" className="primary" onClick={() => onNavigate({ type: 'gap', step: 'overview' })}>
+          <button type="button" className="connect-cta" onClick={() => onNavigate({ type: 'gap', step: 'overview' })}>
             Explore the connections →
           </button>
         </header>
-        <div className="connect-flow">
-          <button type="button" className="connect-node" onClick={() => onNavigate({ type: 'module', module: 'risks' })}>
+        <div className="connect-pipeline-track">
+          <button type="button" className="connect-pipe" onClick={() => onNavigate({ type: 'module', module: 'risks' })}>
             <span>Risks</span>
             <strong>{model.chain.risks.total}</strong>
             <em>{model.chain.risks.critical} elevated</em>
             <em>{model.chain.risks.medium} watch</em>
           </button>
-          <span className="connect-arrow" aria-hidden="true">
+          <span className="connect-pipe-arrow" aria-hidden="true">
             →
           </span>
-          <button type="button" className="connect-node" onClick={() => onNavigate({ type: 'module', module: 'controls' })}>
+          <button type="button" className="connect-pipe" onClick={() => onNavigate({ type: 'module', module: 'controls' })}>
             <span>Controls</span>
             <strong>{model.chain.controls.total}</strong>
             <em>{model.chain.controls.ineffective} partially assured</em>
             <em>{model.chain.controls.needEvidence} need evidence</em>
           </button>
-          <span className="connect-arrow" aria-hidden="true">
+          <span className="connect-pipe-arrow" aria-hidden="true">
             →
           </span>
-          <button type="button" className="connect-node" onClick={() => onNavigate({ type: 'module', module: 'regulatory' })}>
+          <button type="button" className="connect-pipe" onClick={() => onNavigate({ type: 'module', module: 'regulatory' })}>
             <span>Regulatory</span>
             <strong>{model.chain.regulatory.total}</strong>
             <em>{model.chain.regulatory.withGaps} with gaps</em>
             <em>{model.chain.regulatory.highExposure} high exposure</em>
           </button>
-          <span className="connect-arrow" aria-hidden="true">
+          <span className="connect-pipe-arrow" aria-hidden="true">
             →
           </span>
-          <button type="button" className="connect-node" onClick={() => onNavigate({ type: 'module', module: 'evidence' })}>
+          <button type="button" className="connect-pipe" onClick={() => onNavigate({ type: 'module', module: 'evidence' })}>
             <span>Evidence</span>
             <strong>{model.chain.evidence.total}</strong>
             <em>{model.chain.evidence.missing} missing</em>
             <em>{model.chain.evidence.attention} needing attention</em>
           </button>
-          <span className="connect-arrow" aria-hidden="true">
+          <span className="connect-pipe-arrow" aria-hidden="true">
             →
           </span>
           <button
             type="button"
-            className="connect-node"
+            className="connect-pipe"
             onClick={() =>
               onNavigate(
                 model.chain.actions.overdue > 0

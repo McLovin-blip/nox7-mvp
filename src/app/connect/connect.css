@@ -274,21 +274,55 @@
   color: var(--text);
 }
 
-.connect-chain {
-  gap: 16px;
-}
-
-.connect-flow {
+.connect-card.connect-pipeline {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: 8px;
-  align-items: stretch;
+  gap: 18px;
+  align-content: start;
 }
 
-.connect-page .connect-node {
+
+
+.connect-section-head.tight {
+  margin-bottom: 0;
+}
+
+.connect-cta {
   appearance: none;
+  border: 0;
+  border-radius: 8px;
+  background: var(--purple);
+  color: #fff;
+  height: 36px;
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.connect-cta:hover {
+  filter: brightness(1.06);
+}
+
+.connect-pipeline-track {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  align-items: stretch;
+  width: 100%;
+}
+
+.connect-pipeline-track > .connect-pipe {
+  flex: 1 1 0;
+}
+
+.connect-pipe {
+  appearance: none;
+  width: 100%;
+  min-width: 0;
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.025);
   color: inherit;
   border-radius: 12px;
   padding: 14px 12px;
@@ -296,38 +330,45 @@
   cursor: pointer;
   display: grid;
   gap: 4px;
-  width: 100%;
+  align-content: start;
 }
 
-.connect-page .connect-node:hover {
-  border-color: rgba(139, 111, 232, 0.45);
-  background: rgba(139, 111, 232, 0.08);
+.connect-pipe:hover {
+  border-color: rgba(139, 111, 232, 0.5);
+  background: rgba(139, 111, 232, 0.1);
 }
 
-.connect-page .connect-node span {
+.connect-pipe span {
   color: var(--text-2);
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  font-size: 10px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  font-weight: 650;
 }
 
-.connect-page .connect-node strong {
+.connect-pipe strong {
   font-family: 'Space Grotesk', Inter, sans-serif;
-  font-size: 28px;
+  font-size: 30px;
   letter-spacing: -0.04em;
+  line-height: 1.05;
+  font-weight: 650;
 }
 
-.connect-page .connect-node em {
+.connect-pipe em {
   color: var(--text-2);
   font-size: 11px;
   font-style: normal;
+  line-height: 1.35;
 }
 
-.connect-arrow {
+.connect-pipe-arrow {
   align-self: center;
-  color: rgba(183, 168, 242, 0.7);
+  color: rgba(183, 168, 242, 0.75);
   font-size: 18px;
+  line-height: 1;
+  user-select: none;
 }
+
 
 .connect-risk-list,
 .connect-priorities {
@@ -486,12 +527,16 @@
 
 @media (max-width: 1100px) {
   .connect-row-3,
-  .connect-flow {
-    grid-template-columns: 1fr;
+  .connect-pipeline-track {
+    flex-direction: column;
   }
 
-  .connect-arrow {
+  .connect-pipe-arrow {
     display: none;
+  }
+
+  .connect-cta {
+    width: fit-content;
   }
 
   .connect-hero,
