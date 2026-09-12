@@ -26,6 +26,7 @@ export type SuggestionContext = {
   selectedTitle?: string
   hubFocus?: HubFocus | null
   gapStep?: GapStepId
+  riskDrill?: { label: string; questions: string[] } | null
 }
 
 function elevatedRisks(position: PositionState) {
@@ -292,9 +293,11 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
       const status = after ? item.treatment.statusAfter : item.treatment.statusBefore
       return status === 'overdue' || status === 'at-risk'
     })
+    const drill = ctx.riskDrill
     return {
-      intro:
-        count > 0
+      intro: drill
+        ? `Active risk drill-down: ${drill.label}. I can explain why this population matters, which record to open first, and what action to take.`
+        : count > 0
           ? `${organisation.name} currently has ${count} elevated risk${count === 1 ? '' : 's'} and ${above.length} above appetite. Start with the highest residual exposure.`
           : `Elevated exposure is reduced. ${above.length ? `${above.length} remain above appetite.` : 'Appetite pressure is lower.'} Continuity remains a watch item.`,
       actions: [
@@ -335,16 +338,18 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
           },
         },
       ],
-      questions: [
-        count > 0 ? `Show me the ${count} elevated risks.` : 'What are our biggest risks?',
-        'Which risks need immediate attention?',
-        'Which risks are above appetite?',
-        'Which risks have overdue treatments?',
-        'Which business unit has the highest exposure?',
-        'Which risks have ineffective controls?',
-        'Which risks affect compliance the most?',
-        'What changed in our risk position?',
-      ],
+      questions: drill?.questions?.length
+        ? drill.questions
+        : [
+            count > 0 ? `Show me the ${count} elevated risks.` : 'What are our biggest risks?',
+            'Which risks need immediate attention?',
+            'Which risks are above appetite?',
+            'Which risks have overdue treatments?',
+            'Which business unit has the highest exposure?',
+            'Which risks have ineffective controls?',
+            'Which risks affect compliance the most?',
+            'What changed in our risk position?',
+          ],
     }
   }
 

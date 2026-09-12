@@ -22,6 +22,7 @@ export function NoxAiPanel({
   selectedTitle,
   hubFocus,
   gapStep,
+  riskDrill,
   pendingPrompt,
   onConsumePrompt,
   onOpenSource,
@@ -36,6 +37,7 @@ export function NoxAiPanel({
   selectedTitle?: string
   hubFocus?: HubFocus | null
   gapStep?: GapStepId
+  riskDrill?: { label: string; questions: string[] } | null
   pendingPrompt?: string | null
   onConsumePrompt?: () => void
   onOpenSource: (id: string) => void
@@ -48,6 +50,7 @@ export function NoxAiPanel({
     selectedTitle,
     hubFocus,
     gapStep,
+    riskDrill,
   }
 
   const guidance = buildContextGuidance(ctx)
@@ -59,7 +62,7 @@ export function NoxAiPanel({
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const pendingTimer = useRef<number | null>(null)
   const bootstrapped = useRef(false)
-  const contextKey = `${module}|${selectedId ?? ''}|${hubFocus?.id ?? ''}|${position}`
+  const contextKey = `${module}|${selectedId ?? ''}|${hubFocus?.id ?? ''}|${position}|${riskDrill?.label ?? ''}`
 
   useEffect(() => {
     if (bootstrapped.current) return
