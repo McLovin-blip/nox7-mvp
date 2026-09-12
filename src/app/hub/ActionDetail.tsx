@@ -62,7 +62,7 @@ export function ActionDetail({
             {action.cta}
           </button>
           <button className="follow" type="button" onClick={onAsk}>
-            Ask Nox AI
+            Discuss with Nox
           </button>
         </div>
       </div>

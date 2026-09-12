@@ -9,6 +9,7 @@ import {
 } from '../mock/data.ts'
 import type { AiPanelModel, GapStepId, HubFocus, ModuleId, PositionState } from '../mock/types.ts'
 import { answerFor, gapAiFor, hubAiFor } from './answers.ts'
+import { contextualQuestions } from './suggestions.ts'
 
 export type ChatCitation = {
   id: string
@@ -52,6 +53,12 @@ export const EMPTY_SUGGESTIONS = [
   'Why is our assurance position low?',
   'Summarise this for the board.',
 ]
+
+function suggestionsFor(ctx: ConversationContext, fallback?: string[]) {
+  const contextual = contextualQuestions(ctx, 4)
+  if (contextual.length > 0) return contextual
+  return fallback ?? EMPTY_SUGGESTIONS.slice(0, 4)
+}
 
 type Reply = Omit<ChatMessage, 'id' | 'role'>
 
@@ -120,7 +127,7 @@ function composeFromAnswer(
     return {
       text: answer.executiveAnswer,
       citations: factsToCitations(answer, ctx.position),
-      suggestions: answer.prompts.slice(0, 3),
+      suggestions: suggestionsFor(ctx, answer.prompts.slice(0, 3)),
       topic,
     }
   }
@@ -140,7 +147,7 @@ function composeFromAnswer(
   return {
     text: parts.join('\n'),
     citations: factsToCitations(answer, ctx.position),
-    suggestions: answer.prompts.slice(0, 4),
+    suggestions: suggestionsFor(ctx, answer.prompts.slice(0, 4)),
     topic,
   }
 }
@@ -397,10 +404,10 @@ function recordWhyReply(ctx: ConversationContext): Reply | null {
       .filter(Boolean)
       .join('\n'),
     citations: citationsFrom([ctx.selectedId], ctx.position),
-    suggestions: EMPTY_SUGGESTIONS.slice(0, 4),
-    topic: 'general',
+      suggestions: suggestionsFor(ctx),
+      topic: 'general',
+    }
   }
-}
 
 function controlAndEvidenceReply(ctx: ConversationContext): Reply {
   const control = supplierControl
@@ -715,7 +722,7 @@ export function buildNoxReply(
           : ['ctl-supplier-assurance', 'ev-audit-findings'],
         ctx.position,
       ),
-      suggestions: EMPTY_SUGGESTIONS,
+      suggestions: suggestionsFor(ctx),
       topic: 'general',
     }
   }
@@ -749,13 +756,16 @@ export function contextBanner(ctx: ConversationContext) {
 
 export function welcomeText(ctx: ConversationContext) {
   const firstFact = hubAnswerBefore.sourcedFacts?.[0]?.text
+  const focus = ctx.selectedTitle ? ` “${ctx.selectedTitle}” is selected.` : ''
   return [
-    `Hi, I'm Nox. Ask me anything about ${organisation.name}'s risks, controls, compliance, evidence or assurance position.`,
+    `Hi — I'm Nox, your GRC colleague for ${organisation.name}.`,
     '',
-    `You're on ${screenLabel(ctx)}. ${
+    `You're on ${screenLabel(ctx)}.${focus} ${
       ctx.position === 'after'
         ? 'The material supplier-assurance gap is closed for this review.'
         : `The open material gap is still about ${firstFact ? firstFact.replace(/\.$/, '') : 'missing current critical-supplier assessments'}.`
     }`,
+    '',
+    'Ask me what is happening, why it matters, or what to do next.',
   ].join('\n')
 }

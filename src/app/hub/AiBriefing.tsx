@@ -69,9 +69,6 @@ export function AiBriefing({
           <button className="primary" type="button" onClick={onPrimary}>
             {closed ? 'Open Board Summary' : 'Open connected gap'}
           </button>
-          <button className="follow" type="button" onClick={() => onSelect(briefing.askPrompt)}>
-            Ask Nox AI about this briefing
-          </button>
         </div>
       </div>
     </section>

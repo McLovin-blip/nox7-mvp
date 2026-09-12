@@ -1,7 +1,7 @@
 .mod {
   min-height: 0;
   overflow: auto;
-  padding: 18px 24px 28px;
+  padding: 18px 24px 88px;
   display: grid;
   gap: 14px;
   align-content: start;

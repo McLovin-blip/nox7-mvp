@@ -1,7 +1,7 @@
 .gap-view {
   min-height: 0;
   overflow: auto;
-  padding: 16px 22px 24px;
+  padding: 16px 22px 88px;
   display: grid;
   gap: 12px;
   align-content: start;

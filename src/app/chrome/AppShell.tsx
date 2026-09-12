@@ -8,21 +8,19 @@ import './chrome.css'
 
 export function AppShell({
   module,
-  aiOpen,
   onModule,
   onToggleAi,
   onNotification,
   children,
 }: {
   module: ModuleId
-  aiOpen: boolean
   onModule: (id: ModuleId) => void
   onToggleAi: () => void
   onNotification: (item: HubNotification) => void
   children: ReactNode
 }) {
   return (
-    <div className={`shell${aiOpen ? '' : ' ai-closed'}`}>
+    <div className="shell">
       <Sidebar module={module} onModule={onModule} />
       <div className="shell-main">
         <TopBar onToggleAi={onToggleAi} onNotification={onNotification} />

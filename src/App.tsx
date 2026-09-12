@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ActivityModule } from './app/activity/ActivityModule.tsx'
 import { NoxAiPanel } from './app/ai/NoxAiPanel.tsx'
+import type { NoxNavigateTarget } from './app/ai/suggestions.ts'
 import { AppShell } from './app/chrome/AppShell.tsx'
 import { ControlsModule } from './app/controls/ControlsModule.tsx'
 import { EvidenceModule } from './app/evidence/EvidenceModule.tsx'
@@ -28,7 +29,7 @@ function AuthenticatedApp() {
   const [signedIn, setSignedIn] = useState(false)
   const [module, setModule] = useState<ModuleId>('hub')
   const [canvas, setCanvas] = useState<AuthenticatedView>('hub')
-  const [aiOpen, setAiOpen] = useState(() => window.matchMedia('(min-width: 1101px)').matches)
+  const [aiOpen, setAiOpen] = useState(false)
   const [mapOpen, setMapOpen] = useState(false)
   const [mapFilter, setMapFilter] = useState<MapFilter>('all')
   const [selectedNode, setSelectedNode] = useState<MapNodeId>('centre')
@@ -66,9 +67,7 @@ function AuthenticatedApp() {
     setModule(id)
     setCanvas('hub')
     setSelectedId(recordId ?? null)
-    if (id !== 'hub') {
-      setOpenAction(null)
-    }
+    if (id !== 'hub') setOpenAction(null)
   }
 
   const applyFocus = (focus: HubFocus, prompt: string) => {
@@ -109,6 +108,22 @@ function AuthenticatedApp() {
     startUpload()
   }
 
+  const navigateFromNox = (target: NoxNavigateTarget) => {
+    if (target.type === 'gap') {
+      openGap(target.step ?? 'overview')
+      return
+    }
+    if (target.type === 'upload') {
+      startEvidenceUpload()
+      return
+    }
+    if (target.type === 'board') {
+      go('reports', 'rep-board-summary')
+      return
+    }
+    go(target.module, target.recordId)
+  }
+
   if (!signedIn) {
     return (
       <LoginScreen
@@ -123,7 +138,6 @@ function AuthenticatedApp() {
   return (
     <AppShell
       module={module}
-      aiOpen={aiOpen}
       onModule={(id) => go(id)}
       onToggleAi={() => setAiOpen((value) => !value)}
       onNotification={(item) => {
@@ -186,19 +200,21 @@ function AuthenticatedApp() {
       ) : (
         <ActivityModule />
       )}
-      {aiOpen ? (
-        <NoxAiPanel
-          position={position}
-          module={canvas === 'gap' ? 'gap' : module}
-          selectedId={selectedId}
-          selectedTitle={selectedTitle}
-          hubFocus={hubFocus}
-          gapStep={gapStep}
-          pendingPrompt={pendingPrompt}
-          onConsumePrompt={() => setPendingPrompt(null)}
-          onOpenSource={openSource}
-        />
-      ) : null}
+      <NoxAiPanel
+        open={aiOpen}
+        onOpen={() => setAiOpen(true)}
+        onClose={() => setAiOpen(false)}
+        position={position}
+        module={canvas === 'gap' ? 'gap' : module}
+        selectedId={selectedId}
+        selectedTitle={selectedTitle}
+        hubFocus={hubFocus}
+        gapStep={gapStep}
+        pendingPrompt={pendingPrompt}
+        onConsumePrompt={() => setPendingPrompt(null)}
+        onOpenSource={openSource}
+        onNavigate={navigateFromNox}
+      />
     </AppShell>
   )
 }

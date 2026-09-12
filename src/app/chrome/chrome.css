@@ -271,12 +271,9 @@
 .shell-body {
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  overflow: hidden;
-}
-
-.ai-closed .shell-body {
   grid-template-columns: minmax(0, 1fr);
+  overflow: hidden;
+  position: relative;
 }
 
 @media (max-width: 1100px) {
@@ -323,12 +320,6 @@
     position: relative;
   }
 
-  .ai-panel {
-    position: absolute;
-    inset: 0;
-    z-index: 16;
-    background: #0a0a10;
-  }
 
   .top {
     display: grid;
