@@ -43,6 +43,7 @@ function AuthenticatedApp() {
   const [hubFocus, setHubFocus] = useState<HubFocus | null>(null)
   const [openAction, setOpenAction] = useState<HubAction | null>(null)
   const [riskDrill, setRiskDrill] = useState<{ label: string; questions: string[] } | null>(null)
+  const [controlDrill, setControlDrill] = useState<{ label: string; questions: string[] } | null>(null)
 
   const selectedTitle = useMemo(() => {
     if (hubFocus?.title) return hubFocus.title
@@ -73,6 +74,7 @@ function AuthenticatedApp() {
     setCanvas('hub')
     setSelectedId(recordId ?? null)
     if (id !== 'risks') setRiskDrill(null)
+    if (id !== 'controls') setControlDrill(null)
     if (id !== 'hub') setOpenAction(null)
   }
 
@@ -164,6 +166,7 @@ function AuthenticatedApp() {
         hubFocus={hubFocus}
         gapStep={gapStep}
         riskDrill={module === 'risks' ? riskDrill : null}
+        controlDrill={module === 'controls' ? controlDrill : null}
         pendingPrompt={pendingPrompt}
         onConsumePrompt={() => setPendingPrompt(null)}
         onOpenSource={openSource}
@@ -205,7 +208,23 @@ function AuthenticatedApp() {
       ) : module === 'regulatory' ? (
         <RegulatoryModule selectedId={selectedId} onSelect={(id) => go('regulatory', id)} />
       ) : module === 'controls' ? (
-        <ControlsModule selectedId={selectedId} onSelect={(id) => go('controls', id)} />
+        <ControlsModule
+          selectedId={selectedId}
+          onSelect={(id) => go('controls', id)}
+          onNavigate={(target) => {
+            if (target.type === 'control') {
+              go('controls', target.controlId)
+              return
+            }
+            if (target.type === 'upload') {
+              startEvidenceUpload()
+              return
+            }
+            go(target.module, target.recordId)
+          }}
+          onAskNox={openAi}
+          onDrillContextChange={setControlDrill}
+        />
       ) : module === 'evidence' ? (
         <EvidenceModule
           selectedId={selectedId}

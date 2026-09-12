@@ -21,10 +21,22 @@ import {
 
 function toneFrom(status: string): Tone {
   const value = status.toLowerCase()
-  if (value.includes('missing') || value.includes('elevated') || value.includes('attention') || value.includes('expired')) {
+  if (
+    value.includes('missing') ||
+    value.includes('elevated') ||
+    value.includes('attention') ||
+    value.includes('expired') ||
+    value.includes('ineffective')
+  ) {
     return 'attention'
   }
-  if (value.includes('partial') || value.includes('watch') || value.includes('expir')) {
+  if (
+    value.includes('partial') ||
+    value.includes('watch') ||
+    value.includes('expir') ||
+    value.includes('unverifiable') ||
+    value.includes('not assessed')
+  ) {
     return 'partial'
   }
   return 'assured'
@@ -71,20 +83,33 @@ export function buildAppView(position: PositionState) {
   )
 
   const controls = data.controls.map((item) => {
-    const assurance = after ? item.assuranceAfter : item.assuranceBefore
+    const overall = after ? item.overallAfter : item.overallBefore
+    const status =
+      overall === 'effective' || overall === 'assured'
+        ? 'Effective'
+        : overall === 'unverifiable'
+          ? 'Unverifiable'
+          : overall === 'ineffective'
+            ? 'Ineffective'
+            : overall === 'not-assessed'
+              ? 'Not assessed'
+              : 'Partially assured'
+    const summary =
+      item.id === 'ctl-supplier-assurance'
+        ? after
+          ? 'Policy and current assessments are both in place.'
+          : (item.partialReason ?? 'Policy is current. Current assessments are missing.')
+        : 'partialReason' in item && item.partialReason && status !== 'Effective'
+          ? String(item.partialReason)
+          : 'Supported by current evidence.'
     return {
       id: item.id,
       kind: 'Control' as const,
       title: item.title,
-      status: assurance === 'assured' ? 'Assured' : 'Partially assured',
-      tone: toneFrom(assurance),
+      status,
+      tone: toneFrom(status),
       owner: personLabel(item.ownerId),
-      summary:
-        item.id === 'ctl-supplier-assurance'
-          ? after
-            ? 'Policy and current assessments are both in place.'
-            : (item.partialReason ?? 'Policy is current. Current assessments are missing.')
-          : 'Assured by current evidence.',
+      summary,
       meta: item.frameworkIds.map((id) => frameworkName(id)).join(' · '),
       neighbours: [
         ...item.obligationIds.map((id) => ({ label: 'Obligation', title: titleOf(data.obligations, id) })),

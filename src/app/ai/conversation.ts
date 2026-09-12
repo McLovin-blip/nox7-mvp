@@ -44,6 +44,7 @@ export type ConversationContext = {
   hubFocus?: HubFocus | null
   gapStep?: GapStepId
   riskDrill?: { label: string; questions: string[] } | null
+  controlDrill?: { label: string; questions: string[] } | null
 }
 
 export const EMPTY_SUGGESTIONS = [
@@ -353,15 +354,23 @@ function recordWhyReply(ctx: ConversationContext): Reply | null {
 
   if (ctx.selectedId.startsWith('ctl-')) {
     const control = data.controls.find((item) => item.id === ctx.selectedId)
-    const status = after ? control?.assuranceAfter : control?.assuranceBefore
+    const status = after ? control?.overallAfter ?? control?.assuranceAfter : control?.overallBefore ?? control?.assuranceBefore
     return {
       text: [
-        `${title} is important because it sits on the path from policy and obligations to evidence and risk.`,
+        'Sourced facts:',
+        `${title} overall assurance is ${status}. Design ${after ? control?.designAfter : control?.designBefore}; operation ${after ? control?.operatingAfter : control?.operatingBefore}; evidence ${after ? control?.evidenceHealthAfter : control?.evidenceHealthBefore}.`,
         '',
-        `Current assurance: ${status}.`,
-        control?.partialReason && !after ? `Interpretation: ${control.partialReason}` : '',
+        'Nox AI interpretation:',
+        control?.whyBefore && !after
+          ? control.whyBefore
+          : control?.whyAfter && after
+            ? control.whyAfter
+            : `${title} sits on the path from frameworks and obligations to evidence and protected risks.`,
         '',
-        `Recommendation: ${after ? 'Use this control in the Board Summary narrative.' : 'Close the missing evidence that keeps this control partial.'}`,
+        `Confidence: high. Data freshness: ${after ? control?.evidenceHealthAfter : control?.evidenceHealthBefore}.`,
+        '',
+        `Recommended action: ${after ? control?.nextActionAfter : control?.nextActionBefore}.`,
+        'Human approval is required before the organisation position changes.',
       ]
         .filter(Boolean)
         .join('\n'),
@@ -369,7 +378,7 @@ function recordWhyReply(ctx: ConversationContext): Reply | null {
         [ctx.selectedId, ...(after ? control?.evidenceIdsAfter ?? [] : control?.evidenceIdsBefore ?? []).slice(0, 2)],
         ctx.position,
       ),
-      suggestions: ['Where are we missing evidence?', 'What should I do next?'],
+      suggestions: ['Why can this control not be relied upon?', 'What evidence is missing, expiring or conflicting?'],
       topic: 'control',
     }
   }
@@ -629,12 +638,26 @@ function intentReply(question: string, ctx: ConversationContext): Reply | null {
     }
   }
 
-  if (/missing evidence|where are we missing|evidence gap|incomplete evidence/.test(q)) {
+  if (/missing evidence|where are we missing|evidence gap|incomplete evidence|expiring or conflicting/.test(q)) {
     return missingEvidenceReply(ctx)
   }
 
   if (/supplier assurance gap|assurance gaps|supplier gap|biggest.*gap|material gap/.test(q)) {
     return supplierGapReply(ctx)
+  }
+
+  if (/controls can we rely|unverifiable|not be relied|greatest effect on nis2|insufficient for this risk/.test(q) && (ctx.module === 'controls' || /control/.test(q))) {
+    return composeFromAnswer(
+      answerFor({
+        module: 'controls',
+        position: ctx.position,
+        question: question,
+        selectedId: ctx.selectedId ?? undefined,
+        selectedTitle: ctx.selectedTitle,
+      }),
+      ctx,
+      'control',
+    )
   }
 
   if (/priorit|highest-impact|requires my attention|what should i focus|what should i do next/.test(q)) {
@@ -775,6 +798,7 @@ export function contextBanner(ctx: ConversationContext) {
   if (ctx.hubFocus?.title) bits.push(ctx.hubFocus.title)
   else if (ctx.selectedTitle) bits.push(ctx.selectedTitle)
   else if (ctx.riskDrill?.label) bits.push(ctx.riskDrill.label)
+  else if (ctx.controlDrill?.label) bits.push(ctx.controlDrill.label)
   return bits.join(' · ')
 }
 

@@ -31,6 +31,7 @@ export function NoxAiPanel({
   hubFocus,
   gapStep,
   riskDrill,
+  controlDrill,
   pendingPrompt,
   onConsumePrompt,
   onOpenSource,
@@ -46,6 +47,7 @@ export function NoxAiPanel({
   hubFocus?: HubFocus | null
   gapStep?: GapStepId
   riskDrill?: { label: string; questions: string[] } | null
+  controlDrill?: { label: string; questions: string[] } | null
   pendingPrompt?: string | null
   onConsumePrompt?: () => void
   onOpenSource: (id: string) => void
@@ -59,6 +61,7 @@ export function NoxAiPanel({
     hubFocus,
     gapStep,
     riskDrill,
+    controlDrill,
   }
 
   const guidance = buildContextGuidance(ctx)
@@ -74,7 +77,7 @@ export function NoxAiPanel({
   const streamTimers = useRef<number[]>([])
   const pendingFull = useRef<ChatMessage | null>(null)
   const activeStreamId = useRef<string | null>(null)
-  const contextKey = `${module}|${selectedId ?? ''}|${hubFocus?.id ?? ''}|${position}|${riskDrill?.label ?? ''}`
+  const contextKey = `${module}|${selectedId ?? ''}|${hubFocus?.id ?? ''}|${position}|${riskDrill?.label ?? ''}|${controlDrill?.label ?? ''}`
 
   const busy = phase !== 'idle'
 

@@ -39,6 +39,36 @@
       "id": "person-sara",
       "name": "Sara Al-Mutairi",
       "role": "Regional Compliance (KSA)"
+    },
+    {
+      "id": "person-amira",
+      "name": "Amira Khalil",
+      "role": "Head of Internal Audit"
+    },
+    {
+      "id": "person-daniel",
+      "name": "Daniel Okonkwo",
+      "role": "Financial Controller"
+    },
+    {
+      "id": "person-helena",
+      "name": "Helena Voss",
+      "role": "General Counsel"
+    },
+    {
+      "id": "person-priya",
+      "name": "Priya Nair",
+      "role": "Head of People"
+    },
+    {
+      "id": "person-karim",
+      "name": "Karim El-Sayed",
+      "role": "Head of Corporate Security"
+    },
+    {
+      "id": "person-yusuf",
+      "name": "Yusuf Rahman",
+      "role": "Head of Health, Safety and Environment"
     }
   ],
   "frameworks": [
@@ -96,7 +126,7 @@
   "obligations": [
     {
       "id": "obl-iso-a532",
-      "title": "Supplier relationships \u2014 information security",
+      "title": "Supplier relationships — information security",
       "frameworkId": "fw-iso27001",
       "supportBefore": "partial",
       "supportAfter": "supported",
@@ -313,7 +343,62 @@
         "risk-regulatory",
         "risk-vendor-concentration"
       ],
-      "partialReason": "Policy is current. Current assessments for critical suppliers are missing."
+      "partialReason": "Policy is current. Current assessments for critical suppliers are missing.",
+      "categoryId": "cat-third-party",
+      "businessUnit": "Procurement",
+      "type": "detective",
+      "execution": "hybrid",
+      "frequency": "annual",
+      "designBefore": "effective",
+      "designAfter": "effective",
+      "operatingBefore": "not-assessed",
+      "operatingAfter": "effective",
+      "evidenceSufficiencyBefore": "insufficient",
+      "evidenceSufficiencyAfter": "sufficient",
+      "overallBefore": "unverifiable",
+      "overallAfter": "effective",
+      "evidenceHealthBefore": "missing",
+      "evidenceHealthAfter": "current",
+      "priorOverall": "partially-assured",
+      "accountableExecutiveId": "person-omar",
+      "lastAssessed": "2026-06-21",
+      "nextAssessment": "2026-10-15",
+      "nextActionBefore": "Obtain and approve current critical-supplier assessments",
+      "nextActionAfter": "Keep the annual assessment cycle current",
+      "dueDate": "2026-09-26",
+      "whyBefore": "The control is designed and the policy is current, but current operating evidence is missing. Overall assurance is unverifiable, not failed.",
+      "whyAfter": "Policy plus approved 2026 assessments now prove the control is operating for this review.",
+      "whatChangedBefore": "No material improvement since the last period. Assessments remain outstanding.",
+      "whatChangedAfter": "Layla Rahman approved the 2026 assessments. Overall assurance moved from unverifiable to effective.",
+      "mappingLabels": [
+        "ISO 27001",
+        "NIS2",
+        "GDPR",
+        "NCA ECC",
+        "Contractual commitments"
+      ],
+      "testingHistory": [
+        {
+          "date": "2026-06-21",
+          "result": "Design effective; operating unverifiable",
+          "assessorId": "person-amira"
+        },
+        {
+          "date": "2025-11-11",
+          "result": "Operating effective on 2023 pack",
+          "assessorId": "person-nadia"
+        }
+      ],
+      "openActions": [
+        {
+          "id": "ca-supplier-1",
+          "title": "Obtain current critical-supplier assessments",
+          "ownerId": "person-omar",
+          "dueDate": "2026-09-26",
+          "statusBefore": "open",
+          "statusAfter": "completed"
+        }
+      ]
     },
     {
       "id": "ctl-isms-policy",
@@ -338,11 +423,49 @@
       "riskIds": [
         "risk-privileged-access"
       ],
-      "partialReason": null
+      "partialReason": null,
+      "categoryId": "cat-cybersecurity",
+      "businessUnit": "IT Services",
+      "type": "directive",
+      "execution": "manual",
+      "frequency": "annual",
+      "designBefore": "effective",
+      "designAfter": "effective",
+      "operatingBefore": "effective",
+      "operatingAfter": "effective",
+      "evidenceSufficiencyBefore": "sufficient",
+      "evidenceSufficiencyAfter": "sufficient",
+      "overallBefore": "effective",
+      "overallAfter": "effective",
+      "evidenceHealthBefore": "current",
+      "evidenceHealthAfter": "current",
+      "priorOverall": "effective",
+      "accountableExecutiveId": "person-nadia",
+      "lastAssessed": "2026-07-01",
+      "nextAssessment": "2027-03-12",
+      "nextActionBefore": "Maintain attestations on the current policy cycle",
+      "nextActionAfter": "Maintain attestations on the current policy cycle",
+      "dueDate": "2027-03-12",
+      "whyBefore": "Policy and management attestations are current and consistent.",
+      "whyAfter": "Policy and management attestations remain current.",
+      "whatChangedBefore": "No change. Policy 4.1 remains the in-force ISMS policy.",
+      "whatChangedAfter": "No change this period.",
+      "mappingLabels": [
+        "ISO 27001",
+        "Internal policies"
+      ],
+      "testingHistory": [
+        {
+          "date": "2026-07-01",
+          "result": "Effective",
+          "assessorId": "person-nadia"
+        }
+      ],
+      "openActions": []
     },
     {
       "id": "ctl-data-retention",
-      "title": "Data retention",
+      "title": "Data-retention review",
       "assuranceBefore": "assured",
       "assuranceAfter": "assured",
       "ownerId": "person-tomas",
@@ -362,7 +485,45 @@
       "riskIds": [
         "risk-privacy-retention"
       ],
-      "partialReason": null
+      "partialReason": null,
+      "categoryId": "cat-privacy",
+      "businessUnit": "Legal & Privacy",
+      "type": "preventive",
+      "execution": "hybrid",
+      "frequency": "quarterly",
+      "designBefore": "effective",
+      "designAfter": "effective",
+      "operatingBefore": "effective",
+      "operatingAfter": "effective",
+      "evidenceSufficiencyBefore": "sufficient",
+      "evidenceSufficiencyAfter": "sufficient",
+      "overallBefore": "effective",
+      "overallAfter": "effective",
+      "evidenceHealthBefore": "current",
+      "evidenceHealthAfter": "current",
+      "priorOverall": "effective",
+      "accountableExecutiveId": "person-tomas",
+      "lastAssessed": "2026-08-15",
+      "nextAssessment": "2026-11-15",
+      "nextActionBefore": "Complete the Q4 retention sampling",
+      "nextActionAfter": "Complete the Q4 retention sampling",
+      "dueDate": "2026-11-15",
+      "whyBefore": "The retention standard is current and the last quarterly review completed without exception.",
+      "whyAfter": "The retention standard remains current.",
+      "whatChangedBefore": "Held effective versus the prior period.",
+      "whatChangedAfter": "Held effective.",
+      "mappingLabels": [
+        "GDPR",
+        "Internal policies"
+      ],
+      "testingHistory": [
+        {
+          "date": "2026-08-15",
+          "result": "Effective",
+          "assessorId": "person-tomas"
+        }
+      ],
+      "openActions": []
     },
     {
       "id": "ctl-continuity",
@@ -386,7 +547,541 @@
       "riskIds": [
         "risk-continuity"
       ],
-      "partialReason": null
+      "partialReason": null,
+      "categoryId": "cat-resilience",
+      "businessUnit": "IT Services",
+      "type": "corrective",
+      "execution": "hybrid",
+      "frequency": "annual",
+      "designBefore": "effective",
+      "designAfter": "effective",
+      "operatingBefore": "effective",
+      "operatingAfter": "effective",
+      "evidenceSufficiencyBefore": "partial",
+      "evidenceSufficiencyAfter": "partial",
+      "overallBefore": "partially-assured",
+      "overallAfter": "partially-assured",
+      "evidenceHealthBefore": "expiring",
+      "evidenceHealthAfter": "expiring",
+      "priorOverall": "effective",
+      "accountableExecutiveId": "person-nadia",
+      "lastAssessed": "2025-11-18",
+      "nextAssessment": "2026-10-30",
+      "nextActionBefore": "Re-run the business continuity test before the pack expires",
+      "nextActionAfter": "Re-run the business continuity test before the pack expires",
+      "dueDate": "2026-10-30",
+      "whyBefore": "Design and last test were effective, but the test report is expiring, so current assurance is only partial.",
+      "whyAfter": "The continuity test report is still expiring. Approval of supplier assessments did not refresh this pack.",
+      "whatChangedBefore": "Weakened from effective to partially assured because evidence is approaching expiry.",
+      "whatChangedAfter": "Still partially assured. Evidence expiry is unchanged.",
+      "mappingLabels": [
+        "ISO 27001",
+        "NIS2"
+      ],
+      "testingHistory": [
+        {
+          "date": "2025-11-18",
+          "result": "Effective — evidence now expiring",
+          "assessorId": "person-nadia"
+        }
+      ],
+      "openActions": [
+        {
+          "id": "ca-bc-1",
+          "title": "Schedule 2026 continuity test",
+          "ownerId": "person-nadia",
+          "dueDate": "2026-10-30",
+          "statusBefore": "open",
+          "statusAfter": "open"
+        }
+      ]
+    },
+    {
+      "id": "ctl-privileged-access",
+      "title": "Privileged-access review",
+      "assuranceBefore": "partial",
+      "assuranceAfter": "partial",
+      "ownerId": "person-nadia",
+      "frameworkIds": [
+        "fw-iso27001",
+        "fw-nca-ecc"
+      ],
+      "obligationIds": [
+        "obl-iso-isms"
+      ],
+      "evidenceIdsBefore": [
+        "ev-privileged-review-q2",
+        "ev-iam-exception-log",
+        "ev-policy-isms"
+      ],
+      "evidenceIdsAfter": [
+        "ev-privileged-review-q2",
+        "ev-iam-exception-log",
+        "ev-policy-isms"
+      ],
+      "riskIds": [
+        "risk-privileged-access"
+      ],
+      "partialReason": "The Q2 access review and the IAM exception log do not agree on residual privileged accounts.",
+      "categoryId": "cat-cybersecurity",
+      "businessUnit": "IT Services",
+      "type": "detective",
+      "execution": "hybrid",
+      "frequency": "quarterly",
+      "designBefore": "effective",
+      "designAfter": "effective",
+      "operatingBefore": "partially-effective",
+      "operatingAfter": "partially-effective",
+      "evidenceSufficiencyBefore": "partial",
+      "evidenceSufficiencyAfter": "partial",
+      "overallBefore": "partially-assured",
+      "overallAfter": "partially-assured",
+      "evidenceHealthBefore": "conflicting",
+      "evidenceHealthAfter": "conflicting",
+      "priorOverall": "partially-assured",
+      "accountableExecutiveId": "person-nadia",
+      "lastAssessed": "2026-07-12",
+      "nextAssessment": "2026-10-12",
+      "nextActionBefore": "Reconcile the Q2 review with the IAM exception log",
+      "nextActionAfter": "Reconcile the Q2 review with the IAM exception log",
+      "dueDate": "2026-09-30",
+      "whyBefore": "Design is sound, but two current evidence packs conflict, so operating effectiveness cannot be fully relied upon.",
+      "whyAfter": "Supplier-assessment approval did not resolve the privileged-access evidence conflict.",
+      "whatChangedBefore": "Held partially assured. Conflicting evidence remains the issue.",
+      "whatChangedAfter": "No change this period.",
+      "mappingLabels": [
+        "ISO 27001",
+        "NCA ECC",
+        "Internal policies"
+      ],
+      "testingHistory": [
+        {
+          "date": "2026-07-12",
+          "result": "Partially assured — conflicting evidence",
+          "assessorId": "person-nadia"
+        }
+      ],
+      "openActions": [
+        {
+          "id": "ca-priv-1",
+          "title": "Reconcile privileged-access evidence",
+          "ownerId": "person-nadia",
+          "dueDate": "2026-09-30",
+          "statusBefore": "open",
+          "statusAfter": "open"
+        }
+      ]
+    },
+    {
+      "id": "ctl-audit-followup",
+      "title": "Management action follow-up",
+      "assuranceBefore": "partial",
+      "assuranceAfter": "partial",
+      "ownerId": "person-amira",
+      "frameworkIds": [
+        "fw-internal",
+        "fw-iso27001"
+      ],
+      "obligationIds": [
+        "obl-internal-contract",
+        "obl-iso-a532"
+      ],
+      "evidenceIdsBefore": [
+        "ev-audit-actions-register",
+        "ev-audit-findings"
+      ],
+      "evidenceIdsAfter": [
+        "ev-audit-actions-register",
+        "ev-audit-findings"
+      ],
+      "riskIds": [
+        "risk-regulatory"
+      ],
+      "partialReason": "The register exists, but closure evidence for several open management actions is still missing.",
+      "categoryId": "cat-internal-audit",
+      "businessUnit": "Compliance",
+      "type": "corrective",
+      "execution": "manual",
+      "frequency": "monthly",
+      "designBefore": "effective",
+      "designAfter": "effective",
+      "operatingBefore": "not-assessed",
+      "operatingAfter": "not-assessed",
+      "evidenceSufficiencyBefore": "insufficient",
+      "evidenceSufficiencyAfter": "insufficient",
+      "overallBefore": "unverifiable",
+      "overallAfter": "unverifiable",
+      "evidenceHealthBefore": "missing",
+      "evidenceHealthAfter": "missing",
+      "priorOverall": "unverifiable",
+      "accountableExecutiveId": "person-amira",
+      "lastAssessed": "2026-08-04",
+      "nextAssessment": "2026-10-04",
+      "nextActionBefore": "Attach closure evidence for overdue management actions",
+      "nextActionAfter": "Attach closure evidence for overdue management actions",
+      "dueDate": "2026-09-28",
+      "whyBefore": "The follow-up process is designed. Closure evidence is missing, so operation cannot be verified.",
+      "whyAfter": "Supplier assessments did not close internal-audit action evidence.",
+      "whatChangedBefore": "Held unverifiable.",
+      "whatChangedAfter": "Held unverifiable.",
+      "mappingLabels": [
+        "Internal audit programmes",
+        "ISO 27001",
+        "Internal policies"
+      ],
+      "testingHistory": [
+        {
+          "date": "2026-08-04",
+          "result": "Unverifiable — closure evidence missing",
+          "assessorId": "person-amira"
+        }
+      ],
+      "openActions": [
+        {
+          "id": "ca-ia-1",
+          "title": "Collect closure evidence for open audit actions",
+          "ownerId": "person-amira",
+          "dueDate": "2026-09-28",
+          "statusBefore": "open",
+          "statusAfter": "open"
+        }
+      ]
+    },
+    {
+      "id": "ctl-payment-auth",
+      "title": "Payment-authorisation review",
+      "assuranceBefore": "assured",
+      "assuranceAfter": "assured",
+      "ownerId": "person-daniel",
+      "frameworkIds": [
+        "fw-internal"
+      ],
+      "obligationIds": [
+        "obl-internal-contract"
+      ],
+      "evidenceIdsBefore": [
+        "ev-payment-auth-sample"
+      ],
+      "evidenceIdsAfter": [
+        "ev-payment-auth-sample"
+      ],
+      "riskIds": [
+        "risk-vendor-concentration"
+      ],
+      "partialReason": null,
+      "categoryId": "cat-financial",
+      "businessUnit": "Finance",
+      "type": "preventive",
+      "execution": "hybrid",
+      "frequency": "monthly",
+      "designBefore": "effective",
+      "designAfter": "effective",
+      "operatingBefore": "effective",
+      "operatingAfter": "effective",
+      "evidenceSufficiencyBefore": "sufficient",
+      "evidenceSufficiencyAfter": "sufficient",
+      "overallBefore": "effective",
+      "overallAfter": "effective",
+      "evidenceHealthBefore": "current",
+      "evidenceHealthAfter": "current",
+      "priorOverall": "effective",
+      "accountableExecutiveId": "person-daniel",
+      "lastAssessed": "2026-08-22",
+      "nextAssessment": "2026-09-22",
+      "nextActionBefore": "Complete the September dual-authorisation sample",
+      "nextActionAfter": "Complete the September dual-authorisation sample",
+      "dueDate": "2026-09-22",
+      "whyBefore": "Sample testing confirmed dual authorisation is operating on in-scope payments.",
+      "whyAfter": "Sample testing remains current.",
+      "whatChangedBefore": "Held effective.",
+      "whatChangedAfter": "Held effective.",
+      "mappingLabels": [
+        "Internal policies",
+        "Contractual commitments"
+      ],
+      "testingHistory": [
+        {
+          "date": "2026-08-22",
+          "result": "Effective",
+          "assessorId": "person-daniel"
+        }
+      ],
+      "openActions": []
+    },
+    {
+      "id": "ctl-conflict-interest",
+      "title": "Conflict-of-interest declaration",
+      "assuranceBefore": "partial",
+      "assuranceAfter": "partial",
+      "ownerId": "person-helena",
+      "frameworkIds": [
+        "fw-internal"
+      ],
+      "obligationIds": [
+        "obl-internal-contract"
+      ],
+      "evidenceIdsBefore": [
+        "ev-coi-declarations"
+      ],
+      "evidenceIdsAfter": [
+        "ev-coi-declarations"
+      ],
+      "riskIds": [
+        "risk-key-person"
+      ],
+      "partialReason": "2026 declarations have been collected and are awaiting approval.",
+      "categoryId": "cat-legal",
+      "businessUnit": "Legal & Privacy",
+      "type": "directive",
+      "execution": "manual",
+      "frequency": "annual",
+      "designBefore": "effective",
+      "designAfter": "effective",
+      "operatingBefore": "effective",
+      "operatingAfter": "effective",
+      "evidenceSufficiencyBefore": "partial",
+      "evidenceSufficiencyAfter": "partial",
+      "overallBefore": "partially-assured",
+      "overallAfter": "partially-assured",
+      "evidenceHealthBefore": "awaiting-approval",
+      "evidenceHealthAfter": "awaiting-approval",
+      "priorOverall": "effective",
+      "accountableExecutiveId": "person-helena",
+      "lastAssessed": "2026-09-08",
+      "nextAssessment": "2027-01-15",
+      "nextActionBefore": "Approve the 2026 declaration pack",
+      "nextActionAfter": "Approve the 2026 declaration pack",
+      "dueDate": "2026-09-22",
+      "whyBefore": "Declarations are in, but they are not yet approved, so evidence sufficiency is only partial.",
+      "whyAfter": "Declarations remain awaiting approval.",
+      "whatChangedBefore": "Weakened from effective while the annual pack waits for approval.",
+      "whatChangedAfter": "Still awaiting approval.",
+      "mappingLabels": [
+        "Internal policies",
+        "Legal and governance"
+      ],
+      "testingHistory": [
+        {
+          "date": "2026-09-08",
+          "result": "Awaiting approval",
+          "assessorId": "person-helena"
+        }
+      ],
+      "openActions": [
+        {
+          "id": "ca-coi-1",
+          "title": "Approve 2026 conflict-of-interest declarations",
+          "ownerId": "person-layla",
+          "dueDate": "2026-09-22",
+          "statusBefore": "open",
+          "statusAfter": "open"
+        }
+      ]
+    },
+    {
+      "id": "ctl-jml",
+      "title": "Joiner, mover and leaver review",
+      "assuranceBefore": "partial",
+      "assuranceAfter": "partial",
+      "ownerId": "person-priya",
+      "frameworkIds": [
+        "fw-iso27001",
+        "fw-internal"
+      ],
+      "obligationIds": [
+        "obl-iso-isms"
+      ],
+      "evidenceIdsBefore": [
+        "ev-jml-review"
+      ],
+      "evidenceIdsAfter": [
+        "ev-jml-review"
+      ],
+      "riskIds": [
+        "risk-key-person",
+        "risk-privileged-access"
+      ],
+      "partialReason": "Leaver access removal is evidenced; mover recertification is incomplete.",
+      "categoryId": "cat-people",
+      "businessUnit": "People & Culture",
+      "type": "preventive",
+      "execution": "hybrid",
+      "frequency": "monthly",
+      "designBefore": "effective",
+      "designAfter": "effective",
+      "operatingBefore": "partially-effective",
+      "operatingAfter": "partially-effective",
+      "evidenceSufficiencyBefore": "partial",
+      "evidenceSufficiencyAfter": "partial",
+      "overallBefore": "partially-assured",
+      "overallAfter": "partially-assured",
+      "evidenceHealthBefore": "current",
+      "evidenceHealthAfter": "current",
+      "priorOverall": "partially-assured",
+      "accountableExecutiveId": "person-priya",
+      "lastAssessed": "2026-07-31",
+      "nextAssessment": "2026-09-30",
+      "nextActionBefore": "Complete mover recertification for the Q3 cycle",
+      "nextActionAfter": "Complete mover recertification for the Q3 cycle",
+      "dueDate": "2026-09-30",
+      "whyBefore": "Joiners and leavers are controlled. Mover recertification is incomplete, so the control is only partially assured.",
+      "whyAfter": "Mover recertification remains incomplete.",
+      "whatChangedBefore": "Held partially assured.",
+      "whatChangedAfter": "Held partially assured.",
+      "mappingLabels": [
+        "ISO 27001",
+        "Internal policies"
+      ],
+      "testingHistory": [
+        {
+          "date": "2026-07-31",
+          "result": "Partially assured — mover gaps",
+          "assessorId": "person-priya"
+        }
+      ],
+      "openActions": [
+        {
+          "id": "ca-jml-1",
+          "title": "Finish Q3 mover recertification",
+          "ownerId": "person-priya",
+          "dueDate": "2026-09-30",
+          "statusBefore": "open",
+          "statusAfter": "open"
+        }
+      ]
+    },
+    {
+      "id": "ctl-site-access",
+      "title": "Restricted-site access review",
+      "assuranceBefore": "assured",
+      "assuranceAfter": "assured",
+      "ownerId": "person-karim",
+      "frameworkIds": [
+        "fw-iso27001",
+        "fw-nca-ecc"
+      ],
+      "obligationIds": [
+        "obl-iso-isms"
+      ],
+      "evidenceIdsBefore": [
+        "ev-site-access-log"
+      ],
+      "evidenceIdsAfter": [
+        "ev-site-access-log"
+      ],
+      "riskIds": [
+        "risk-privileged-access"
+      ],
+      "partialReason": null,
+      "categoryId": "cat-physical",
+      "businessUnit": "Facilities",
+      "type": "preventive",
+      "execution": "automated",
+      "frequency": "continuous",
+      "designBefore": "effective",
+      "designAfter": "effective",
+      "operatingBefore": "effective",
+      "operatingAfter": "effective",
+      "evidenceSufficiencyBefore": "sufficient",
+      "evidenceSufficiencyAfter": "sufficient",
+      "overallBefore": "effective",
+      "overallAfter": "effective",
+      "evidenceHealthBefore": "current",
+      "evidenceHealthAfter": "current",
+      "priorOverall": "effective",
+      "accountableExecutiveId": "person-karim",
+      "lastAssessed": "2026-08-18",
+      "nextAssessment": "2026-11-18",
+      "nextActionBefore": "Keep badge exception reviews on the monthly cycle",
+      "nextActionAfter": "Keep badge exception reviews on the monthly cycle",
+      "dueDate": "2026-11-18",
+      "whyBefore": "Continuous badge logs and the August review show the control operating as designed.",
+      "whyAfter": "Site-access evidence remains current.",
+      "whatChangedBefore": "Held effective.",
+      "whatChangedAfter": "Held effective.",
+      "mappingLabels": [
+        "ISO 27001",
+        "NCA ECC"
+      ],
+      "testingHistory": [
+        {
+          "date": "2026-08-18",
+          "result": "Effective",
+          "assessorId": "person-karim"
+        }
+      ],
+      "openActions": []
+    },
+    {
+      "id": "ctl-safety-inspection",
+      "title": "Safety inspection completion",
+      "assuranceBefore": "partial",
+      "assuranceAfter": "partial",
+      "ownerId": "person-yusuf",
+      "frameworkIds": [
+        "fw-internal",
+        "fw-nis2"
+      ],
+      "obligationIds": [
+        "obl-iso-bc"
+      ],
+      "evidenceIdsBefore": [
+        "ev-safety-inspections"
+      ],
+      "evidenceIdsAfter": [
+        "ev-safety-inspections"
+      ],
+      "riskIds": [
+        "risk-continuity"
+      ],
+      "partialReason": "Inspection records show overdue plant inspections. The pack also has no evidence owner.",
+      "categoryId": "cat-hse",
+      "businessUnit": "Operations",
+      "type": "detective",
+      "execution": "manual",
+      "frequency": "monthly",
+      "designBefore": "effective",
+      "designAfter": "effective",
+      "operatingBefore": "ineffective",
+      "operatingAfter": "ineffective",
+      "evidenceSufficiencyBefore": "partial",
+      "evidenceSufficiencyAfter": "partial",
+      "overallBefore": "ineffective",
+      "overallAfter": "ineffective",
+      "evidenceHealthBefore": "current",
+      "evidenceHealthAfter": "current",
+      "priorOverall": "partially-assured",
+      "accountableExecutiveId": "person-yusuf",
+      "lastAssessed": "2026-06-02",
+      "nextAssessment": "2026-09-20",
+      "nextActionBefore": "Assign an evidence owner and close overdue plant inspections",
+      "nextActionAfter": "Assign an evidence owner and close overdue plant inspections",
+      "dueDate": "2026-09-20",
+      "whyBefore": "Evidence exists and is current. It proves inspections were not completed on time, so the control is ineffective — not unverifiable.",
+      "whyAfter": "Overdue inspections remain evidenced. This is independent of the supplier-assurance approval.",
+      "whatChangedBefore": "Weakened from partially assured to ineffective after the H1 inspection pack.",
+      "whatChangedAfter": "Still ineffective.",
+      "mappingLabels": [
+        "Internal policies",
+        "NIS2"
+      ],
+      "testingHistory": [
+        {
+          "date": "2026-06-02",
+          "result": "Ineffective — overdue inspections",
+          "assessorId": "person-yusuf"
+        }
+      ],
+      "openActions": [
+        {
+          "id": "ca-hse-1",
+          "title": "Close overdue plant inspections and assign an evidence owner",
+          "ownerId": "person-yusuf",
+          "dueDate": "2026-09-20",
+          "statusBefore": "open",
+          "statusAfter": "open"
+        }
+      ]
     }
   ],
   "evidence": [
@@ -585,9 +1280,12 @@
       "processingState": "indexed",
       "duplicateOf": "ev-supplier-assessments-2023",
       "missingMetadata": false,
-      "usedByControlIds": [],
+      "usedByControlIds": [
+        "ctl-supplier-assurance"
+      ],
       "usedByObligationIds": [],
-      "usedByRiskIds": []
+      "usedByRiskIds": [],
+      "conflictWith": "ev-supplier-assessments-2023"
     },
     {
       "id": "ev-supplier-assessments-2023",
@@ -632,6 +1330,177 @@
         "risk-regulatory"
       ],
       "availableFromState": "after"
+    },
+    {
+      "id": "ev-privileged-review-q2",
+      "title": "Privileged-access review Q2 2026",
+      "fileType": "XLSX",
+      "ownerId": "person-nadia",
+      "date": "2026-06-28",
+      "version": "2026.Q2",
+      "freshness": "current",
+      "processingState": "indexed",
+      "duplicateOf": null,
+      "missingMetadata": false,
+      "conflictWith": "ev-iam-exception-log",
+      "usedByControlIds": [
+        "ctl-privileged-access"
+      ],
+      "usedByObligationIds": [
+        "obl-iso-isms"
+      ],
+      "usedByRiskIds": [
+        "risk-privileged-access"
+      ]
+    },
+    {
+      "id": "ev-iam-exception-log",
+      "title": "IAM exception log",
+      "fileType": "CSV",
+      "ownerId": "person-nadia",
+      "date": "2026-07-12",
+      "version": "2026.7",
+      "freshness": "current",
+      "processingState": "indexed",
+      "duplicateOf": null,
+      "missingMetadata": false,
+      "conflictWith": "ev-privileged-review-q2",
+      "usedByControlIds": [
+        "ctl-privileged-access"
+      ],
+      "usedByObligationIds": [
+        "obl-iso-isms"
+      ],
+      "usedByRiskIds": [
+        "risk-privileged-access"
+      ]
+    },
+    {
+      "id": "ev-audit-actions-register",
+      "title": "Internal audit management-action register",
+      "fileType": "XLSX",
+      "ownerId": "person-amira",
+      "date": "2026-08-04",
+      "version": "2026.8",
+      "freshness": "current",
+      "processingState": "indexed",
+      "duplicateOf": null,
+      "missingMetadata": false,
+      "usedByControlIds": [
+        "ctl-audit-followup"
+      ],
+      "usedByObligationIds": [
+        "obl-internal-contract"
+      ],
+      "usedByRiskIds": [
+        "risk-regulatory"
+      ]
+    },
+    {
+      "id": "ev-payment-auth-sample",
+      "title": "Payment-authorisation sample review",
+      "fileType": "PDF",
+      "ownerId": "person-daniel",
+      "date": "2026-08-22",
+      "version": "2026.8",
+      "freshness": "current",
+      "processingState": "indexed",
+      "duplicateOf": null,
+      "missingMetadata": false,
+      "usedByControlIds": [
+        "ctl-payment-auth"
+      ],
+      "usedByObligationIds": [
+        "obl-internal-contract"
+      ],
+      "usedByRiskIds": [
+        "risk-vendor-concentration"
+      ]
+    },
+    {
+      "id": "ev-coi-declarations",
+      "title": "2026 conflict-of-interest declarations",
+      "fileType": "PDF",
+      "ownerId": "person-helena",
+      "date": "2026-09-08",
+      "version": "2026.1",
+      "freshness": "current",
+      "processingState": "awaiting-approval",
+      "duplicateOf": null,
+      "missingMetadata": false,
+      "usedByControlIds": [
+        "ctl-conflict-interest"
+      ],
+      "usedByObligationIds": [
+        "obl-internal-contract"
+      ],
+      "usedByRiskIds": [
+        "risk-key-person"
+      ]
+    },
+    {
+      "id": "ev-jml-review",
+      "title": "Joiner, mover and leaver review pack",
+      "fileType": "XLSX",
+      "ownerId": "person-priya",
+      "date": "2026-07-31",
+      "version": "2026.Q3",
+      "freshness": "current",
+      "processingState": "indexed",
+      "duplicateOf": null,
+      "missingMetadata": false,
+      "usedByControlIds": [
+        "ctl-jml"
+      ],
+      "usedByObligationIds": [
+        "obl-iso-isms"
+      ],
+      "usedByRiskIds": [
+        "risk-key-person",
+        "risk-privileged-access"
+      ]
+    },
+    {
+      "id": "ev-site-access-log",
+      "title": "Restricted-site access log",
+      "fileType": "PDF",
+      "ownerId": "person-karim",
+      "date": "2026-08-18",
+      "version": "2026.8",
+      "freshness": "current",
+      "processingState": "indexed",
+      "duplicateOf": null,
+      "missingMetadata": false,
+      "usedByControlIds": [
+        "ctl-site-access"
+      ],
+      "usedByObligationIds": [
+        "obl-iso-isms"
+      ],
+      "usedByRiskIds": [
+        "risk-privileged-access"
+      ]
+    },
+    {
+      "id": "ev-safety-inspections",
+      "title": "Plant safety inspection pack",
+      "fileType": "PDF",
+      "ownerId": "",
+      "date": "2026-06-02",
+      "version": "2026.H1",
+      "freshness": "current",
+      "processingState": "indexed",
+      "duplicateOf": null,
+      "missingMetadata": true,
+      "usedByControlIds": [
+        "ctl-safety-inspection"
+      ],
+      "usedByObligationIds": [
+        "obl-iso-bc"
+      ],
+      "usedByRiskIds": [
+        "risk-continuity"
+      ]
     }
   ],
   "risks": [
@@ -745,8 +1614,8 @@
       "history": [
         {
           "date": "2026-09-10",
-          "textBefore": "Residual risk held at 92 \u2014 Critical; treatment overdue.",
-          "textAfter": "Residual risk reduced 92 \u2192 38 after assessment approval."
+          "textBefore": "Residual risk held at 92 — Critical; treatment overdue.",
+          "textAfter": "Residual risk reduced 92 → 38 after assessment approval."
         },
         {
           "date": "2026-09-08",
@@ -767,7 +1636,8 @@
       "levelAfter": "reduced",
       "ownerId": "person-layla",
       "controlIds": [
-        "ctl-supplier-assurance"
+        "ctl-supplier-assurance",
+        "ctl-audit-followup"
       ],
       "obligationIds": [
         "obl-nis2-supply",
@@ -858,8 +1728,8 @@
       "history": [
         {
           "date": "2026-09-10",
-          "textBefore": "Residual risk 78 \u2014 High; above appetite.",
-          "textAfter": "Residual risk reduced 78 \u2192 34; within appetite."
+          "textBefore": "Residual risk 78 — High; above appetite.",
+          "textAfter": "Residual risk reduced 78 → 34; within appetite."
         },
         {
           "date": "2026-09-05",
@@ -875,7 +1745,8 @@
       "levelAfter": "watch",
       "ownerId": "person-nadia",
       "controlIds": [
-        "ctl-continuity"
+        "ctl-continuity",
+        "ctl-safety-inspection"
       ],
       "obligationIds": [
         "obl-iso-bc"
@@ -886,7 +1757,7 @@
       "evidenceIdsAfter": [
         "ev-bc-test"
       ],
-      "contributingGap": "Business continuity test report is expiring \u2014 not the primary action",
+      "contributingGap": "Business continuity test report is expiring — not the primary action",
       "code": "RSK-274910",
       "category": "Operational",
       "businessUnit": "IT Services",
@@ -982,7 +1853,8 @@
       "levelAfter": "elevated",
       "ownerId": "person-nadia",
       "controlIds": [
-        "ctl-isms-policy"
+        "ctl-isms-policy",
+        "ctl-privileged-access"
       ],
       "obligationIds": [
         "obl-iso-isms"
@@ -1066,7 +1938,7 @@
       "history": [
         {
           "date": "2026-09-05",
-          "textBefore": "Residual risk increased 68 \u2192 72 on incomplete access reviews.",
+          "textBefore": "Residual risk increased 68 → 72 on incomplete access reviews.",
           "textAfter": "Residual risk held near 70 pending recertification evidence."
         }
       ]
@@ -1172,7 +2044,8 @@
       "levelAfter": "watch",
       "ownerId": "person-omar",
       "controlIds": [
-        "ctl-supplier-assurance"
+        "ctl-supplier-assurance",
+        "ctl-payment-auth"
       ],
       "obligationIds": [
         "obl-iso-a532",
@@ -1273,7 +2146,10 @@
       "levelBefore": "watch",
       "levelAfter": "watch",
       "ownerId": "person-sara",
-      "controlIds": [],
+      "controlIds": [
+        "ctl-jml",
+        "ctl-conflict-interest"
+      ],
       "obligationIds": [
         "obl-internal-contract"
       ],
@@ -1450,10 +2326,12 @@
         "Which requirements have no accountable owner?"
       ],
       "controls": [
-        "Which frameworks does this control support?",
-        "Why is this control only partially assured?",
-        "Which evidence is missing or outdated?",
-        "Which risks would be affected if this control weakened?",
+        "Which controls can we rely on?",
+        "Which cybersecurity controls are currently unverifiable?",
+        "Why can this control not be relied upon?",
+        "What evidence is missing, expiring or conflicting?",
+        "Which controls have the greatest effect on NIS2 assurance?",
+        "Which controls are insufficient for this risk?",
         "What should the owner do next?"
       ],
       "evidence": [
@@ -1535,5 +2413,87 @@
       "approvalRequired": true,
       "expectedImpact": "Coverage rises across the four frameworks; supplier-assurance moves from partial to assured; third-party and regulatory exposure reduce; Board Summary can cite current assessments."
     }
-  }
+  },
+  "controlCategories": [
+    {
+      "id": "cat-cybersecurity",
+      "name": "Cybersecurity",
+      "shortLabel": "Cybersecurity",
+      "accountableFunction": "Information Security",
+      "accountableExecutiveId": "person-nadia",
+      "sortOrder": 1
+    },
+    {
+      "id": "cat-internal-audit",
+      "name": "Internal Audit",
+      "shortLabel": "Internal Audit",
+      "accountableFunction": "Internal Audit",
+      "accountableExecutiveId": "person-amira",
+      "sortOrder": 2
+    },
+    {
+      "id": "cat-privacy",
+      "name": "Privacy and Data Protection",
+      "shortLabel": "Privacy",
+      "accountableFunction": "Privacy",
+      "accountableExecutiveId": "person-tomas",
+      "sortOrder": 3
+    },
+    {
+      "id": "cat-third-party",
+      "name": "Third-Party and Supplier Assurance",
+      "shortLabel": "Third Party",
+      "accountableFunction": "Procurement",
+      "accountableExecutiveId": "person-omar",
+      "sortOrder": 4
+    },
+    {
+      "id": "cat-financial",
+      "name": "Financial Controls",
+      "shortLabel": "Financial Controls",
+      "accountableFunction": "Finance",
+      "accountableExecutiveId": "person-daniel",
+      "sortOrder": 5
+    },
+    {
+      "id": "cat-resilience",
+      "name": "Operational Resilience and Business Continuity",
+      "shortLabel": "Operational Resilience",
+      "accountableFunction": "Operations",
+      "accountableExecutiveId": "person-nadia",
+      "sortOrder": 6
+    },
+    {
+      "id": "cat-legal",
+      "name": "Legal, Ethics and Corporate Governance",
+      "shortLabel": "Legal and Governance",
+      "accountableFunction": "Legal",
+      "accountableExecutiveId": "person-helena",
+      "sortOrder": 7
+    },
+    {
+      "id": "cat-people",
+      "name": "People and Human Resources",
+      "shortLabel": "People and HR",
+      "accountableFunction": "People",
+      "accountableExecutiveId": "person-priya",
+      "sortOrder": 8
+    },
+    {
+      "id": "cat-physical",
+      "name": "Physical Security",
+      "shortLabel": "Physical Security",
+      "accountableFunction": "Corporate Security",
+      "accountableExecutiveId": "person-karim",
+      "sortOrder": 9
+    },
+    {
+      "id": "cat-hse",
+      "name": "Health, Safety and Environmental",
+      "shortLabel": "HSE",
+      "accountableFunction": "HSE",
+      "accountableExecutiveId": "person-yusuf",
+      "sortOrder": 10
+    }
+  ]
 }
