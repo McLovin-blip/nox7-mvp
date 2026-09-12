@@ -42,6 +42,7 @@ function AuthenticatedApp() {
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null)
   const [hubFocus, setHubFocus] = useState<HubFocus | null>(null)
   const [openAction, setOpenAction] = useState<HubAction | null>(null)
+  const [riskDrill, setRiskDrill] = useState<{ label: string; questions: string[] } | null>(null)
 
   const selectedTitle = useMemo(() => {
     if (hubFocus?.title) return hubFocus.title
@@ -71,6 +72,7 @@ function AuthenticatedApp() {
     setModule(id)
     setCanvas('hub')
     setSelectedId(recordId ?? null)
+    if (id !== 'risks') setRiskDrill(null)
     if (id !== 'hub') setOpenAction(null)
   }
 
@@ -161,6 +163,7 @@ function AuthenticatedApp() {
         selectedTitle={selectedTitle}
         hubFocus={hubFocus}
         gapStep={gapStep}
+        riskDrill={module === 'risks' ? riskDrill : null}
         pendingPrompt={pendingPrompt}
         onConsumePrompt={() => setPendingPrompt(null)}
         onOpenSource={openSource}
@@ -227,6 +230,8 @@ function AuthenticatedApp() {
             }
             go(target.module, target.recordId)
           }}
+          onAskNox={openAi}
+          onDrillContextChange={setRiskDrill}
         />
       ) : module === 'reports' ? (
         <ReportsModule selectedId={selectedId} onOpenSource={openSource} />

@@ -43,6 +43,7 @@ export type ConversationContext = {
   selectedTitle?: string
   hubFocus?: HubFocus | null
   gapStep?: GapStepId
+  riskDrill?: { label: string; questions: string[] } | null
 }
 
 export const EMPTY_SUGGESTIONS = [
@@ -773,6 +774,7 @@ export function contextBanner(ctx: ConversationContext) {
   ]
   if (ctx.hubFocus?.title) bits.push(ctx.hubFocus.title)
   else if (ctx.selectedTitle) bits.push(ctx.selectedTitle)
+  else if (ctx.riskDrill?.label) bits.push(ctx.riskDrill.label)
   return bits.join(' · ')
 }
 

@@ -1,14 +1,21 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { organisation, reportingPeriod } from '../mock/data.ts'
 import type { ModuleId, PositionState } from '../mock/types.ts'
 import { useSession } from '../state/SessionProvider.tsx'
 import {
+  activeFilterChips,
   appetiteLabel,
+  buildFrameworkImpact,
   buildRiskRecords,
   buildRiskSummary,
+  clearFilterChip,
   coverageLabel,
+  coverageRowsFor,
   defaultFilters,
+  describeRiskDrill,
+  emptyStateForFilters,
   filterRisks,
+  hasActiveFilters,
   linkedControlsFor,
   linkedEvidenceFor,
   linkedObligationsFor,
@@ -17,6 +24,8 @@ import {
   sortRisks,
   treatmentLabel,
   trendLabel,
+  type FilterChip,
+  type FrameworkImpact,
   type RiskFilters,
   type RiskNavigateTarget,
   type RiskRecord,
@@ -25,21 +34,33 @@ import {
 import './risks.css'
 
 type DetailTab = 'overview' | 'assessment' | 'connections' | 'treatment' | 'activity'
+type DrillPanel = 'none' | 'coverage' | 'framework' | 'treatment'
+
+function scrollToRegister() {
+  window.requestAnimationFrame(() => {
+    document.getElementById('risk-register')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  })
+}
 
 export function RisksModule({
   selectedId,
   onSelect,
   onNavigate,
+  onAskNox,
+  onDrillContextChange,
 }: {
   selectedId: string | null
   onSelect: (id: string | null) => void
   onNavigate?: (target: RiskNavigateTarget) => void
+  onAskNox?: (prompt?: string) => void
+  onDrillContextChange?: (context: { label: string; questions: string[] } | null) => void
 }) {
   const { position } = useSession()
   const [filters, setFilters] = useState<RiskFilters>(defaultFilters())
   const [sortKey, setSortKey] = useState<RiskSortKey>('residual')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [tab, setTab] = useState<DetailTab>('overview')
+  const [drillPanel, setDrillPanel] = useState<DrillPanel>('none')
 
   const risks = useMemo(() => buildRiskRecords(position), [position])
   const summary = useMemo(() => buildRiskSummary(risks), [risks])
@@ -48,9 +69,45 @@ export function RisksModule({
     [risks, filters, sortKey, sortDirection],
   )
   const selected = selectedId ? risks.find((item) => item.id === selectedId) ?? null : null
+  const drill = useMemo(() => describeRiskDrill(filters), [filters])
+  const chips = useMemo(() => activeFilterChips(filters), [filters])
+  const coverageRows = useMemo(() => coverageRowsFor(risks), [risks])
+  const frameworkImpact = useMemo(() => {
+    if (filters.framework === 'all') return null
+    return buildFrameworkImpact(risks, filters.framework, position)
+  }, [filters.framework, risks, position])
+  const emptyState = useMemo(() => emptyStateForFilters(filters, risks), [filters, risks])
+
+  useEffect(() => {
+    onDrillContextChange?.(drill ? { label: drill.label, questions: drill.questions } : null)
+  }, [drill, onDrillContextChange])
 
   const patchFilters = (patch: Partial<RiskFilters>) => {
     setFilters((current) => ({ ...current, ...patch }))
+    onSelect(null)
+  }
+
+  const applyDrill = (next: RiskFilters, panel: DrillPanel = 'none') => {
+    setFilters(next)
+    setDrillPanel(panel)
+    onSelect(null)
+    scrollToRegister()
+  }
+
+  const clearAll = () => applyDrill(defaultFilters(), 'none')
+
+  const removeChip = (chip: FilterChip) => {
+    const next = clearFilterChip(filters, chip.key)
+    setFilters(next)
+    if (chip.key === 'framework') setDrillPanel((current) => (current === 'framework' ? 'none' : current))
+    if (chip.key === 'coverage' || chip.key === 'priorityOnly') {
+      if (!next.priorityOnly && next.coverage === 'all') {
+        setDrillPanel((current) => (current === 'coverage' ? 'none' : current))
+      }
+    }
+    if (chip.key === 'treatment' && next.treatment === 'all') {
+      setDrillPanel((current) => (current === 'treatment' ? 'none' : current))
+    }
     onSelect(null)
   }
 
@@ -91,19 +148,37 @@ export function RisksModule({
         </div>
       </header>
 
-      <ExecutiveSummary summary={summary} onFilter={patchFilters} onOpenRisk={onSelect} />
+      <ExecutiveSummary
+        summary={summary}
+        onDrill={applyDrill}
+        onOpenRisk={(id) => {
+          setTab('overview')
+          onSelect(id)
+        }}
+      />
+
       <Register
         risks={visible}
         allRisks={risks}
         filters={filters}
+        chips={chips}
+        drill={drill}
+        drillPanel={drillPanel}
+        coverageRows={coverageRows}
+        frameworkImpact={frameworkImpact}
+        emptyState={emptyState}
         sortKey={sortKey}
         sortDirection={sortDirection}
         onFilter={patchFilters}
+        onClearChip={removeChip}
+        onClearAll={clearAll}
+        onAskNox={onAskNox}
         onSort={toggleSort}
         onOpenRisk={(id) => {
           setTab('overview')
           onSelect(id)
         }}
+        onShowPanel={setDrillPanel}
       />
     </div>
   )
@@ -111,48 +186,57 @@ export function RisksModule({
 
 function ExecutiveSummary({
   summary,
-  onFilter,
+  onDrill,
   onOpenRisk,
 }: {
   summary: ReturnType<typeof buildRiskSummary>
-  onFilter: (patch: Partial<RiskFilters>) => void
+  onDrill: (filters: RiskFilters, panel?: DrillPanel) => void
   onOpenRisk: (id: string) => void
 }) {
   const unitMax = Math.max(...summary.byUnit.map((item) => item.count), 1)
   const categoryMax = Math.max(...summary.byCategory.map((item) => item.count), 1)
 
+  const drill = (patch: Partial<RiskFilters>, panel: DrillPanel = 'none') => {
+    onDrill({ ...defaultFilters(), ...patch }, panel)
+  }
+
   return (
     <div className="risk-exec">
       <div className="risk-kpi-row">
-        <button type="button" className="risk-kpi" onClick={() => onFilter(defaultFilters())}>
+        <button type="button" className="risk-kpi" onClick={() => drill({})}>
           <span>Total Risks</span>
           <strong>{summary.total}</strong>
           <em>Organisation risk register</em>
         </button>
-        <button type="button" className="risk-kpi is-critical" onClick={() => onFilter({ severity: 'critical' })}>
+        <button type="button" className="risk-kpi is-critical" onClick={() => drill({ severity: 'critical' })}>
           <span>Critical Risks</span>
           <strong>{summary.criticalCount}</strong>
           <em>Requires executive attention</em>
         </button>
-        <button type="button" className="risk-kpi is-high" onClick={() => onFilter({ severity: 'high' })}>
+        <button type="button" className="risk-kpi is-high" onClick={() => drill({ severity: 'high' })}>
           <span>High Risks</span>
           <strong>{summary.highCount}</strong>
           <em>Prioritise for treatment</em>
         </button>
-        <button type="button" className="risk-kpi is-appetite" onClick={() => onFilter({ appetite: 'above' })}>
+        <button type="button" className="risk-kpi is-appetite" onClick={() => drill({ appetite: 'above' })}>
           <span>Above Appetite</span>
           <strong>{summary.aboveCount}</strong>
           <em>
             {summary.aboveCritical} Critical · {summary.aboveHigh} High
           </em>
         </button>
-        <button type="button" className="risk-kpi" onClick={() => onFilter({ treatment: 'overdue' })}>
-          <span>Treatment Progress</span>
-          <strong>{summary.treatmentProgress}%</strong>
-          <em>
-            {summary.treatmentActive} of {summary.total} active · {summary.treatmentOverdue} overdue
-          </em>
-        </button>
+        <div className="risk-kpi risk-kpi-split">
+          <button type="button" onClick={() => drill({ treatment: 'active' }, 'treatment')}>
+            <span>Treatment Progress</span>
+            <strong>{summary.treatmentProgress}%</strong>
+            <em>
+              {summary.treatmentActive} of {summary.total} active
+            </em>
+          </button>
+          <button type="button" className="risk-kpi-overdue" onClick={() => drill({ treatment: 'overdue' }, 'treatment')}>
+            {summary.treatmentOverdue} overdue
+          </button>
+        </div>
       </div>
 
       <div className="risk-exec-grid">
@@ -164,7 +248,7 @@ function ExecutiveSummary({
           <ul className="risk-bars">
             {summary.byUnit.map((item) => (
               <li key={item.name}>
-                <button type="button" onClick={() => onFilter({ businessUnit: item.name })}>
+                <button type="button" onClick={() => drill({ businessUnit: item.name })}>
                   <span>{item.name}</span>
                   <b>{item.count}</b>
                 </button>
@@ -182,7 +266,7 @@ function ExecutiveSummary({
           <ul className="risk-bars">
             {summary.byCategory.map((item) => (
               <li key={item.name}>
-                <button type="button" onClick={() => onFilter({ category: item.name })}>
+                <button type="button" onClick={() => drill({ category: item.name })}>
                   <span>{item.name}</span>
                   <b>{item.count}</b>
                 </button>
@@ -198,12 +282,23 @@ function ExecutiveSummary({
             <p>Are the most important risks actually controlled?</p>
           </header>
           <div className="risk-coverage">
-            <strong>{summary.coveragePct}%</strong>
-            <p>
-              {summary.adequate} adequate · {summary.partial} partial · {summary.insufficient} insufficient across{' '}
-              {summary.coveragePoolSize} priority risks
-            </p>
-            <div className="risk-coverage-stack">
+            <button type="button" className="risk-coverage-hero" onClick={() => drill({ priorityOnly: true }, 'coverage')}>
+              <strong>{summary.coveragePct}%</strong>
+              <span>View priority coverage breakdown</span>
+            </button>
+            <div className="risk-coverage-metrics" role="group" aria-label="Control coverage breakdown">
+              <button type="button" onClick={() => drill({ priorityOnly: true, coverage: 'adequate' }, 'coverage')}>
+                {summary.adequate} adequate
+              </button>
+              <button type="button" onClick={() => drill({ priorityOnly: true, coverage: 'partial' }, 'coverage')}>
+                {summary.partial} partial
+              </button>
+              <button type="button" onClick={() => drill({ priorityOnly: true, coverage: 'insufficient' }, 'coverage')}>
+                {summary.insufficient} insufficient
+              </button>
+            </div>
+            <p>across {summary.coveragePoolSize} priority risks</p>
+            <div className="risk-coverage-stack" aria-hidden="true">
               <i className="ok" style={{ flex: Math.max(summary.adequate, 0.0001) }} />
               <i className="partial" style={{ flex: Math.max(summary.partial, 0.0001) }} />
               <i className="bad" style={{ flex: Math.max(summary.insufficient, 0.0001) }} />
@@ -221,10 +316,12 @@ function ExecutiveSummary({
           <ul className="risk-frameworks">
             {summary.frameworks.map((item) => (
               <li key={item.name}>
-                <strong>{item.name}</strong>
-                <span>
-                  {item.count} linked risk{item.count === 1 ? '' : 's'}
-                </span>
+                <button type="button" onClick={() => drill({ framework: item.name }, 'framework')}>
+                  <strong>{item.name}</strong>
+                  <span>
+                    {item.count} linked risk{item.count === 1 ? '' : 's'}
+                  </span>
+                </button>
               </li>
             ))}
           </ul>
@@ -238,19 +335,37 @@ function ExecutiveSummary({
           <ul className="risk-emerging">
             {summary.emerging.map((item) => (
               <li key={item.id}>
-                <button type="button" onClick={() => onOpenRisk(item.id)}>
-                  <div>
+                <div className="risk-emerging-row">
+                  <button type="button" className="risk-emerging-main" onClick={() => onOpenRisk(item.id)}>
                     <strong>{item.title}</strong>
                     <em>
                       {item.businessUnit} · Residual {item.residual.score} · {appetiteLabel(item.appetiteStatus)}
                     </em>
-                  </div>
+                  </button>
                   <div className="risk-pill-row">
-                    <Pill className={`sev-${item.severity}`}>{severityLabel(item.severity)}</Pill>
-                    <Pill className={`trend-${item.trend}`}>{trendLabel(item.trend)}</Pill>
-                    <Pill className={`treatment-${item.treatment.status}`}>{treatmentLabel(item.treatment.status)}</Pill>
+                    <button
+                      type="button"
+                      className={`risk-pill sev-${item.severity}`}
+                      onClick={() => drill({ severity: item.severity })}
+                    >
+                      {severityLabel(item.severity)}
+                    </button>
+                    <button
+                      type="button"
+                      className={`risk-pill trend-${item.trend}`}
+                      onClick={() => drill({ trend: item.trend })}
+                    >
+                      {trendLabel(item.trend)}
+                    </button>
+                    <button
+                      type="button"
+                      className={`risk-pill treatment-${item.treatment.status}`}
+                      onClick={() => drill({ treatment: item.treatment.status }, 'treatment')}
+                    >
+                      {treatmentLabel(item.treatment.status)}
+                    </button>
                   </div>
-                </button>
+                </div>
               </li>
             ))}
           </ul>
@@ -290,24 +405,45 @@ function Register({
   risks,
   allRisks,
   filters,
+  chips,
+  drill,
+  drillPanel,
+  coverageRows,
+  frameworkImpact,
+  emptyState,
   sortKey,
   sortDirection,
   onFilter,
+  onClearChip,
+  onClearAll,
+  onAskNox,
   onSort,
   onOpenRisk,
+  onShowPanel,
 }: {
   risks: RiskRecord[]
   allRisks: RiskRecord[]
   filters: RiskFilters
+  chips: FilterChip[]
+  drill: ReturnType<typeof describeRiskDrill>
+  drillPanel: DrillPanel
+  coverageRows: ReturnType<typeof coverageRowsFor>
+  frameworkImpact: FrameworkImpact | null
+  emptyState: ReturnType<typeof emptyStateForFilters>
   sortKey: RiskSortKey
   sortDirection: 'asc' | 'desc'
   onFilter: (patch: Partial<RiskFilters>) => void
+  onClearChip: (chip: FilterChip) => void
+  onClearAll: () => void
+  onAskNox?: (prompt?: string) => void
   onSort: (key: RiskSortKey) => void
   onOpenRisk: (id: string) => void
+  onShowPanel: (panel: DrillPanel) => void
 }) {
   const units = unique(allRisks.map((item) => item.businessUnit))
   const categories = unique(allRisks.map((item) => item.category))
   const owners = unique(allRisks.map((item) => item.owner))
+  const active = hasActiveFilters(filters)
 
   return (
     <section className="risk-register" id="risk-register">
@@ -320,6 +456,146 @@ function Register({
           Showing {risks.length} of {allRisks.length}
         </em>
       </header>
+
+      {active ? (
+        <div className="risk-filter-context" aria-live="polite">
+          <div className="risk-filter-context-copy">
+            <strong>Showing risks for:</strong>
+            <div className="risk-filter-chips">
+              {chips.map((chip) => (
+                <button key={`${chip.key}-${chip.valueLabel}`} type="button" onClick={() => onClearChip(chip)}>
+                  {chip.label}: {chip.valueLabel} <span aria-hidden="true">×</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="risk-filter-context-actions">
+            {drill ? (
+              <button type="button" className="risk-ghost-btn" onClick={() => onAskNox?.(drill.questions[0] ?? drill.askPrompt)}>
+                {drill.askPrompt}
+              </button>
+            ) : null}
+            <button type="button" className="risk-ghost-btn" onClick={onClearAll}>
+              Clear all
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {drillPanel === 'coverage' ? (
+        <div className="risk-drill-panel">
+          <header>
+            <div>
+              <h3>Control coverage — priority risks</h3>
+              <p>Why coverage is {filters.coverage === 'all' ? 'weak on critical and high risks' : coverageLabel(filters.coverage).toLowerCase()}.</p>
+            </div>
+            <button type="button" className="risk-ghost-btn" onClick={() => onShowPanel('none')}>
+              Hide
+            </button>
+          </header>
+          <div className="risk-drill-table-wrap">
+            <table className="risk-drill-table">
+              <thead>
+                <tr>
+                  <th>Risk</th>
+                  <th>Residual</th>
+                  <th>Linked controls</th>
+                  <th>Coverage</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(filters.coverage === 'all' ? coverageRows : coverageRows.filter((row) => row.coverage === filters.coverage)).map(
+                  (row) => (
+                    <tr key={row.risk.id}>
+                      <td>
+                        <button type="button" onClick={() => onOpenRisk(row.risk.id)}>
+                          {row.risk.title}
+                        </button>
+                      </td>
+                      <td>
+                        {row.risk.residual.score} · {severityLabel(row.risk.severity)}
+                      </td>
+                      <td>{row.linkedControls}</td>
+                      <td>
+                        <Pill className={`coverage-${row.coverage}`}>{coverageLabel(row.coverage)}</Pill>
+                      </td>
+                    </tr>
+                  ),
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : null}
+
+      {drillPanel === 'framework' && frameworkImpact ? (
+        <div className="risk-drill-panel">
+          <header>
+            <div>
+              <h3>{frameworkImpact.name}</h3>
+              <p>
+                {frameworkImpact.linkedRisks.length} linked risks · {frameworkImpact.relatedControlIds.length} related
+                controls · {frameworkImpact.obligationsWithGaps} obligations with gaps ·{' '}
+                {frameworkImpact.missingEvidenceCount} missing/expired evidence items
+              </p>
+            </div>
+            <button type="button" className="risk-ghost-btn" onClick={() => onAskNox?.(`Ask Nox about ${frameworkImpact.name} exposure`)}>
+              Ask Nox about {frameworkImpact.name} exposure
+            </button>
+          </header>
+          <ul className="risk-chain-list">
+            {frameworkImpact.chains.map((chain) => (
+              <li key={`${chain.riskId}-${chain.obligationId}-${chain.evidenceId}`}>
+                <button type="button" onClick={() => onOpenRisk(chain.riskId)}>
+                  <span>{chain.riskTitle}</span>
+                  <em>→</em>
+                  <span>{chain.controlTitle}</span>
+                  <em>→</em>
+                  <span>{chain.obligationTitle}</span>
+                  <em>→</em>
+                  <span>
+                    {chain.evidenceTitle} — {chain.evidenceStatus}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {drillPanel === 'treatment' ? (
+        <div className="risk-drill-panel">
+          <header>
+            <div>
+              <h3>Treatment progress</h3>
+              <p>Filter the register by treatment status.</p>
+            </div>
+            <button type="button" className="risk-ghost-btn" onClick={() => onShowPanel('none')}>
+              Hide
+            </button>
+          </header>
+          <div className="risk-treatment-breakdown">
+            {(
+              [
+                ['active', 'Active'],
+                ['in-progress', 'In Progress'],
+                ['overdue', 'Overdue'],
+                ['completed', 'Completed'],
+                ['not-started', 'Not Started'],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                className={filters.treatment === value ? 'is-active' : undefined}
+                onClick={() => onFilter({ ...defaultFilters(), treatment: value })}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       <div className="risk-toolbar">
         <input
@@ -335,10 +611,7 @@ function Register({
           <option value="medium">Medium</option>
           <option value="low">Low</option>
         </select>
-        <select
-          value={filters.businessUnit}
-          onChange={(event) => onFilter({ businessUnit: event.target.value })}
-        >
+        <select value={filters.businessUnit} onChange={(event) => onFilter({ businessUnit: event.target.value })}>
           <option value="all">All business units</option>
           {units.map((item) => (
             <option key={item} value={item}>
@@ -365,11 +638,12 @@ function Register({
           onChange={(event) => onFilter({ treatment: event.target.value as RiskFilters['treatment'] })}
         >
           <option value="all">All treatments</option>
-          <option value="overdue">Overdue</option>
-          <option value="at-risk">At risk</option>
+          <option value="active">Active</option>
           <option value="in-progress">In progress</option>
-          <option value="not-started">Not started</option>
+          <option value="overdue">Overdue</option>
           <option value="completed">Completed</option>
+          <option value="not-started">Not started</option>
+          <option value="at-risk">At risk</option>
         </select>
         <select value={filters.coverage} onChange={(event) => onFilter({ coverage: event.target.value as RiskFilters['coverage'] })}>
           <option value="all">All coverage</option>
@@ -385,7 +659,7 @@ function Register({
             </option>
           ))}
         </select>
-        <button type="button" className="risk-ghost-btn" onClick={() => onFilter(defaultFilters())}>
+        <button type="button" className="risk-ghost-btn" onClick={onClearAll}>
           Reset
         </button>
       </div>
@@ -464,7 +738,15 @@ function Register({
             ))}
           </tbody>
         </table>
-        {risks.length === 0 ? <p className="risk-empty">No risks match the current filters.</p> : null}
+        {risks.length === 0 ? (
+          <div className="risk-empty-state">
+            <strong>{emptyState.title}</strong>
+            <p>{emptyState.detail}</p>
+            <button type="button" className="risk-ghost-btn" onClick={() => onFilter(emptyState.actionFilters)}>
+              {emptyState.actionLabel}
+            </button>
+          </div>
+        ) : null}
       </div>
     </section>
   )

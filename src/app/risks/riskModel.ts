@@ -107,9 +107,48 @@ export type RiskFilters = {
   businessUnit: 'all' | string
   category: 'all' | string
   appetite: 'all' | AppetiteStatus
-  treatment: 'all' | TreatmentStatus
+  treatment: 'all' | TreatmentStatus | 'active'
   coverage: 'all' | CoverageLevel
   owner: 'all' | string
+  framework: 'all' | string
+  trend: 'all' | RiskTrend
+  /** When true, restrict to critical and high severity (control-coverage pool). */
+  priorityOnly: boolean
+}
+
+export type FilterChip = {
+  key: keyof RiskFilters | 'priorityOnly'
+  label: string
+  valueLabel: string
+}
+
+export type FrameworkImpact = {
+  name: string
+  frameworkId: string
+  linkedRisks: RiskRecord[]
+  relatedControlIds: string[]
+  obligationIds: string[]
+  obligationsWithGaps: number
+  missingEvidenceCount: number
+  chains: ComplianceChain[]
+}
+
+export type ComplianceChain = {
+  riskId: string
+  riskTitle: string
+  controlId: string
+  controlTitle: string
+  obligationId: string
+  obligationTitle: string
+  evidenceId: string
+  evidenceTitle: string
+  evidenceStatus: string
+}
+
+export type CoverageRow = {
+  risk: RiskRecord
+  linkedControls: number
+  coverage: CoverageLevel
 }
 
 export type RiskSortKey =
@@ -284,7 +323,11 @@ export function buildRiskSummary(risks: RiskRecord[]) {
   const high = risks.filter((item) => item.severity === 'high')
   const above = risks.filter((item) => item.appetiteStatus === 'above')
   const treatmentActive = risks.filter((item) => item.treatment.status !== 'not-started')
-  const treatmentOverdue = risks.filter((item) => item.treatment.status === 'overdue' || item.treatment.status === 'at-risk')
+  const treatmentOverdue = risks.filter((item) => item.treatment.status === 'overdue')
+  const treatmentAtRisk = risks.filter((item) => item.treatment.status === 'at-risk')
+  const treatmentInProgress = risks.filter((item) => item.treatment.status === 'in-progress')
+  const treatmentCompleted = risks.filter((item) => item.treatment.status === 'completed')
+  const treatmentNotStarted = risks.filter((item) => item.treatment.status === 'not-started')
   const treatmentProgress =
     total === 0 ? 0 : Math.round(risks.reduce((sum, item) => sum + item.treatment.progress, 0) / total)
 
@@ -314,13 +357,15 @@ export function buildRiskSummary(risks: RiskRecord[]) {
   const coveragePct = coveragePool.length ? Math.round((adequate / coveragePool.length) * 100) : 0
 
   const complianceRisks = risks.filter((item) => item.obligationIds.length > 0)
-  const frameworkCounts = new Map<string, number>()
+  const frameworkRiskIds = new Map<string, { frameworkId: string; riskIds: Set<string> }>()
   for (const risk of complianceRisks) {
     for (const obligationId of risk.obligationIds) {
       const obligation = data.obligations.find((item) => item.id === obligationId)
       if (!obligation) continue
       const name = frameworkName(obligation.frameworkId)
-      frameworkCounts.set(name, (frameworkCounts.get(name) ?? 0) + 1)
+      const existing = frameworkRiskIds.get(name)
+      if (existing) existing.riskIds.add(risk.id)
+      else frameworkRiskIds.set(name, { frameworkId: obligation.frameworkId, riskIds: new Set([risk.id]) })
     }
   }
 
@@ -337,16 +382,25 @@ export function buildRiskSummary(risks: RiskRecord[]) {
     treatmentProgress,
     treatmentActive: treatmentActive.length,
     treatmentOverdue: treatmentOverdue.length,
+    treatmentAtRisk: treatmentAtRisk.length,
+    treatmentInProgress: treatmentInProgress.length,
+    treatmentCompleted: treatmentCompleted.length,
+    treatmentNotStarted: treatmentNotStarted.length,
     byUnit,
     byCategory,
     coveragePct,
     coveragePoolSize: coveragePool.length,
+    coveragePool,
     adequate,
     partial,
     insufficient,
     complianceCount: complianceRisks.length,
-    frameworks: [...frameworkCounts.entries()]
-      .map(([name, count]) => ({ name, count }))
+    frameworks: [...frameworkRiskIds.entries()]
+      .map(([name, value]) => ({
+        name,
+        frameworkId: value.frameworkId,
+        count: value.riskIds.size,
+      }))
       .sort((a, b) => b.count - a.count),
     emerging: risks
       .filter((item) => item.trend === 'worsening' || item.treatment.status === 'overdue' || item.appetiteStatus === 'above')
@@ -464,16 +518,34 @@ export function linkedEvidenceFor(risk: RiskRecord, position: PositionState): Li
   })
 }
 
+export function riskTouchesFramework(risk: RiskRecord, frameworkNameOrId: string) {
+  return risk.obligationIds.some((obligationId) => {
+    const obligation = data.obligations.find((item) => item.id === obligationId)
+    if (!obligation) return false
+    return (
+      obligation.frameworkId === frameworkNameOrId ||
+      frameworkName(obligation.frameworkId) === frameworkNameOrId
+    )
+  })
+}
+
 export function filterRisks(risks: RiskRecord[], filters: RiskFilters) {
   const query = filters.query.trim().toLowerCase()
   return risks.filter((item) => {
+    if (filters.priorityOnly && item.severity !== 'critical' && item.severity !== 'high') return false
     if (filters.severity !== 'all' && item.severity !== filters.severity) return false
     if (filters.businessUnit !== 'all' && item.businessUnit !== filters.businessUnit) return false
     if (filters.category !== 'all' && item.category !== filters.category) return false
     if (filters.appetite !== 'all' && item.appetiteStatus !== filters.appetite) return false
-    if (filters.treatment !== 'all' && item.treatment.status !== filters.treatment) return false
+    if (filters.treatment === 'active') {
+      if (item.treatment.status === 'not-started') return false
+    } else if (filters.treatment !== 'all' && item.treatment.status !== filters.treatment) {
+      return false
+    }
     if (filters.coverage !== 'all' && item.controlCoverage !== filters.coverage) return false
     if (filters.owner !== 'all' && item.owner !== filters.owner) return false
+    if (filters.framework !== 'all' && !riskTouchesFramework(item, filters.framework)) return false
+    if (filters.trend !== 'all' && item.trend !== filters.trend) return false
     if (!query) return true
     return [item.title, item.code, item.businessUnit, item.category, item.owner].some((value) =>
       value.toLowerCase().includes(query),
@@ -504,6 +576,298 @@ export function defaultFilters(): RiskFilters {
     treatment: 'all',
     coverage: 'all',
     owner: 'all',
+    framework: 'all',
+    trend: 'all',
+    priorityOnly: false,
+  }
+}
+
+export function hasActiveFilters(filters: RiskFilters) {
+  const defaults = defaultFilters()
+  return (Object.keys(defaults) as (keyof RiskFilters)[]).some((key) => filters[key] !== defaults[key])
+}
+
+export function activeFilterChips(filters: RiskFilters): FilterChip[] {
+  const chips: FilterChip[] = []
+  if (filters.priorityOnly) {
+    chips.push({ key: 'priorityOnly', label: 'Priority', valueLabel: 'Critical & High' })
+  }
+  if (filters.severity !== 'all') {
+    chips.push({ key: 'severity', label: 'Severity', valueLabel: severityLabel(filters.severity) })
+  }
+  if (filters.businessUnit !== 'all') {
+    chips.push({ key: 'businessUnit', label: 'Business Unit', valueLabel: filters.businessUnit })
+  }
+  if (filters.category !== 'all') {
+    chips.push({ key: 'category', label: 'Category', valueLabel: filters.category })
+  }
+  if (filters.appetite !== 'all') {
+    chips.push({ key: 'appetite', label: 'Appetite', valueLabel: appetiteLabel(filters.appetite) })
+  }
+  if (filters.treatment === 'active') {
+    chips.push({ key: 'treatment', label: 'Treatment', valueLabel: 'Active' })
+  } else if (filters.treatment !== 'all') {
+    chips.push({ key: 'treatment', label: 'Treatment Status', valueLabel: treatmentLabel(filters.treatment) })
+  }
+  if (filters.coverage !== 'all') {
+    chips.push({ key: 'coverage', label: 'Control Coverage', valueLabel: coverageLabel(filters.coverage) })
+  }
+  if (filters.framework !== 'all') {
+    chips.push({ key: 'framework', label: 'Framework', valueLabel: filters.framework })
+  }
+  if (filters.trend !== 'all') {
+    chips.push({ key: 'trend', label: 'Trend', valueLabel: trendLabel(filters.trend) })
+  }
+  if (filters.owner !== 'all') {
+    chips.push({ key: 'owner', label: 'Owner', valueLabel: filters.owner })
+  }
+  if (filters.query.trim()) {
+    chips.push({ key: 'query', label: 'Search', valueLabel: filters.query.trim() })
+  }
+  return chips
+}
+
+export function clearFilterChip(filters: RiskFilters, key: FilterChip['key']): RiskFilters {
+  if (key === 'priorityOnly') return { ...filters, priorityOnly: false }
+  if (key === 'query') return { ...filters, query: '' }
+  if (key === 'severity') return { ...filters, severity: 'all' }
+  if (key === 'businessUnit') return { ...filters, businessUnit: 'all' }
+  if (key === 'category') return { ...filters, category: 'all' }
+  if (key === 'appetite') return { ...filters, appetite: 'all' }
+  if (key === 'treatment') return { ...filters, treatment: 'all' }
+  if (key === 'coverage') return { ...filters, coverage: 'all' }
+  if (key === 'framework') return { ...filters, framework: 'all' }
+  if (key === 'trend') return { ...filters, trend: 'all' }
+  if (key === 'owner') return { ...filters, owner: 'all' }
+  return filters
+}
+
+export function describeRiskDrill(filters: RiskFilters): { label: string; questions: string[]; askPrompt: string } | null {
+  if (!hasActiveFilters(filters)) return null
+  if (filters.framework !== 'all') {
+    return {
+      label: `Risks affecting ${filters.framework}`,
+      askPrompt: `Ask Nox about ${filters.framework} exposure`,
+      questions: [
+        `Which risks have the largest ${filters.framework} impact?`,
+        'Which controls are causing the gaps?',
+        'What evidence is missing?',
+        'What should we fix first?',
+      ],
+    }
+  }
+  if (filters.businessUnit !== 'all') {
+    return {
+      label: `Risk exposure filtered to ${filters.businessUnit}`,
+      askPrompt: `Ask Nox about ${filters.businessUnit} risks`,
+      questions: [
+        `Why does ${filters.businessUnit} have the highest exposure?`,
+        `Which ${filters.businessUnit} risk is most urgent?`,
+        'Which controls are weak?',
+        'What compliance obligations are affected?',
+      ],
+    }
+  }
+  if (filters.category !== 'all') {
+    return {
+      label: `${filters.category} risks`,
+      askPrompt: `Ask Nox about ${filters.category} risks`,
+      questions: [
+        `Why are ${filters.category} risks elevated?`,
+        'Which of these risks should we address first?',
+        'Which controls are weak?',
+        'What compliance obligations are affected?',
+      ],
+    }
+  }
+  if (filters.severity !== 'all') {
+    const label = `${severityLabel(filters.severity)} risks`
+    return {
+      label,
+      askPrompt: `Ask Nox about ${label}`,
+      questions: [
+        `Why are these risks ${severityLabel(filters.severity)}?`,
+        `Which ${severityLabel(filters.severity)} risk should I address first?`,
+        `Which ${severityLabel(filters.severity)} risks are above appetite?`,
+        `Which ${severityLabel(filters.severity)} risks have weak controls?`,
+        'What actions are overdue?',
+      ],
+    }
+  }
+  if (filters.coverage !== 'all' || filters.priorityOnly) {
+    return {
+      label: filters.coverage !== 'all' ? `${coverageLabel(filters.coverage)} control coverage` : 'Control coverage on priority risks',
+      askPrompt: 'Ask Nox why coverage is weak',
+      questions: [
+        'Why is control coverage weak on priority risks?',
+        'Which controls are causing the gaps?',
+        'Which risk should we remediate first?',
+        'What evidence is missing?',
+      ],
+    }
+  }
+  if (filters.appetite !== 'all') {
+    return {
+      label: appetiteLabel(filters.appetite),
+      askPrompt: `Ask Nox about risks ${appetiteLabel(filters.appetite).toLowerCase()}`,
+      questions: [
+        'Which above-appetite risk is most urgent?',
+        'Why are these risks outside appetite?',
+        'Which treatments are overdue?',
+        'What should leadership prioritise?',
+      ],
+    }
+  }
+  if (filters.treatment !== 'all') {
+    const label =
+      filters.treatment === 'active' ? 'Active treatments' : `${treatmentLabel(filters.treatment)} treatments`
+    return {
+      label,
+      askPrompt: `Ask Nox about ${label.toLowerCase()}`,
+      questions: [
+        'Which treatment is most overdue?',
+        'Who owns the delayed actions?',
+        'Which risks are blocked by treatment progress?',
+        'What should we complete first?',
+      ],
+    }
+  }
+  if (filters.trend !== 'all') {
+    return {
+      label: `${trendLabel(filters.trend)} risks`,
+      askPrompt: `Ask Nox about ${trendLabel(filters.trend).toLowerCase()} risks`,
+      questions: [
+        'Why are these risks worsening?',
+        'Which changing risk needs attention first?',
+        'What controls are failing?',
+        'What changed recently?',
+      ],
+    }
+  }
+  const chips = activeFilterChips(filters)
+  if (!chips.length) return null
+  return {
+    label: chips.map((chip) => `${chip.label}: ${chip.valueLabel}`).join(' · '),
+    askPrompt: 'Ask Nox about this filtered risk set',
+    questions: [
+      'Which of these risks is most urgent?',
+      'Which controls are weak?',
+      'What compliance obligations are affected?',
+      'What should we do next?',
+    ],
+  }
+}
+
+export function coverageRowsFor(risks: RiskRecord[]): CoverageRow[] {
+  const priority = risks.filter((item) => item.severity === 'critical' || item.severity === 'high')
+  const pool = priority.length ? priority : risks
+  return pool.map((risk) => ({
+    risk,
+    linkedControls: risk.controlIds.length,
+    coverage: risk.controlCoverage,
+  }))
+}
+
+export function buildFrameworkImpact(
+  risks: RiskRecord[],
+  frameworkNameOrId: string,
+  position: PositionState,
+): FrameworkImpact | null {
+  const linkedRisks = risks.filter((item) => riskTouchesFramework(item, frameworkNameOrId))
+  if (!linkedRisks.length) return null
+
+  const frameworkId =
+    data.frameworks.find((item) => item.name === frameworkNameOrId || item.id === frameworkNameOrId)?.id ??
+    linkedRisks.flatMap((risk) => risk.obligationIds)
+      .map((id) => data.obligations.find((item) => item.id === id)?.frameworkId)
+      .find(Boolean) ??
+    ''
+
+  const name = frameworkId ? frameworkName(frameworkId) : frameworkNameOrId
+  const relatedControlIds = new Set<string>()
+  const obligationIds = new Set<string>()
+  let obligationsWithGaps = 0
+  let missingEvidenceCount = 0
+  const chains: ComplianceChain[] = []
+  const catalogue = evidenceFor(position)
+
+  for (const risk of linkedRisks) {
+    for (const controlId of risk.controlIds) relatedControlIds.add(controlId)
+    for (const obligationId of risk.obligationIds) {
+      const obligation = data.obligations.find((item) => item.id === obligationId)
+      if (!obligation) continue
+      if (obligation.frameworkId !== frameworkId && frameworkName(obligation.frameworkId) !== name) continue
+      obligationIds.add(obligation.id)
+      const support = position === 'after' ? obligation.supportAfter : obligation.supportBefore
+      if (support !== 'supported') obligationsWithGaps += 1
+
+      const controlId = obligation.controlIds[0] ?? risk.controlIds[0]
+      const control = controlId ? data.controls.find((item) => item.id === controlId) : undefined
+      const evidenceIds = control
+        ? position === 'after'
+          ? control.evidenceIdsAfter
+          : control.evidenceIdsBefore
+        : risk.evidenceIds
+      const evidenceId = evidenceIds[0] ?? risk.evidenceIds[0] ?? 'missing-evidence'
+      const evidence = catalogue.find((item) => item.id === evidenceId) ?? data.evidence.find((item) => item.id === evidenceId)
+      const hidden = evidence && 'availableFromState' in evidence && evidence.availableFromState === 'after' && position !== 'after'
+      const evidenceStatus = !evidence || hidden ? 'Missing' : evidence.freshness === 'expired' ? 'Expired' : evidence.freshness === 'expiring' ? 'Expiring' : 'Current'
+      if (evidenceStatus === 'Missing' || evidenceStatus === 'Expired') missingEvidenceCount += 1
+
+      if (chains.length < 6) {
+        chains.push({
+          riskId: risk.id,
+          riskTitle: risk.title,
+          controlId: control?.id ?? controlId ?? '',
+          controlTitle: control?.title ?? 'Unlinked control',
+          obligationId: obligation.id,
+          obligationTitle: obligation.title,
+          evidenceId: evidence?.id ?? evidenceId,
+          evidenceTitle: evidence?.title ?? 'Evidence not linked',
+          evidenceStatus,
+        })
+      }
+    }
+  }
+
+  return {
+    name,
+    frameworkId,
+    linkedRisks,
+    relatedControlIds: [...relatedControlIds],
+    obligationIds: [...obligationIds],
+    obligationsWithGaps,
+    missingEvidenceCount,
+    chains,
+  }
+}
+
+export function emptyStateForFilters(filters: RiskFilters, allRisks: RiskRecord[]) {
+  if (filters.coverage === 'adequate' && filters.priorityOnly) {
+    const weak = allRisks.filter(
+      (item) =>
+        (item.severity === 'critical' || item.severity === 'high') && item.controlCoverage !== 'adequate',
+    ).length
+    return {
+      title: 'No risks currently have adequate control coverage.',
+      detail: `${weak} critical/high risk${weak === 1 ? '' : 's'} currently have either partial or insufficient coverage.`,
+      actionLabel: 'Review weak control coverage',
+      actionFilters: { ...defaultFilters(), priorityOnly: true } satisfies RiskFilters,
+    }
+  }
+  if (filters.coverage !== 'all') {
+    return {
+      title: `No risks currently have ${coverageLabel(filters.coverage).toLowerCase()} control coverage.`,
+      detail: 'Try another coverage state or clear the active filters.',
+      actionLabel: 'Clear coverage filter',
+      actionFilters: { ...filters, coverage: 'all' } satisfies RiskFilters,
+    }
+  }
+  return {
+    title: 'No risks match the current filters.',
+    detail: 'Clear one or more filters to widen the register view.',
+    actionLabel: 'Clear all filters',
+    actionFilters: defaultFilters(),
   }
 }
 
