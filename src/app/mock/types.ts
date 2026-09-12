@@ -1,5 +1,6 @@
 export type ModuleId =
   | 'hub'
+  | 'connect'
   | 'regulatory'
   | 'controls'
   | 'evidence'

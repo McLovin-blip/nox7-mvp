@@ -3,6 +3,7 @@ import { ActivityModule } from './app/activity/ActivityModule.tsx'
 import { NoxAiPanel } from './app/ai/NoxAiPanel.tsx'
 import type { NoxNavigateTarget } from './app/ai/suggestions.ts'
 import { AppShell } from './app/chrome/AppShell.tsx'
+import { NoxConnect } from './app/connect/NoxConnect.tsx'
 import { ControlsModule } from './app/controls/ControlsModule.tsx'
 import { EvidenceModule } from './app/evidence/EvidenceModule.tsx'
 import { ConnectedGapView } from './app/gap/ConnectedGapView.tsx'
@@ -139,7 +140,6 @@ function AuthenticatedApp() {
     <AppShell
       module={module}
       onModule={(id) => go(id)}
-      onToggleAi={() => setAiOpen((value) => !value)}
       onNotification={(item) => {
         if (item.target === 'gap') openGap('overview')
         else if (item.target === 'board') go('reports', 'rep-board-summary')
@@ -176,6 +176,8 @@ function AuthenticatedApp() {
           onOpenAction={setOpenAction}
           onCloseAction={() => setOpenAction(null)}
         />
+      ) : module === 'connect' ? (
+        <NoxConnect onAsk={openAi} onNavigate={navigateFromNox} />
       ) : module === 'regulatory' ? (
         <RegulatoryModule selectedId={selectedId} onSelect={(id) => go('regulatory', id)} />
       ) : module === 'controls' ? (

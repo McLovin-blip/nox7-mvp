@@ -58,7 +58,7 @@
 .strip-card:hover,
 .coverage-card:hover,
 .action-open:hover,
-.connect-node:hover,
+.connect .connect-node:hover,
 .change-row:hover,
 .fact-link:hover,
 .interpret:hover {
@@ -149,7 +149,7 @@
 .strip-card.on,
 .coverage-card.on,
 .action-open.on,
-.connect-node.on,
+.connect .connect-node.on,
 .change-row.on,
 .briefing.on,
 .map-core.on,
@@ -436,27 +436,27 @@
   flex-shrink: 0;
 }
 
-.connect-chain {
+.connect .connect-chain {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 8px;
 }
 
-.connect-step {
+.connect .connect-step {
   display: flex;
   align-items: stretch;
   min-width: 0;
 }
 
-.connect-step:first-child {
+.connect .connect-step:first-child {
   display: flex;
 }
 
-.connect-line {
+.connect .connect-line {
   display: none;
 }
 
-.connect-node {
+.connect .connect-node {
   flex: 1;
   min-width: 0;
   min-height: 92px;
@@ -469,7 +469,7 @@
   cursor: pointer;
 }
 
-.connect-node span {
+.connect .connect-node span {
   display: block;
   color: #b7a8f2;
   font-size: 10px;
@@ -478,7 +478,7 @@
   margin-bottom: 8px;
 }
 
-.connect-node strong {
+.connect .connect-node strong {
   display: block;
   font-size: 13px;
   font-weight: 600;
@@ -705,7 +705,7 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  .connect-chain {
+  .connect .connect-chain {
     grid-template-columns: 1fr 1fr 1fr;
   }
 }
@@ -723,12 +723,12 @@
   .coverage-grid,
   .briefing-grid,
   .map-grid,
-  .connect-chain {
+  .connect .connect-chain {
     grid-template-columns: 1fr;
   }
 
-  .connect-step,
-  .connect-step:first-child {
+  .connect .connect-step,
+  .connect .connect-step:first-child {
     display: flex;
   }
 

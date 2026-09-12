@@ -9,13 +9,11 @@ import './chrome.css'
 export function AppShell({
   module,
   onModule,
-  onToggleAi,
   onNotification,
   children,
 }: {
   module: ModuleId
   onModule: (id: ModuleId) => void
-  onToggleAi: () => void
   onNotification: (item: HubNotification) => void
   children: ReactNode
 }) {
@@ -23,11 +21,53 @@ export function AppShell({
     <div className="shell">
       <Sidebar module={module} onModule={onModule} />
       <div className="shell-main">
-        <TopBar onToggleAi={onToggleAi} onNotification={onNotification} />
+        <TopBar onNotification={onNotification} />
         <MobileNav module={module} onModule={onModule} />
         <div className="shell-body">{children}</div>
       </div>
     </div>
+  )
+}
+
+
+function NavIcon({ id }: { id: ModuleId }) {
+  const common = {
+    width: 16,
+    height: 16,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.8,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    'aria-hidden': true as const,
+  }
+  if (id === 'connect') {
+    return (
+      <svg {...common}>
+        <circle cx="6" cy="12" r="2.5" />
+        <circle cx="18" cy="6" r="2.5" />
+        <circle cx="18" cy="18" r="2.5" />
+        <path d="M8.2 11.2 15.5 7.2" />
+        <path d="M8.2 12.8 15.5 16.8" />
+      </svg>
+    )
+  }
+  if (id === 'hub') {
+    return (
+      <svg {...common}>
+        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+      </svg>
+    )
+  }
+  return (
+    <svg {...common}>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21" />
+    </svg>
   )
 }
 
@@ -56,7 +96,7 @@ function Sidebar({
             aria-current={module === item.id ? 'page' : undefined}
             onClick={() => onModule(item.id)}
           >
-            <span>{item.label}</span>
+            <span className="rail-ico"><NavIcon id={item.id} /></span><span>{item.label}</span>
             {item.badge ? <b>{item.badge}</b> : null}
           </button>
         ))}
@@ -97,10 +137,8 @@ function MobileNav({
 }
 
 function TopBar({
-  onToggleAi,
   onNotification,
 }: {
-  onToggleAi: () => void
   onNotification: (item: HubNotification) => void
 }) {
   const { view } = useSession()
@@ -163,10 +201,6 @@ function TopBar({
             </div>
           ) : null}
         </div>
-        <button className="ask" type="button" onClick={onToggleAi}>
-          Ask Nox AI
-          <kbd>⌘K</kbd>
-        </button>
       </div>
     </header>
   )
