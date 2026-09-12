@@ -69,29 +69,72 @@ function recordGuidance(ctx: SuggestionContext): NoxGuidance | null {
   const title = ctx.selectedTitle ?? ctx.hubFocus?.title
   if (!id && !title) return null
 
-  if (id?.startsWith('risk-') || ctx.module === 'risks') {
+  if (id?.startsWith('risk-')) {
     const risk = data.risks.find((item) => item.id === id)
     const name = risk?.title ?? title ?? 'this risk'
+    const after = ctx.position === 'after'
+    const appetite = after ? risk?.appetiteStatusAfter : risk?.appetiteStatusBefore
+    const coverage = after ? risk?.controlCoverageAfter : risk?.controlCoverageBefore
+    const treatment = after ? risk?.treatment.statusAfter : risk?.treatment.statusBefore
+    const controlId = risk?.controlIds[0]
+    const evidenceId = after
+      ? risk?.evidenceIdsAfter.find((item) => item.includes('2026')) ?? risk?.evidenceIdsAfter[0]
+      : risk?.evidenceIdsBefore.find((item) => item.includes('audit') || item.includes('findings')) ??
+        risk?.evidenceIdsBefore[0]
+    const pressure = [
+      appetite === 'above' ? 'above appetite' : null,
+      coverage && coverage !== 'adequate' ? `${coverage} control coverage` : null,
+      treatment === 'overdue' || treatment === 'at-risk' ? 'treatment under pressure' : null,
+    ].filter(Boolean)
     return {
-      intro: `You're looking at ${name}. I can explain the rating, missing evidence, or what to do next.`,
+      intro: pressure.length
+        ? `You're reviewing ${name}. It needs attention because it is ${pressure.join(' and ')}.`
+        : `You're reviewing ${name}. I can explain residual exposure, linked controls, compliance impact, or treatment.`,
       actions: [
         { id: 'act-risk-open', label: `Review ${name}`, navigate: { type: 'module' as const, module: 'risks', recordId: id } },
-        {
-          id: 'act-risk-evidence',
-          label: 'Review missing evidence',
-          navigate: { type: 'module' as const, module: 'evidence', recordId: ctx.position === 'after' ? 'ev-supplier-assessments-2026' : 'ev-audit-findings' },
-        },
-        {
-          id: 'act-risk-control',
-          label: 'Open affected control',
-          navigate: { type: 'module' as const, module: 'controls', recordId: 'ctl-supplier-assurance' },
-        },
+        controlId
+          ? {
+              id: 'act-risk-control',
+              label: 'Open linked control',
+              navigate: { type: 'module' as const, module: 'controls', recordId: controlId },
+            }
+          : {
+              id: 'act-risk-controls',
+              label: 'Browse controls',
+              navigate: { type: 'module' as const, module: 'controls' },
+            },
+        evidenceId
+          ? {
+              id: 'act-risk-evidence',
+              label: after ? 'Open related evidence' : 'Review missing evidence',
+              navigate: { type: 'module' as const, module: 'evidence', recordId: evidenceId },
+            }
+          : {
+              id: 'act-risk-evidence-module',
+              label: 'Open evidence',
+              navigate: { type: 'module' as const, module: 'evidence' },
+            },
+        risk?.obligationIds[0]
+          ? {
+              id: 'act-risk-obligation',
+              label: 'Review compliance impact',
+              navigate: { type: 'module' as const, module: 'regulatory', recordId: risk.obligationIds[0] },
+            }
+          : {
+              id: 'act-risk-regulatory',
+              label: 'Open regulatory',
+              navigate: { type: 'module' as const, module: 'regulatory' },
+            },
       ] as NoxActionChip[],
       questions: [
-        `Why is ${name} rated high?`,
-        'What evidence is missing?',
-        'Which controls are affected?',
-        `What should I do about ${name}?`,
+        `Why is ${name} rated ${risk?.severity ?? 'this severity'}?`,
+        'What is driving residual risk?',
+        'Why is this risk above appetite?',
+        'Which controls are ineffective?',
+        'Which evidence is missing?',
+        'Which frameworks are affected?',
+        'Is the treatment plan on track?',
+        'What should I do next?',
       ],
     }
   }
@@ -241,15 +284,23 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
 
   if (ctx.module === 'risks') {
     const count = elevated.length
+    const above = data.risks.filter((item) => {
+      const appetite = after ? item.appetiteStatusAfter : item.appetiteStatusBefore
+      return appetite === 'above'
+    })
+    const overdue = data.risks.filter((item) => {
+      const status = after ? item.treatment.statusAfter : item.treatment.statusBefore
+      return status === 'overdue' || status === 'at-risk'
+    })
     return {
       intro:
         count > 0
-          ? `${organisation.name} currently has ${count} elevated risk${count === 1 ? '' : 's'}. Start with the highest exposure.`
-          : 'Elevated third-party and regulatory exposure are reduced. Continuity remains a watch item.',
+          ? `${organisation.name} currently has ${count} elevated risk${count === 1 ? '' : 's'} and ${above.length} above appetite. Start with the highest residual exposure.`
+          : `Elevated exposure is reduced. ${above.length ? `${above.length} remain above appetite.` : 'Appetite pressure is lower.'} Continuity remains a watch item.`,
       actions: [
         {
           id: 'risk-highest',
-          label: count > 0 ? `Open the highest risk` : 'Review continuity risk',
+          label: count > 0 ? 'Open the highest risk' : 'Review continuity risk',
           navigate: {
             type: 'module' as const,
             module: 'risks',
@@ -257,9 +308,22 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
           },
         },
         {
-          id: 'risk-no-mitigation',
-          label: 'Show risks tied to missing evidence',
-          navigate: { type: 'module' as const, module: 'risks', recordId: 'risk-third-party' },
+          id: 'risk-above-appetite',
+          label: 'Review above-appetite risks',
+          navigate: {
+            type: 'module' as const,
+            module: 'risks',
+            recordId: above[0]?.id ?? elevated[0]?.id ?? 'risk-third-party',
+          },
+        },
+        {
+          id: 'risk-overdue-treatment',
+          label: overdue.length ? 'Review overdue treatments' : 'Review treatment plans',
+          navigate: {
+            type: 'module' as const,
+            module: 'risks',
+            recordId: overdue[0]?.id ?? 'risk-privileged-access',
+          },
         },
         {
           id: 'risk-evidence',
@@ -272,11 +336,14 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
         },
       ],
       questions: [
-        count > 0 ? `Show me the ${count} elevated risks.` : 'What are our highest risks?',
+        count > 0 ? `Show me the ${count} elevated risks.` : 'What are our biggest risks?',
         'Which risks need immediate attention?',
-        'Why are these risks rated high?',
-        'Which risks have no mitigation plan?',
-        'Which risks could impact our assurance position?',
+        'Which risks are above appetite?',
+        'Which risks have overdue treatments?',
+        'Which business unit has the highest exposure?',
+        'Which risks have ineffective controls?',
+        'Which risks affect compliance the most?',
+        'What changed in our risk position?',
       ],
     }
   }

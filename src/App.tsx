@@ -217,7 +217,17 @@ function AuthenticatedApp() {
           }}
         />
       ) : module === 'risks' ? (
-        <RisksModule selectedId={selectedId} onSelect={(id) => go('risks', id)} />
+        <RisksModule
+          selectedId={selectedId}
+          onSelect={(id) => go('risks', id)}
+          onNavigate={(target) => {
+            if (target.type === 'risk') {
+              go('risks', target.riskId)
+              return
+            }
+            go(target.module, target.recordId)
+          }}
+        />
       ) : module === 'reports' ? (
         <ReportsModule selectedId={selectedId} onOpenSource={openSource} />
       ) : (

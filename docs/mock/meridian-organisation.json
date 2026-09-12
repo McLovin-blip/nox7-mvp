@@ -96,19 +96,29 @@
   "obligations": [
     {
       "id": "obl-iso-a532",
-      "title": "Supplier relationships — information security",
+      "title": "Supplier relationships \u2014 information security",
       "frameworkId": "fw-iso27001",
       "supportBefore": "partial",
       "supportAfter": "supported",
-      "policyIds": ["ev-policy-supplier"],
-      "controlIds": ["ctl-supplier-assurance"],
-      "evidenceIdsBefore": ["ev-policy-supplier", "ev-audit-findings"],
+      "policyIds": [
+        "ev-policy-supplier"
+      ],
+      "controlIds": [
+        "ctl-supplier-assurance"
+      ],
+      "evidenceIdsBefore": [
+        "ev-policy-supplier",
+        "ev-audit-findings"
+      ],
       "evidenceIdsAfter": [
         "ev-policy-supplier",
         "ev-audit-findings",
         "ev-supplier-assessments-2026"
       ],
-      "riskIds": ["risk-third-party"],
+      "riskIds": [
+        "risk-third-party",
+        "risk-vendor-concentration"
+      ],
       "ownerId": "person-nadia"
     },
     {
@@ -117,11 +127,23 @@
       "frameworkId": "fw-nis2",
       "supportBefore": "partial",
       "supportAfter": "supported",
-      "policyIds": ["ev-policy-supplier"],
-      "controlIds": ["ctl-supplier-assurance"],
-      "evidenceIdsBefore": ["ev-policy-supplier"],
-      "evidenceIdsAfter": ["ev-policy-supplier", "ev-supplier-assessments-2026"],
-      "riskIds": ["risk-third-party", "risk-regulatory"],
+      "policyIds": [
+        "ev-policy-supplier"
+      ],
+      "controlIds": [
+        "ctl-supplier-assurance"
+      ],
+      "evidenceIdsBefore": [
+        "ev-policy-supplier"
+      ],
+      "evidenceIdsAfter": [
+        "ev-policy-supplier",
+        "ev-supplier-assessments-2026"
+      ],
+      "riskIds": [
+        "risk-regulatory",
+        "risk-third-party"
+      ],
       "ownerId": "person-omar"
     },
     {
@@ -130,15 +152,28 @@
       "frameworkId": "fw-gdpr",
       "supportBefore": "partial",
       "supportAfter": "supported",
-      "policyIds": ["ev-policy-supplier", "ev-data-retention"],
-      "controlIds": ["ctl-supplier-assurance", "ctl-data-retention"],
-      "evidenceIdsBefore": ["ev-policy-supplier", "ev-data-retention"],
+      "policyIds": [
+        "ev-policy-supplier",
+        "ev-data-retention"
+      ],
+      "controlIds": [
+        "ctl-supplier-assurance",
+        "ctl-data-retention"
+      ],
+      "evidenceIdsBefore": [
+        "ev-policy-supplier",
+        "ev-data-retention"
+      ],
       "evidenceIdsAfter": [
         "ev-policy-supplier",
         "ev-data-retention",
         "ev-supplier-assessments-2026"
       ],
-      "riskIds": ["risk-third-party", "risk-regulatory"],
+      "riskIds": [
+        "risk-privacy-retention",
+        "risk-regulatory",
+        "risk-third-party"
+      ],
       "ownerId": "person-tomas"
     },
     {
@@ -147,11 +182,23 @@
       "frameworkId": "fw-nca-ecc",
       "supportBefore": "partial",
       "supportAfter": "supported",
-      "policyIds": ["ev-policy-supplier"],
-      "controlIds": ["ctl-supplier-assurance"],
-      "evidenceIdsBefore": ["ev-policy-supplier"],
-      "evidenceIdsAfter": ["ev-policy-supplier", "ev-supplier-assessments-2026"],
-      "riskIds": ["risk-third-party", "risk-regulatory"],
+      "policyIds": [
+        "ev-policy-supplier"
+      ],
+      "controlIds": [
+        "ctl-supplier-assurance"
+      ],
+      "evidenceIdsBefore": [
+        "ev-policy-supplier"
+      ],
+      "evidenceIdsAfter": [
+        "ev-policy-supplier",
+        "ev-supplier-assessments-2026"
+      ],
+      "riskIds": [
+        "risk-regulatory",
+        "risk-third-party"
+      ],
       "ownerId": "person-sara"
     },
     {
@@ -160,11 +207,23 @@
       "frameworkId": "fw-iso27001",
       "supportBefore": "supported",
       "supportAfter": "supported",
-      "policyIds": ["ev-policy-isms"],
-      "controlIds": ["ctl-isms-policy"],
-      "evidenceIdsBefore": ["ev-policy-isms", "ev-attestations"],
-      "evidenceIdsAfter": ["ev-policy-isms", "ev-attestations"],
-      "riskIds": [],
+      "policyIds": [
+        "ev-policy-isms"
+      ],
+      "controlIds": [
+        "ctl-isms-policy"
+      ],
+      "evidenceIdsBefore": [
+        "ev-policy-isms",
+        "ev-attestations"
+      ],
+      "evidenceIdsAfter": [
+        "ev-policy-isms",
+        "ev-attestations"
+      ],
+      "riskIds": [
+        "risk-privileged-access"
+      ],
       "ownerId": "person-nadia"
     },
     {
@@ -173,15 +232,26 @@
       "frameworkId": "fw-internal",
       "supportBefore": "partial",
       "supportAfter": "supported",
-      "policyIds": ["ev-policy-supplier"],
-      "controlIds": ["ctl-supplier-assurance"],
-      "evidenceIdsBefore": ["ev-policy-supplier", "ev-remediation-register"],
+      "policyIds": [
+        "ev-policy-supplier"
+      ],
+      "controlIds": [
+        "ctl-supplier-assurance"
+      ],
+      "evidenceIdsBefore": [
+        "ev-policy-supplier",
+        "ev-remediation-register"
+      ],
       "evidenceIdsAfter": [
         "ev-policy-supplier",
         "ev-remediation-register",
         "ev-supplier-assessments-2026"
       ],
-      "riskIds": ["risk-third-party"],
+      "riskIds": [
+        "risk-key-person",
+        "risk-third-party",
+        "risk-vendor-concentration"
+      ],
       "ownerId": "person-omar"
     },
     {
@@ -190,11 +260,21 @@
       "frameworkId": "fw-iso27001",
       "supportBefore": "supported",
       "supportAfter": "supported",
-      "policyIds": ["ev-bc-test"],
-      "controlIds": ["ctl-continuity"],
-      "evidenceIdsBefore": ["ev-bc-test"],
-      "evidenceIdsAfter": ["ev-bc-test"],
-      "riskIds": ["risk-continuity"],
+      "policyIds": [
+        "ev-bc-test"
+      ],
+      "controlIds": [
+        "ctl-continuity"
+      ],
+      "evidenceIdsBefore": [
+        "ev-bc-test"
+      ],
+      "evidenceIdsAfter": [
+        "ev-bc-test"
+      ],
+      "riskIds": [
+        "risk-continuity"
+      ],
       "ownerId": "person-nadia"
     }
   ],
@@ -219,13 +299,20 @@
         "obl-nca-third-party",
         "obl-internal-contract"
       ],
-      "evidenceIdsBefore": ["ev-policy-supplier", "ev-audit-findings"],
+      "evidenceIdsBefore": [
+        "ev-policy-supplier",
+        "ev-audit-findings"
+      ],
       "evidenceIdsAfter": [
         "ev-policy-supplier",
         "ev-audit-findings",
         "ev-supplier-assessments-2026"
       ],
-      "riskIds": ["risk-third-party", "risk-regulatory"],
+      "riskIds": [
+        "risk-third-party",
+        "risk-regulatory",
+        "risk-vendor-concentration"
+      ],
       "partialReason": "Policy is current. Current assessments for critical suppliers are missing."
     },
     {
@@ -234,11 +321,23 @@
       "assuranceBefore": "assured",
       "assuranceAfter": "assured",
       "ownerId": "person-nadia",
-      "frameworkIds": ["fw-iso27001"],
-      "obligationIds": ["obl-iso-isms"],
-      "evidenceIdsBefore": ["ev-policy-isms", "ev-attestations"],
-      "evidenceIdsAfter": ["ev-policy-isms", "ev-attestations"],
-      "riskIds": [],
+      "frameworkIds": [
+        "fw-iso27001"
+      ],
+      "obligationIds": [
+        "obl-iso-isms"
+      ],
+      "evidenceIdsBefore": [
+        "ev-policy-isms",
+        "ev-attestations"
+      ],
+      "evidenceIdsAfter": [
+        "ev-policy-isms",
+        "ev-attestations"
+      ],
+      "riskIds": [
+        "risk-privileged-access"
+      ],
       "partialReason": null
     },
     {
@@ -247,11 +346,22 @@
       "assuranceBefore": "assured",
       "assuranceAfter": "assured",
       "ownerId": "person-tomas",
-      "frameworkIds": ["fw-gdpr", "fw-internal"],
-      "obligationIds": ["obl-gdpr-processor"],
-      "evidenceIdsBefore": ["ev-data-retention"],
-      "evidenceIdsAfter": ["ev-data-retention"],
-      "riskIds": [],
+      "frameworkIds": [
+        "fw-gdpr",
+        "fw-internal"
+      ],
+      "obligationIds": [
+        "obl-gdpr-processor"
+      ],
+      "evidenceIdsBefore": [
+        "ev-data-retention"
+      ],
+      "evidenceIdsAfter": [
+        "ev-data-retention"
+      ],
+      "riskIds": [
+        "risk-privacy-retention"
+      ],
       "partialReason": null
     },
     {
@@ -260,11 +370,22 @@
       "assuranceBefore": "assured",
       "assuranceAfter": "assured",
       "ownerId": "person-nadia",
-      "frameworkIds": ["fw-iso27001", "fw-nis2"],
-      "obligationIds": ["obl-iso-bc"],
-      "evidenceIdsBefore": ["ev-bc-test"],
-      "evidenceIdsAfter": ["ev-bc-test"],
-      "riskIds": ["risk-continuity"],
+      "frameworkIds": [
+        "fw-iso27001",
+        "fw-nis2"
+      ],
+      "obligationIds": [
+        "obl-iso-bc"
+      ],
+      "evidenceIdsBefore": [
+        "ev-bc-test"
+      ],
+      "evidenceIdsAfter": [
+        "ev-bc-test"
+      ],
+      "riskIds": [
+        "risk-continuity"
+      ],
       "partialReason": null
     }
   ],
@@ -280,8 +401,12 @@
       "processingState": "indexed",
       "duplicateOf": null,
       "missingMetadata": false,
-      "usedByControlIds": ["ctl-isms-policy"],
-      "usedByObligationIds": ["obl-iso-isms"],
+      "usedByControlIds": [
+        "ctl-isms-policy"
+      ],
+      "usedByObligationIds": [
+        "obl-iso-isms"
+      ],
       "usedByRiskIds": []
     },
     {
@@ -297,7 +422,11 @@
       "missingMetadata": false,
       "usedByControlIds": [],
       "usedByObligationIds": [],
-      "usedByRiskIds": ["risk-third-party", "risk-regulatory", "risk-continuity"]
+      "usedByRiskIds": [
+        "risk-third-party",
+        "risk-regulatory",
+        "risk-continuity"
+      ]
     },
     {
       "id": "ev-policy-supplier",
@@ -310,7 +439,9 @@
       "processingState": "indexed",
       "duplicateOf": null,
       "missingMetadata": false,
-      "usedByControlIds": ["ctl-supplier-assurance"],
+      "usedByControlIds": [
+        "ctl-supplier-assurance"
+      ],
       "usedByObligationIds": [
         "obl-iso-a532",
         "obl-nis2-supply",
@@ -318,7 +449,9 @@
         "obl-nca-third-party",
         "obl-internal-contract"
       ],
-      "usedByRiskIds": ["risk-third-party"]
+      "usedByRiskIds": [
+        "risk-third-party"
+      ]
     },
     {
       "id": "ev-bc-test",
@@ -331,9 +464,15 @@
       "processingState": "indexed",
       "duplicateOf": null,
       "missingMetadata": false,
-      "usedByControlIds": ["ctl-continuity"],
-      "usedByObligationIds": ["obl-iso-bc"],
-      "usedByRiskIds": ["risk-continuity"]
+      "usedByControlIds": [
+        "ctl-continuity"
+      ],
+      "usedByObligationIds": [
+        "obl-iso-bc"
+      ],
+      "usedByRiskIds": [
+        "risk-continuity"
+      ]
     },
     {
       "id": "ev-data-retention",
@@ -346,8 +485,12 @@
       "processingState": "indexed",
       "duplicateOf": null,
       "missingMetadata": false,
-      "usedByControlIds": ["ctl-data-retention"],
-      "usedByObligationIds": ["obl-gdpr-processor"],
+      "usedByControlIds": [
+        "ctl-data-retention"
+      ],
+      "usedByObligationIds": [
+        "obl-gdpr-processor"
+      ],
       "usedByRiskIds": []
     },
     {
@@ -361,9 +504,16 @@
       "processingState": "indexed",
       "duplicateOf": null,
       "missingMetadata": false,
-      "usedByControlIds": ["ctl-supplier-assurance"],
-      "usedByObligationIds": ["obl-iso-a532"],
-      "usedByRiskIds": ["risk-third-party", "risk-regulatory"]
+      "usedByControlIds": [
+        "ctl-supplier-assurance"
+      ],
+      "usedByObligationIds": [
+        "obl-iso-a532"
+      ],
+      "usedByRiskIds": [
+        "risk-third-party",
+        "risk-regulatory"
+      ]
     },
     {
       "id": "ev-attestations",
@@ -376,8 +526,12 @@
       "processingState": "indexed",
       "duplicateOf": null,
       "missingMetadata": false,
-      "usedByControlIds": ["ctl-isms-policy"],
-      "usedByObligationIds": ["obl-iso-isms"],
+      "usedByControlIds": [
+        "ctl-isms-policy"
+      ],
+      "usedByObligationIds": [
+        "obl-iso-isms"
+      ],
       "usedByRiskIds": []
     },
     {
@@ -392,8 +546,12 @@
       "duplicateOf": null,
       "missingMetadata": false,
       "usedByControlIds": [],
-      "usedByObligationIds": ["obl-nca-third-party"],
-      "usedByRiskIds": ["risk-regulatory"]
+      "usedByObligationIds": [
+        "obl-nca-third-party"
+      ],
+      "usedByRiskIds": [
+        "risk-regulatory"
+      ]
     },
     {
       "id": "ev-remediation-register",
@@ -406,9 +564,15 @@
       "processingState": "indexed",
       "duplicateOf": null,
       "missingMetadata": false,
-      "usedByControlIds": ["ctl-supplier-assurance"],
-      "usedByObligationIds": ["obl-internal-contract"],
-      "usedByRiskIds": ["risk-third-party"]
+      "usedByControlIds": [
+        "ctl-supplier-assurance"
+      ],
+      "usedByObligationIds": [
+        "obl-internal-contract"
+      ],
+      "usedByRiskIds": [
+        "risk-third-party"
+      ]
     },
     {
       "id": "ev-supplier-q-duplicate",
@@ -438,7 +602,9 @@
       "missingMetadata": true,
       "usedByControlIds": [],
       "usedByObligationIds": [],
-      "usedByRiskIds": ["risk-third-party"]
+      "usedByRiskIds": [
+        "risk-third-party"
+      ]
     },
     {
       "id": "ev-supplier-assessments-2026",
@@ -451,7 +617,9 @@
       "processingState": "indexed",
       "duplicateOf": null,
       "missingMetadata": false,
-      "usedByControlIds": ["ctl-supplier-assurance"],
+      "usedByControlIds": [
+        "ctl-supplier-assurance"
+      ],
       "usedByObligationIds": [
         "obl-iso-a532",
         "obl-nis2-supply",
@@ -459,7 +627,10 @@
         "obl-nca-third-party",
         "obl-internal-contract"
       ],
-      "usedByRiskIds": ["risk-third-party", "risk-regulatory"],
+      "usedByRiskIds": [
+        "risk-third-party",
+        "risk-regulatory"
+      ],
       "availableFromState": "after"
     }
   ],
@@ -470,7 +641,9 @@
       "levelBefore": "elevated",
       "levelAfter": "reduced",
       "ownerId": "person-omar",
-      "controlIds": ["ctl-supplier-assurance"],
+      "controlIds": [
+        "ctl-supplier-assurance"
+      ],
       "obligationIds": [
         "obl-iso-a532",
         "obl-nis2-supply",
@@ -489,7 +662,103 @@
         "ev-risk-assessment",
         "ev-supplier-assessments-2026"
       ],
-      "contributingGap": "Missing current assessments for critical suppliers"
+      "contributingGap": "Missing current assessments for critical suppliers",
+      "code": "RSK-274770",
+      "category": "Third Party",
+      "businessUnit": "Procurement",
+      "severity": "critical",
+      "cause": "Supplier assessments and supporting assurance controls are incomplete for several critical suppliers.",
+      "event": "Third-party vulnerabilities and control weaknesses may remain unidentified ahead of the governance review.",
+      "businessImpact": "Data exposure, regulatory findings, service disruption, and reputational damage across connected frameworks.",
+      "inherent": {
+        "likelihood": 5,
+        "impact": 5,
+        "score": 96,
+        "rating": "Critical"
+      },
+      "residualBefore": {
+        "likelihood": 4,
+        "impact": 5,
+        "score": 92,
+        "rating": "Critical"
+      },
+      "residualAfter": {
+        "likelihood": 2,
+        "impact": 3,
+        "score": 38,
+        "rating": "Medium"
+      },
+      "target": {
+        "likelihood": 2,
+        "impact": 3,
+        "score": 36,
+        "rating": "Medium"
+      },
+      "appetiteStatusBefore": "above",
+      "appetiteStatusAfter": "within",
+      "trendBefore": "worsening",
+      "trendAfter": "improving",
+      "controlCoverageBefore": "insufficient",
+      "controlCoverageAfter": "adequate",
+      "nextReview": "2026-09-12",
+      "lastAssessment": "2026-08-18",
+      "createdAt": "2025-11-12",
+      "updatedAt": "2026-09-10",
+      "treatment": {
+        "strategy": "mitigate",
+        "ownerId": "person-omar",
+        "progressBefore": 35,
+        "progressAfter": 100,
+        "targetDate": "2026-09-30",
+        "statusBefore": "overdue",
+        "statusAfter": "completed",
+        "priority": "critical",
+        "latestUpdateBefore": "Assessment collection still incomplete for three critical suppliers.",
+        "latestUpdateAfter": "2026 assessment pack approved by Layla Rahman.",
+        "actions": [
+          {
+            "id": "rta-tp-1",
+            "title": "Obtain current critical-supplier assessments",
+            "ownerId": "person-omar",
+            "dueDate": "2026-09-16",
+            "statusBefore": "overdue",
+            "statusAfter": "completed"
+          },
+          {
+            "id": "rta-tp-2",
+            "title": "Review high-risk supplier controls",
+            "ownerId": "person-nadia",
+            "dueDate": "2026-09-20",
+            "statusBefore": "in-progress",
+            "statusAfter": "completed"
+          },
+          {
+            "id": "rta-tp-3",
+            "title": "Approve revised treatment and evidence pack",
+            "ownerId": "person-layla",
+            "dueDate": "2026-09-22",
+            "statusBefore": "pending",
+            "statusAfter": "completed"
+          }
+        ]
+      },
+      "history": [
+        {
+          "date": "2026-09-10",
+          "textBefore": "Residual risk held at 92 \u2014 Critical; treatment overdue.",
+          "textAfter": "Residual risk reduced 92 \u2192 38 after assessment approval."
+        },
+        {
+          "date": "2026-09-08",
+          "textBefore": "Supplier evidence still missing for critical suppliers.",
+          "textAfter": "2026 supplier assessments indexed and approved."
+        },
+        {
+          "date": "2026-08-18",
+          "textBefore": "Last assessment confirmed incomplete control coverage.",
+          "textAfter": "Last assessment confirmed incomplete control coverage."
+        }
+      ]
     },
     {
       "id": "risk-regulatory",
@@ -497,19 +766,107 @@
       "levelBefore": "elevated",
       "levelAfter": "reduced",
       "ownerId": "person-layla",
-      "controlIds": ["ctl-supplier-assurance"],
+      "controlIds": [
+        "ctl-supplier-assurance"
+      ],
       "obligationIds": [
         "obl-nis2-supply",
         "obl-gdpr-processor",
         "obl-nca-third-party"
       ],
-      "evidenceIdsBefore": ["ev-audit-findings", "ev-prior-assessment"],
+      "evidenceIdsBefore": [
+        "ev-audit-findings",
+        "ev-prior-assessment"
+      ],
       "evidenceIdsAfter": [
         "ev-audit-findings",
         "ev-prior-assessment",
         "ev-supplier-assessments-2026"
       ],
-      "contributingGap": "The same supplier-assurance gap appears across several frameworks"
+      "contributingGap": "The same supplier-assurance gap appears across several frameworks",
+      "code": "RSK-274801",
+      "category": "Regulatory",
+      "businessUnit": "Compliance",
+      "severity": "high",
+      "cause": "The same supplier-assurance gap appears across NIS2, GDPR and NCA ECC obligations.",
+      "event": "Regulatory reviewers may find insufficient evidence of third-party oversight before the review window closes.",
+      "businessImpact": "Findings across multiple frameworks, delayed assurance statements, and increased regulatory scrutiny.",
+      "inherent": {
+        "likelihood": 4,
+        "impact": 5,
+        "score": 88,
+        "rating": "High"
+      },
+      "residualBefore": {
+        "likelihood": 4,
+        "impact": 4,
+        "score": 78,
+        "rating": "High"
+      },
+      "residualAfter": {
+        "likelihood": 2,
+        "impact": 3,
+        "score": 34,
+        "rating": "Medium"
+      },
+      "target": {
+        "likelihood": 2,
+        "impact": 2,
+        "score": 28,
+        "rating": "Low"
+      },
+      "appetiteStatusBefore": "above",
+      "appetiteStatusAfter": "within",
+      "trendBefore": "stable",
+      "trendAfter": "improving",
+      "controlCoverageBefore": "partial",
+      "controlCoverageAfter": "adequate",
+      "nextReview": "2026-09-18",
+      "lastAssessment": "2026-08-20",
+      "createdAt": "2025-12-02",
+      "updatedAt": "2026-09-10",
+      "treatment": {
+        "strategy": "mitigate",
+        "ownerId": "person-layla",
+        "progressBefore": 40,
+        "progressAfter": 100,
+        "targetDate": "2026-09-25",
+        "statusBefore": "in-progress",
+        "statusAfter": "completed",
+        "priority": "high",
+        "latestUpdateBefore": "Framework owners waiting on the same supplier evidence pack.",
+        "latestUpdateAfter": "Connected obligations moved to supported after approval.",
+        "actions": [
+          {
+            "id": "rta-rg-1",
+            "title": "Map supplier evidence to NIS2 / GDPR / NCA ECC obligations",
+            "ownerId": "person-sara",
+            "dueDate": "2026-09-18",
+            "statusBefore": "in-progress",
+            "statusAfter": "completed"
+          },
+          {
+            "id": "rta-rg-2",
+            "title": "Brief governance review on residual regulatory exposure",
+            "ownerId": "person-layla",
+            "dueDate": "2026-09-24",
+            "statusBefore": "pending",
+            "statusAfter": "completed"
+          }
+        ]
+      },
+      "history": [
+        {
+          "date": "2026-09-10",
+          "textBefore": "Residual risk 78 \u2014 High; above appetite.",
+          "textAfter": "Residual risk reduced 78 \u2192 34; within appetite."
+        },
+        {
+          "date": "2026-09-05",
+          "textBefore": "Three frameworks still cite the same missing assessments.",
+          "textAfter": "Three frameworks still cite the same missing assessments."
+        }
+      ]
     },
     {
       "id": "risk-continuity",
@@ -517,11 +874,486 @@
       "levelBefore": "watch",
       "levelAfter": "watch",
       "ownerId": "person-nadia",
-      "controlIds": ["ctl-continuity"],
-      "obligationIds": ["obl-iso-bc"],
-      "evidenceIdsBefore": ["ev-bc-test"],
-      "evidenceIdsAfter": ["ev-bc-test"],
-      "contributingGap": "Business continuity test report is expiring — not the primary action"
+      "controlIds": [
+        "ctl-continuity"
+      ],
+      "obligationIds": [
+        "obl-iso-bc"
+      ],
+      "evidenceIdsBefore": [
+        "ev-bc-test"
+      ],
+      "evidenceIdsAfter": [
+        "ev-bc-test"
+      ],
+      "contributingGap": "Business continuity test report is expiring \u2014 not the primary action",
+      "code": "RSK-274910",
+      "category": "Operational",
+      "businessUnit": "IT Services",
+      "severity": "medium",
+      "cause": "The business continuity test report is approaching expiry and has not yet been refreshed for the review cycle.",
+      "event": "Continuity evidence may fall out of date during the governance review window.",
+      "businessImpact": "Limited assurance over continuity preparedness; secondary finding risk if left unaddressed.",
+      "inherent": {
+        "likelihood": 3,
+        "impact": 4,
+        "score": 55,
+        "rating": "Medium"
+      },
+      "residualBefore": {
+        "likelihood": 3,
+        "impact": 3,
+        "score": 48,
+        "rating": "Medium"
+      },
+      "residualAfter": {
+        "likelihood": 3,
+        "impact": 3,
+        "score": 48,
+        "rating": "Medium"
+      },
+      "target": {
+        "likelihood": 2,
+        "impact": 3,
+        "score": 32,
+        "rating": "Medium"
+      },
+      "appetiteStatusBefore": "near",
+      "appetiteStatusAfter": "near",
+      "trendBefore": "stable",
+      "trendAfter": "stable",
+      "controlCoverageBefore": "adequate",
+      "controlCoverageAfter": "adequate",
+      "nextReview": "2026-10-02",
+      "lastAssessment": "2026-07-14",
+      "createdAt": "2026-01-20",
+      "updatedAt": "2026-09-01",
+      "treatment": {
+        "strategy": "mitigate",
+        "ownerId": "person-nadia",
+        "progressBefore": 55,
+        "progressAfter": 55,
+        "targetDate": "2026-10-15",
+        "statusBefore": "in-progress",
+        "statusAfter": "in-progress",
+        "priority": "medium",
+        "latestUpdateBefore": "Refresh of BC test evidence scheduled; not the primary review action.",
+        "latestUpdateAfter": "Refresh of BC test evidence scheduled; not the primary review action.",
+        "actions": [
+          {
+            "id": "rta-bc-1",
+            "title": "Commission refreshed business continuity test",
+            "ownerId": "person-nadia",
+            "dueDate": "2026-10-08",
+            "statusBefore": "in-progress",
+            "statusAfter": "in-progress"
+          },
+          {
+            "id": "rta-bc-2",
+            "title": "Index updated BC evidence against ISO continuity obligation",
+            "ownerId": "person-nadia",
+            "dueDate": "2026-10-12",
+            "statusBefore": "not-started",
+            "statusAfter": "not-started"
+          }
+        ]
+      },
+      "history": [
+        {
+          "date": "2026-09-01",
+          "textBefore": "Continuity evidence marked approaching review.",
+          "textAfter": "Continuity evidence marked approaching review."
+        },
+        {
+          "date": "2026-07-14",
+          "textBefore": "BC control remained assured with current test report.",
+          "textAfter": "BC control remained assured with current test report."
+        }
+      ]
+    },
+    {
+      "id": "risk-privileged-access",
+      "code": "RSK-275014",
+      "title": "Privileged access oversight",
+      "category": "Information Security",
+      "businessUnit": "IT Services",
+      "severity": "high",
+      "levelBefore": "elevated",
+      "levelAfter": "elevated",
+      "ownerId": "person-nadia",
+      "controlIds": [
+        "ctl-isms-policy"
+      ],
+      "obligationIds": [
+        "obl-iso-isms"
+      ],
+      "evidenceIdsBefore": [
+        "ev-policy-isms",
+        "ev-attestations"
+      ],
+      "evidenceIdsAfter": [
+        "ev-policy-isms",
+        "ev-attestations"
+      ],
+      "contributingGap": "Privileged access reviews are not fully evidenced against the ISMS policy cycle",
+      "cause": "Periodic privileged-access reviews are incomplete relative to the ISMS policy commitments.",
+      "event": "Excess privilege may persist on critical systems without timely detection.",
+      "businessImpact": "Unauthorised change, data exposure, and weakened ISMS assurance.",
+      "inherent": {
+        "likelihood": 4,
+        "impact": 5,
+        "score": 84,
+        "rating": "High"
+      },
+      "residualBefore": {
+        "likelihood": 3,
+        "impact": 5,
+        "score": 72,
+        "rating": "High"
+      },
+      "residualAfter": {
+        "likelihood": 3,
+        "impact": 5,
+        "score": 70,
+        "rating": "High"
+      },
+      "target": {
+        "likelihood": 2,
+        "impact": 4,
+        "score": 42,
+        "rating": "Medium"
+      },
+      "appetiteStatusBefore": "above",
+      "appetiteStatusAfter": "above",
+      "trendBefore": "worsening",
+      "trendAfter": "stable",
+      "controlCoverageBefore": "partial",
+      "controlCoverageAfter": "partial",
+      "nextReview": "2026-09-28",
+      "lastAssessment": "2026-08-30",
+      "createdAt": "2026-03-04",
+      "updatedAt": "2026-09-05",
+      "treatment": {
+        "strategy": "mitigate",
+        "ownerId": "person-nadia",
+        "progressBefore": 25,
+        "progressAfter": 30,
+        "targetDate": "2026-10-20",
+        "statusBefore": "in-progress",
+        "statusAfter": "in-progress",
+        "priority": "high",
+        "latestUpdateBefore": "Access review evidence pack still incomplete.",
+        "latestUpdateAfter": "Access review evidence pack still incomplete.",
+        "actions": [
+          {
+            "id": "rta-pa-1",
+            "title": "Complete privileged access recertification for critical systems",
+            "ownerId": "person-nadia",
+            "dueDate": "2026-09-30",
+            "statusBefore": "overdue",
+            "statusAfter": "overdue"
+          },
+          {
+            "id": "rta-pa-2",
+            "title": "Attach review evidence to ISMS policy control",
+            "ownerId": "person-nadia",
+            "dueDate": "2026-10-05",
+            "statusBefore": "not-started",
+            "statusAfter": "not-started"
+          }
+        ]
+      },
+      "history": [
+        {
+          "date": "2026-09-05",
+          "textBefore": "Residual risk increased 68 \u2192 72 on incomplete access reviews.",
+          "textAfter": "Residual risk held near 70 pending recertification evidence."
+        }
+      ]
+    },
+    {
+      "id": "risk-privacy-retention",
+      "code": "RSK-275088",
+      "title": "Personal data retention overrun",
+      "category": "Regulatory",
+      "businessUnit": "Legal & Privacy",
+      "severity": "medium",
+      "levelBefore": "watch",
+      "levelAfter": "watch",
+      "ownerId": "person-tomas",
+      "controlIds": [
+        "ctl-data-retention"
+      ],
+      "obligationIds": [
+        "obl-gdpr-processor"
+      ],
+      "evidenceIdsBefore": [
+        "ev-data-retention"
+      ],
+      "evidenceIdsAfter": [
+        "ev-data-retention"
+      ],
+      "contributingGap": "Retention schedules are documented but exception handling for supplier-held data needs tighter evidence",
+      "cause": "Supplier-held personal data retention exceptions are not fully reconciled to the retention schedule.",
+      "event": "Personal data may be retained longer than policy and GDPR processor expectations allow.",
+      "businessImpact": "Privacy findings, contractual exposure, and weakened GDPR support evidence.",
+      "inherent": {
+        "likelihood": 3,
+        "impact": 4,
+        "score": 58,
+        "rating": "Medium"
+      },
+      "residualBefore": {
+        "likelihood": 3,
+        "impact": 3,
+        "score": 44,
+        "rating": "Medium"
+      },
+      "residualAfter": {
+        "likelihood": 3,
+        "impact": 3,
+        "score": 42,
+        "rating": "Medium"
+      },
+      "target": {
+        "likelihood": 2,
+        "impact": 2,
+        "score": 24,
+        "rating": "Low"
+      },
+      "appetiteStatusBefore": "within",
+      "appetiteStatusAfter": "within",
+      "trendBefore": "stable",
+      "trendAfter": "stable",
+      "controlCoverageBefore": "adequate",
+      "controlCoverageAfter": "adequate",
+      "nextReview": "2026-10-10",
+      "lastAssessment": "2026-08-12",
+      "createdAt": "2026-02-18",
+      "updatedAt": "2026-08-28",
+      "treatment": {
+        "strategy": "mitigate",
+        "ownerId": "person-tomas",
+        "progressBefore": 60,
+        "progressAfter": 65,
+        "targetDate": "2026-10-30",
+        "statusBefore": "in-progress",
+        "statusAfter": "in-progress",
+        "priority": "medium",
+        "latestUpdateBefore": "Exception register under review with Privacy.",
+        "latestUpdateAfter": "Exception register under review with Privacy.",
+        "actions": [
+          {
+            "id": "rta-pr-1",
+            "title": "Reconcile supplier retention exceptions to schedule",
+            "ownerId": "person-tomas",
+            "dueDate": "2026-10-12",
+            "statusBefore": "in-progress",
+            "statusAfter": "in-progress"
+          }
+        ]
+      },
+      "history": [
+        {
+          "date": "2026-08-28",
+          "textBefore": "Retention control remains assured; exception evidence still being tightened.",
+          "textAfter": "Retention control remains assured; exception evidence still being tightened."
+        }
+      ]
+    },
+    {
+      "id": "risk-vendor-concentration",
+      "code": "RSK-275141",
+      "title": "Critical vendor concentration",
+      "category": "Third Party",
+      "businessUnit": "Procurement",
+      "severity": "high",
+      "levelBefore": "elevated",
+      "levelAfter": "watch",
+      "ownerId": "person-omar",
+      "controlIds": [
+        "ctl-supplier-assurance"
+      ],
+      "obligationIds": [
+        "obl-iso-a532",
+        "obl-internal-contract"
+      ],
+      "evidenceIdsBefore": [
+        "ev-policy-supplier",
+        "ev-audit-findings"
+      ],
+      "evidenceIdsAfter": [
+        "ev-policy-supplier",
+        "ev-audit-findings",
+        "ev-supplier-assessments-2026"
+      ],
+      "contributingGap": "Concentration in a small set of critical suppliers amplifies the assessment gap",
+      "cause": "A small number of critical suppliers underpin multiple regulated processes.",
+      "event": "Disruption or control failure at a concentrated vendor could cascade across services.",
+      "businessImpact": "Operational interruption, amplified third-party risk, and contractual non-performance.",
+      "inherent": {
+        "likelihood": 4,
+        "impact": 4,
+        "score": 76,
+        "rating": "High"
+      },
+      "residualBefore": {
+        "likelihood": 4,
+        "impact": 4,
+        "score": 74,
+        "rating": "High"
+      },
+      "residualAfter": {
+        "likelihood": 3,
+        "impact": 3,
+        "score": 46,
+        "rating": "Medium"
+      },
+      "target": {
+        "likelihood": 2,
+        "impact": 3,
+        "score": 34,
+        "rating": "Medium"
+      },
+      "appetiteStatusBefore": "above",
+      "appetiteStatusAfter": "near",
+      "trendBefore": "stable",
+      "trendAfter": "improving",
+      "controlCoverageBefore": "partial",
+      "controlCoverageAfter": "adequate",
+      "nextReview": "2026-09-22",
+      "lastAssessment": "2026-08-22",
+      "createdAt": "2026-04-09",
+      "updatedAt": "2026-09-10",
+      "treatment": {
+        "strategy": "mitigate",
+        "ownerId": "person-omar",
+        "progressBefore": 30,
+        "progressAfter": 70,
+        "targetDate": "2026-10-05",
+        "statusBefore": "in-progress",
+        "statusAfter": "in-progress",
+        "priority": "high",
+        "latestUpdateBefore": "Concentration review blocked on missing assessments.",
+        "latestUpdateAfter": "Assessments approved; diversification options still under review.",
+        "actions": [
+          {
+            "id": "rta-vc-1",
+            "title": "Complete critical-vendor concentration review",
+            "ownerId": "person-omar",
+            "dueDate": "2026-09-26",
+            "statusBefore": "in-progress",
+            "statusAfter": "in-progress"
+          },
+          {
+            "id": "rta-vc-2",
+            "title": "Propose secondary-supplier options for top two vendors",
+            "ownerId": "person-omar",
+            "dueDate": "2026-10-05",
+            "statusBefore": "not-started",
+            "statusAfter": "in-progress"
+          }
+        ]
+      },
+      "history": [
+        {
+          "date": "2026-09-10",
+          "textBefore": "Residual risk held High on concentration plus missing assessments.",
+          "textAfter": "Residual risk improved to Medium after assessment approval; concentration work continues."
+        }
+      ]
+    },
+    {
+      "id": "risk-key-person",
+      "code": "RSK-275203",
+      "title": "Key-person dependency in compliance operations",
+      "category": "Strategic",
+      "businessUnit": "People & Culture",
+      "severity": "medium",
+      "levelBefore": "watch",
+      "levelAfter": "watch",
+      "ownerId": "person-sara",
+      "controlIds": [],
+      "obligationIds": [
+        "obl-internal-contract"
+      ],
+      "evidenceIdsBefore": [],
+      "evidenceIdsAfter": [],
+      "contributingGap": "Regional compliance coverage depends heavily on a small set of specialists",
+      "cause": "Specialist knowledge for regional compliance workflows is concentrated in a few individuals.",
+      "event": "Absence or departure of key specialists could slow obligation evidence and review responses.",
+      "businessImpact": "Delayed compliance responses and weaker continuity of governance operations.",
+      "inherent": {
+        "likelihood": 3,
+        "impact": 3,
+        "score": 49,
+        "rating": "Medium"
+      },
+      "residualBefore": {
+        "likelihood": 3,
+        "impact": 3,
+        "score": 47,
+        "rating": "Medium"
+      },
+      "residualAfter": {
+        "likelihood": 3,
+        "impact": 3,
+        "score": 47,
+        "rating": "Medium"
+      },
+      "target": {
+        "likelihood": 2,
+        "impact": 3,
+        "score": 30,
+        "rating": "Low"
+      },
+      "appetiteStatusBefore": "within",
+      "appetiteStatusAfter": "within",
+      "trendBefore": "stable",
+      "trendAfter": "stable",
+      "controlCoverageBefore": "insufficient",
+      "controlCoverageAfter": "insufficient",
+      "nextReview": "2026-11-01",
+      "lastAssessment": "2026-07-30",
+      "createdAt": "2026-05-11",
+      "updatedAt": "2026-08-15",
+      "treatment": {
+        "strategy": "mitigate",
+        "ownerId": "person-sara",
+        "progressBefore": 20,
+        "progressAfter": 25,
+        "targetDate": "2026-11-30",
+        "statusBefore": "not-started",
+        "statusAfter": "in-progress",
+        "priority": "medium",
+        "latestUpdateBefore": "Cross-training plan drafted but not started.",
+        "latestUpdateAfter": "Cross-training plan opened with People & Culture.",
+        "actions": [
+          {
+            "id": "rta-kp-1",
+            "title": "Document regional compliance runbooks",
+            "ownerId": "person-sara",
+            "dueDate": "2026-10-20",
+            "statusBefore": "not-started",
+            "statusAfter": "in-progress"
+          },
+          {
+            "id": "rta-kp-2",
+            "title": "Assign deputy coverage for KSA compliance workflows",
+            "ownerId": "person-layla",
+            "dueDate": "2026-11-15",
+            "statusBefore": "not-started",
+            "statusAfter": "not-started"
+          }
+        ]
+      },
+      "history": [
+        {
+          "date": "2026-08-15",
+          "textBefore": "Key-person dependency logged as a watch item.",
+          "textAfter": "Key-person dependency logged as a watch item."
+        }
+      ]
     }
   ],
   "actions": [
@@ -561,7 +1393,9 @@
         "filename": "critical-supplier-assessment-alpha.pdf",
         "outcome": "success",
         "suggestedClassification": "Critical-supplier assessment",
-        "suggestedControlIds": ["ctl-supplier-assurance"],
+        "suggestedControlIds": [
+          "ctl-supplier-assurance"
+        ],
         "suggestedObligationIds": [
           "obl-iso-a532",
           "obl-nis2-supply",
@@ -573,7 +1407,9 @@
         "filename": "critical-supplier-assessment-beta.pdf",
         "outcome": "success",
         "suggestedClassification": "Critical-supplier assessment",
-        "suggestedControlIds": ["ctl-supplier-assurance"],
+        "suggestedControlIds": [
+          "ctl-supplier-assurance"
+        ],
         "suggestedObligationIds": [
           "obl-iso-a532",
           "obl-nis2-supply",
@@ -589,7 +1425,10 @@
       {
         "filename": "supplier-note.docx",
         "outcome": "missing_metadata",
-        "missingFields": ["owner", "review date"]
+        "missingFields": [
+          "owner",
+          "review date"
+        ]
       }
     ],
     "resultingEvidenceId": "ev-supplier-assessments-2026"
@@ -652,11 +1491,15 @@
       "sourcedFacts": [
         {
           "text": "The supplier assurance policy is current (version 3.0).",
-          "citationIds": ["ev-policy-supplier"]
+          "citationIds": [
+            "ev-policy-supplier"
+          ]
         },
         {
           "text": "Internal audit findings record that current critical-supplier assessments are missing.",
-          "citationIds": ["ev-audit-findings"]
+          "citationIds": [
+            "ev-audit-findings"
+          ]
         },
         {
           "text": "The same control supports obligations in ISO 27001, NIS2, GDPR and NCA ECC.",
@@ -678,8 +1521,13 @@
           "obl-gdpr-processor",
           "obl-nca-third-party"
         ],
-        "controlIds": ["ctl-supplier-assurance"],
-        "riskIds": ["risk-third-party", "risk-regulatory"]
+        "controlIds": [
+          "ctl-supplier-assurance"
+        ],
+        "riskIds": [
+          "risk-third-party",
+          "risk-regulatory"
+        ]
       },
       "freshness": "Policy current; assessments missing; 2023 pack expired",
       "confidence": "high",

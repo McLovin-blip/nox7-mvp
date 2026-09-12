@@ -375,20 +375,41 @@ function recordWhyReply(ctx: ConversationContext): Reply | null {
 
   if (ctx.selectedId.startsWith('risk-')) {
     const risk = data.risks.find((item) => item.id === ctx.selectedId)
-    const level = after ? risk?.levelAfter : risk?.levelBefore
+    const residual = after ? risk?.residualAfter : risk?.residualBefore
+    const appetite = after ? risk?.appetiteStatusAfter : risk?.appetiteStatusBefore
+    const coverage = after ? risk?.controlCoverageAfter : risk?.controlCoverageBefore
+    const treatment = after ? risk?.treatment.statusAfter : risk?.treatment.statusBefore
+    const controlId = risk?.controlIds[0] ?? 'ctl-supplier-assurance'
     return {
       text: [
-        `${title} is on the executive radar because it is linked to the same supplier-assurance story.`,
+        '### Fact',
+        `${title} currently has residual risk ${residual?.score ?? 'n/a'} (${residual?.rating ?? 'n/a'}).`,
+        risk
+          ? `Appetite is ${appetite}; control coverage is ${coverage}; treatment is ${treatment}.`
+          : '',
+        risk ? `Linked controls: ${risk.controlIds.length}. Linked obligations: ${risk.obligationIds.length}.` : '',
         '',
-        `Current level: ${level}.`,
-        risk ? `Contributing gap: ${risk.contributingGap}.` : '',
+        '### Why it matters',
+        risk?.contributingGap
+          ? risk.contributingGap
+          : `${title} remains on the executive radar because of connected control and compliance exposure.`,
         '',
-        `Recommendation: ${after ? 'Keep monitoring, and cite the improved evidence in reporting.' : 'Close the missing assessments to reduce this exposure before the review.'}`,
+        '### Recommended action',
+        after
+          ? 'Keep monitoring residual exposure and cite the improved evidence in reporting.'
+          : treatment === 'overdue' || treatment === 'at-risk'
+            ? 'Bring the treatment plan back on track and close the linked evidence gaps before the review.'
+            : 'Strengthen the linked controls and evidence so residual risk can move toward target.',
       ]
         .filter(Boolean)
         .join('\n'),
-      citations: citationsFrom([ctx.selectedId, 'ctl-supplier-assurance'], ctx.position),
-      suggestions: ['What should I prioritise?', 'Show me our supplier assurance gaps.'],
+      citations: citationsFrom([ctx.selectedId, controlId, ...(risk?.obligationIds.slice(0, 2) ?? [])], ctx.position),
+      suggestions: [
+        'Which controls are ineffective?',
+        'Which evidence is missing?',
+        'Is the treatment plan on track?',
+        'What should I do next?',
+      ],
       topic: 'risk',
     }
   }
