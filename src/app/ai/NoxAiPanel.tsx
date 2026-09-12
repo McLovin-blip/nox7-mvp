@@ -1,115 +1,189 @@
-import { useState } from 'react'
-import { lookupSource } from '../mock/data.ts'
-import type { AiPanelModel, PositionState } from '../mock/types.ts'
+import { useEffect, useRef, useState } from 'react'
+import type { GapStepId, ModuleId, PositionState } from '../mock/types.ts'
+import {
+  EMPTY_SUGGESTIONS,
+  buildNoxReply,
+  contextBanner,
+  createUserMessage,
+  welcomeText,
+  type ChatMessage,
+  type ConversationContext,
+} from './conversation.ts'
 import './ai.css'
 
 export function NoxAiPanel({
-  answer,
-  question,
   position,
-  onAsk,
+  module,
+  selectedId,
+  selectedTitle,
+  gapStep,
+  pendingPrompt,
+  onConsumePrompt,
   onOpenSource,
 }: {
-  answer: AiPanelModel
-  question: string
   position: PositionState
-  onAsk: (prompt: string) => void
+  module: ModuleId | 'gap'
+  selectedId?: string | null
+  selectedTitle?: string
+  gapStep?: GapStepId
+  pendingPrompt?: string | null
+  onConsumePrompt?: () => void
   onOpenSource: (id: string) => void
 }) {
-  const [sourceId, setSourceId] = useState<string | null>(null)
-  const source = sourceId ? lookupSource(sourceId, position) : null
+  const ctx: ConversationContext = {
+    position,
+    module,
+    selectedId,
+    selectedTitle,
+    gapStep,
+  }
+
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [draft, setDraft] = useState('')
+  const [thinking, setThinking] = useState(false)
+  const scrollerRef = useRef<HTMLDivElement>(null)
+  const pendingTimer = useRef<number | null>(null)
+  const bootstrapped = useRef(false)
+
+  useEffect(() => {
+    if (bootstrapped.current) return
+    bootstrapped.current = true
+    setMessages([
+      {
+        id: 'nox-welcome',
+        role: 'nox',
+        text: welcomeText(ctx),
+        suggestions: EMPTY_SUGGESTIONS,
+        topic: 'general',
+      },
+    ])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    const node = scrollerRef.current
+    if (!node) return
+    node.scrollTop = node.scrollHeight
+  }, [messages, thinking])
+
+  useEffect(() => {
+    return () => {
+      if (pendingTimer.current) window.clearTimeout(pendingTimer.current)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!pendingPrompt) return
+    const prompt = pendingPrompt
+    onConsumePrompt?.()
+    void send(prompt)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingPrompt])
+
+  function send(raw: string) {
+    const text = raw.trim()
+    if (!text || thinking) return
+
+    const user = createUserMessage(text)
+    setMessages((current) => [...current, user])
+    setDraft('')
+    setThinking(true)
+
+    if (pendingTimer.current) window.clearTimeout(pendingTimer.current)
+    pendingTimer.current = window.setTimeout(() => {
+      setMessages((current) => {
+        const reply = buildNoxReply(text, ctx, current)
+        return [...current, reply]
+      })
+      setThinking(false)
+      pendingTimer.current = null
+    }, 450 + Math.min(500, text.length * 8))
+  }
+
+  const latestSuggestions =
+    [...messages].reverse().find((item) => item.role === 'nox' && item.suggestions?.length)?.suggestions ??
+    EMPTY_SUGGESTIONS
 
   return (
     <aside className="ai-panel" aria-label="Nox AI">
-      <header>
-        <p className="ai-kicker">Ask Nox AI</p>
-        <p className="ai-ctx">{answer.context}</p>
-        <h2>{question || answer.question}</h2>
+      <header className="ai-head">
+        <div>
+          <p className="ai-kicker">Nox</p>
+          <h2>GRC copilot</h2>
+        </div>
+        <p className="ai-ctx">{contextBanner(ctx)}</p>
       </header>
-      <div className="ai-scroll">
-        <section>
-          <span>Executive answer</span>
-          <p>{answer.executiveAnswer}</p>
-        </section>
-        <section className="ai-facts">
-          <span>Sourced facts</span>
-          <p className="ai-note">From organisation records</p>
-          <ul>
-            {answer.facts.map((fact) => (
-              <li key={`${fact.citationId}-${fact.text}`}>
-                {fact.text}{' '}
-                <button
-                  type="button"
-                  className="cite"
-                  aria-current={sourceId === fact.citationId}
-                  onClick={() => {
-                    setSourceId(fact.citationId)
-                    onOpenSource(fact.citationId)
-                  }}
-                >
-                  Source
-                </button>
-              </li>
-            ))}
-          </ul>
-          {source ? (
-            <div className="ai-source">
-              <strong>{source.title}</strong>
-              <div>
-                {source.kind} · {source.freshness}
+
+      <div className="ai-thread" ref={scrollerRef}>
+        {messages.map((message) => (
+          <article key={message.id} className={`ai-msg ${message.role}`}>
+            <div className="ai-bubble">
+              <p className="ai-role">{message.role === 'nox' ? 'Nox' : 'You'}</p>
+              <div className="ai-text">
+                {message.text.split('\n').map((line, index) =>
+                  line ? <p key={`${message.id}-${index}`}>{line}</p> : <br key={`${message.id}-br-${index}`} />,
+                )}
               </div>
-              <div>{source.meta}</div>
+              {message.citations && message.citations.length > 0 ? (
+                <div className="ai-cites">
+                  {message.citations.map((cite) => (
+                    <button key={cite.id} type="button" onClick={() => onOpenSource(cite.id)}>
+                      <span>{cite.kind}</span>
+                      {cite.title}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
             </div>
-          ) : null}
-        </section>
-        <section className="ai-interp">
-          <span>AI interpretation</span>
-          <p className="ai-note">Inference, not a sourced fact</p>
-          <p>{answer.interpretation}</p>
-        </section>
-        <section>
-          <span>Connected</span>
-          <div className="ai-rel">
-            {answer.connected.map((item) => (
-              <b key={item}>{item}</b>
-            ))}
-          </div>
-        </section>
-        <section>
-          <span>Evidence freshness</span>
-          <p>{answer.freshness}</p>
-        </section>
-        <section>
-          <span>Confidence</span>
-          <p>{answer.confidence === 'high' ? 'High' : answer.confidence}</p>
-        </section>
-        <section>
-          <span>Accountable owner</span>
-          <p>{answer.owner}</p>
-        </section>
-        <section>
-          <span>Expected effect</span>
-          <p>{answer.expectedImpact}</p>
-        </section>
-        <section>
-          <span>Ask this screen</span>
-          <div className="ai-rel">
-            {answer.prompts.map((prompt) => (
-              <button key={prompt} type="button" className="cite" onClick={() => onAsk(prompt)}>
-                {prompt}
-              </button>
-            ))}
-          </div>
-        </section>
+          </article>
+        ))}
+        {thinking ? (
+          <article className="ai-msg nox">
+            <div className="ai-bubble thinking">
+              <p className="ai-role">Nox</p>
+              <p className="ai-thinking">Reviewing organisation records…</p>
+            </div>
+          </article>
+        ) : null}
       </div>
-      <section className="ai-act">
-        <span>Recommended action</span>
-        <p className="ai-note">
-          {position === 'after' ? 'Already applied after human approval' : 'Not applied until human approval'}
-        </p>
-        <p>{answer.recommendedAction}</p>
-        <p>{answer.approval}</p>
-      </section>
+
+      {!thinking ? (
+        <div className="ai-suggestions" aria-label="Suggested questions">
+          {latestSuggestions.slice(0, 4).map((item) => (
+            <button key={item} type="button" onClick={() => send(item)}>
+              {item}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
+      <form
+        className="ai-composer"
+        onSubmit={(event) => {
+          event.preventDefault()
+          send(draft)
+        }}
+      >
+        <label className="sr-only" htmlFor="nox-input">
+          Message Nox
+        </label>
+        <textarea
+          id="nox-input"
+          rows={2}
+          value={draft}
+          placeholder="Ask about risks, controls, evidence, assurance…"
+          onChange={(event) => setDraft(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+              event.preventDefault()
+              send(draft)
+            }
+          }}
+        />
+        <button type="submit" disabled={!draft.trim() || thinking}>
+          Send
+        </button>
+      </form>
     </aside>
   )
 }

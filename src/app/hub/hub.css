@@ -58,16 +58,16 @@
 .strip {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
 }
 
 .strip article,
 .strip > button.gap {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px 16px;
-  min-height: 132px;
+  border-radius: 12px;
+  padding: 12px 14px;
+  min-height: 0;
 }
 
 .strip > button.gap {
@@ -86,7 +86,7 @@
 
 .strip strong {
   display: block;
-  font-size: 28px;
+  font-size: 24px;
   letter-spacing: -0.04em;
   font-family: 'Space Grotesk', Inter, sans-serif;
   line-height: 1.1;
@@ -161,8 +161,8 @@
 
 .hub-lower {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
-  gap: 12px;
+  grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.85fr);
+  gap: 10px;
 }
 
 .briefing,
@@ -170,8 +170,8 @@
 .map {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px 18px 18px;
+  border-radius: 12px;
+  padding: 14px 16px 16px;
 }
 
 .briefing header,
@@ -228,17 +228,20 @@
 }
 
 .briefing-actions {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
 .primary,
 .follow {
-  width: 100%;
-  height: 36px;
-  border-radius: 10px;
+  width: auto;
+  min-width: 140px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .primary {

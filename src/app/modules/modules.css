@@ -50,9 +50,16 @@
 .mod-list,
 .mod-detail,
 .mod-card {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.mod-detail {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 12px;
+  padding: 16px;
 }
 
 .mod-list {

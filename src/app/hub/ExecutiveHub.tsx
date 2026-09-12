@@ -141,30 +141,22 @@ function AiBriefing({
   return (
     <section className="briefing">
       <header>
-        <span>Nox AI briefing</span>
+        <span>Position briefing</span>
         <em>{view.briefing.confidence === 'high' ? 'High confidence' : view.briefing.confidence}</em>
       </header>
       <h2>{view.briefing.title}</h2>
       <p>{view.briefing.body}</p>
-      <div className="chips">
-        {view.briefing.chips.map((chip) => (
-          <span key={chip}>{chip}</span>
-        ))}
-      </div>
       <div className="briefing-actions">
         <button className="primary" type="button" onClick={onPrimary}>
           {closed ? 'Open Board Summary' : 'Open connected gap'}
         </button>
-        <button className="follow" type="button" onClick={() => onAsk()}>
-          Ask a follow-up about this briefing
+        <button
+          className="follow"
+          type="button"
+          onClick={() => onAsk(closed ? 'Has our position improved?' : 'What is our biggest supplier assurance gap?')}
+        >
+          Ask Nox
         </button>
-      </div>
-      <div className="prompts">
-        {view.briefing.prompts.map((prompt) => (
-          <button key={prompt} type="button" onClick={() => onAsk(prompt)}>
-            {prompt}
-          </button>
-        ))}
       </div>
     </section>
   )

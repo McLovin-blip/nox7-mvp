@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ActivityModule } from './app/activity/ActivityModule.tsx'
 import { NoxAiPanel } from './app/ai/NoxAiPanel.tsx'
-import { answerFor, gapAiFor, hubAiFor } from './app/ai/answers.ts'
 import { AppShell } from './app/chrome/AppShell.tsx'
 import { ControlsModule } from './app/controls/ControlsModule.tsx'
 import { EvidenceModule } from './app/evidence/EvidenceModule.tsx'
@@ -34,24 +33,14 @@ function AuthenticatedApp() {
   const [selectedNode, setSelectedNode] = useState<MapNodeId>('centre')
   const [gapStep, setGapStep] = useState<GapStepId>('overview')
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [question, setQuestion] = useState(hubAiFor(position).question)
+  const [pendingPrompt, setPendingPrompt] = useState<string | null>(null)
 
-  const aiScreen = canvas === 'gap' ? 'gap' : module
-  const aiAnswer = useMemo(() => {
-    if (canvas === 'gap') {
-      return gapAiFor(position)[gapStep]
-    }
-    return answerFor({
-      module,
-      position,
-      question,
-      selectedId: selectedId ?? undefined,
-      selectedTitle: selectedId
-        ? [...view.obligations, ...view.controls, ...view.evidence, ...view.risks].find((item) => item.id === selectedId)
-            ?.title
-        : undefined,
-    })
-  }, [canvas, gapStep, module, position, question, selectedId, view])
+  const selectedTitle = useMemo(() => {
+    if (!selectedId) return undefined
+    return [...view.obligations, ...view.controls, ...view.evidence, ...view.risks, ...view.reports].find(
+      (item) => item.id === selectedId,
+    )?.title
+  }, [selectedId, view])
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -65,16 +54,14 @@ function AuthenticatedApp() {
   }, [])
 
   const openAi = (prompt?: string) => {
-    setQuestion(prompt || hubAiFor(position).question)
     setAiOpen(true)
+    if (prompt) setPendingPrompt(prompt)
   }
 
   const go = (id: ModuleId, recordId?: string | null) => {
     setModule(id)
     setCanvas('hub')
     setSelectedId(recordId ?? null)
-    setQuestion(answerFor({ module: id, position, question: '' }).question)
-    setAiOpen(true)
   }
 
   const openSource = (id: string) => {
@@ -90,8 +77,6 @@ function AuthenticatedApp() {
     setModule('hub')
     setCanvas('gap')
     setGapStep(step)
-    setQuestion(gapAiFor(position)[step].question)
-    setAiOpen(true)
   }
 
   const startEvidenceUpload = () => {
@@ -121,10 +106,7 @@ function AuthenticatedApp() {
         <ConnectedGapView
           selectedStep={gapStep}
           onBack={() => go('hub')}
-          onSelectStep={(id) => {
-            setGapStep(id)
-            setQuestion(gapAiFor(position)[id].question)
-          }}
+          onSelectStep={(id) => setGapStep(id)}
           onContinue={position === 'after' ? () => go('reports', 'rep-board-summary') : startEvidenceUpload}
         />
       ) : module === 'hub' ? (
@@ -155,8 +137,8 @@ function AuthenticatedApp() {
             setModule('hub')
             setCanvas('hub')
             setSelectedId(null)
-            setQuestion(hubAiFor('after').question)
             setAiOpen(true)
+            setPendingPrompt('Has our position improved?')
           }}
         />
       ) : module === 'risks' ? (
@@ -168,11 +150,13 @@ function AuthenticatedApp() {
       )}
       {aiOpen ? (
         <NoxAiPanel
-          key={`${aiScreen}:${aiAnswer.question}:${position}`}
-          answer={aiAnswer}
-          question={question}
           position={position}
-          onAsk={openAi}
+          module={canvas === 'gap' ? 'gap' : module}
+          selectedId={selectedId}
+          selectedTitle={selectedTitle}
+          gapStep={gapStep}
+          pendingPrompt={pendingPrompt}
+          onConsumePrompt={() => setPendingPrompt(null)}
           onOpenSource={openSource}
         />
       ) : null}

@@ -1,7 +1,7 @@
 .shell {
   height: 100svh;
   display: grid;
-  grid-template-columns: 232px minmax(0, 1fr);
+  grid-template-columns: 210px minmax(0, 1fr);
   background: #07070c;
   color: var(--text);
 }
@@ -153,10 +153,9 @@
 .top-chip {
   font-size: 11px;
   color: var(--text-2);
-  border: 1px solid var(--border);
-  background: var(--surface-2);
-  padding: 6px 10px;
-  border-radius: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .ask {
@@ -185,7 +184,7 @@
 .shell-body {
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 380px;
+  grid-template-columns: minmax(0, 1fr) 340px;
   overflow: hidden;
 }
 
