@@ -76,15 +76,15 @@
 
 .nox-chat {
   position: fixed;
-  top: calc(var(--header-height) + 12px);
-  right: 14px;
-  bottom: 14px;
-  width: min(var(--nox-rail-width), calc(100vw - 28px));
+  top: calc(var(--header-height) + 16px);
+  right: 18px;
+  bottom: 18px;
+  width: min(var(--nox-rail-width), calc(100vw - 36px));
   max-width: 430px;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto auto;
   min-height: 0;
-  border-radius: 16px;
+  border-radius: 18px;
   border: 1px solid var(--border-default);
   background: var(--bg-elevated);
   box-shadow: var(--shadow-panel);

@@ -13,7 +13,7 @@
 }
 
 .shell.is-ai-open .shell-main {
-  padding-right: calc(var(--nox-rail-width) + 28px);
+  padding-right: calc(var(--nox-rail-width) + 36px);
   transition: padding-right 240ms ease;
 }
 

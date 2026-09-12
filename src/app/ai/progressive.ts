@@ -108,5 +108,5 @@ export function writeDurationMs(fullText: string, stepCount: number): number {
 }
 
 export function thinkingDelayMs(reduced: boolean): number {
-  return reduced ? 120 : 340
+  return reduced ? 120 : 480
 }
