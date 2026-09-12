@@ -8,7 +8,13 @@
 }
 
 .shell.is-ai-open {
-  grid-template-columns: var(--sidebar-width) minmax(0, 1fr) var(--nox-rail-width);
+  /* Keep workspace readable while the floating Nox panel occupies the right edge. */
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+}
+
+.shell.is-ai-open .shell-main {
+  padding-right: calc(var(--nox-rail-width) + 28px);
+  transition: padding-right 240ms ease;
 }
 
 .rail {
@@ -409,6 +415,10 @@
     --nox-rail-width: 360px;
   }
 
+  .shell.is-ai-open .shell-main {
+    padding-right: calc(var(--nox-rail-width) + 20px);
+  }
+
   .top-chip.subtle {
     display: none;
   }
@@ -418,6 +428,10 @@
   .shell,
   .shell.is-ai-open {
     grid-template-columns: 1fr;
+  }
+
+  .shell.is-ai-open .shell-main {
+    padding-right: 0;
   }
 
   .rail {

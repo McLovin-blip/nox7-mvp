@@ -262,7 +262,7 @@
   appearance: none;
   border: 0;
   background: transparent;
-  color: #b7a8f2;
+  color: var(--accent-secondary);
   padding: 0;
   font-size: 12px;
   font-weight: 650;
@@ -410,7 +410,7 @@
 
 .connect-risk-list b,
 .connect-priorities b {
-  color: #b7a8f2;
+  color: var(--accent-secondary);
   font-size: 11px;
   letter-spacing: 0.08em;
 }

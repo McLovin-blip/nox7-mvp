@@ -1,7 +1,6 @@
-/* Closed: bottom-center Ask Nox launcher only (parked out of shell flow).
-   Open (desktop): right-rail panel that occupies the shell's third column. */
+/* Ask Nox — floating right-docked copilot (not a center modal, not a plain sidebar). */
 
-.nox-dock:not(.is-open) {
+.nox-dock {
   position: fixed;
   inset: 0;
   width: 0;
@@ -11,12 +10,6 @@
   overflow: visible;
   pointer-events: none;
   z-index: 70;
-  grid-column: 1;
-  grid-row: 1;
-}
-
-.nox-dock.is-open {
-  display: contents;
 }
 
 .nox-fab,
@@ -47,7 +40,7 @@
   position: absolute;
   inset: -8px;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(139, 111, 232, 0.3) 0%, rgba(139, 111, 232, 0) 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent-primary) 30%, transparent) 0%, transparent 70%);
   animation: nox-breathe 3.2s ease-in-out infinite;
   pointer-events: none;
 }
@@ -82,19 +75,28 @@
 }
 
 .nox-chat {
-  display: none;
+  position: fixed;
+  top: calc(var(--header-height) + 12px);
+  right: 14px;
+  bottom: 14px;
+  width: min(var(--nox-rail-width), calc(100vw - 28px));
+  max-width: 430px;
+  display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto auto;
   min-height: 0;
-  height: 100%;
-  border-left: 1px solid var(--border-default);
+  border-radius: 16px;
+  border: 1px solid var(--border-default);
   background: var(--bg-elevated);
   box-shadow: var(--shadow-panel);
   overflow: hidden;
-  transform: translateX(18px);
   opacity: 0;
+  visibility: hidden;
+  transform: translateX(18px);
+  pointer-events: none;
   transition:
     transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 220ms ease;
+    opacity 220ms ease,
+    visibility 220ms ease;
 }
 
 .nox-dock.is-open .nox-fab {
@@ -105,15 +107,10 @@
 }
 
 .nox-dock.is-open .nox-chat {
-  display: grid;
   opacity: 1;
+  visibility: visible;
   transform: translateX(0);
-}
-
-.shell.is-ai-open .nox-dock.is-open .nox-chat {
-  /* Fills the shell's third grid column via display:contents parent */
-  grid-column: 3;
-  grid-row: 1 / -1;
+  pointer-events: auto;
 }
 
 .nox-chat-head {
@@ -121,7 +118,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 14px 12px;
+  padding: 14px 16px 12px;
   border-bottom: 1px solid var(--border-default);
   background: var(--bg-surface);
 }
@@ -186,7 +183,8 @@
 }
 
 .nox-minimize,
-.nox-close {
+.nox-close,
+.nox-skip {
   appearance: none;
   border: 1px solid var(--border-default);
   background: transparent;
@@ -199,8 +197,15 @@
   cursor: pointer;
 }
 
+.nox-skip {
+  border-color: var(--accent-line);
+  color: var(--accent-secondary);
+  background: var(--accent-soft);
+}
+
 .nox-minimize:hover,
-.nox-close:hover {
+.nox-close:hover,
+.nox-skip:hover {
   color: var(--text-primary);
   border-color: var(--accent-line);
 }
@@ -208,10 +213,10 @@
 .nox-thread {
   min-height: 0;
   overflow: auto;
-  padding: 12px 12px 6px;
+  padding: 14px 14px 8px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   background: var(--bg-app);
 }
 
@@ -228,20 +233,26 @@
 }
 
 .ai-bubble {
-  max-width: 94%;
   border-radius: 14px;
-  padding: 10px 12px;
+  padding: 11px 13px;
   border: 1px solid var(--border-default);
   background: var(--bg-surface);
 }
 
+.ai-msg.nox .ai-bubble {
+  max-width: 100%;
+  width: 100%;
+}
+
 .ai-msg.user .ai-bubble {
+  max-width: 86%;
   background: var(--accent-soft);
   border-color: var(--accent-line);
 }
 
-.ai-bubble.thinking {
-  opacity: 0.85;
+.ai-bubble.thinking,
+.ai-bubble.is-streaming {
+  opacity: 0.98;
 }
 
 .ai-role {
@@ -260,16 +271,42 @@
 .ai-text p {
   margin: 0;
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.55;
   white-space: pre-wrap;
   color: var(--text-primary);
 }
 
 .ai-thinking {
   margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-size: 13px;
   color: var(--text-secondary);
   font-style: italic;
+}
+
+.ai-dots {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.ai-dots i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent-secondary);
+  opacity: 0.35;
+  animation: nox-dot 1.1s ease-in-out infinite;
+}
+
+.ai-dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.ai-dots i:nth-child(3) {
+  animation-delay: 0.3s;
 }
 
 .ai-cites {
@@ -304,9 +341,22 @@
 .nox-guides {
   display: grid;
   gap: 8px;
-  padding: 10px 12px;
+  padding: 10px 14px;
   border-top: 1px solid var(--border-default);
   background: var(--bg-surface);
+}
+
+.nox-guides.is-generating {
+  padding: 10px 14px;
+}
+
+.nox-generating-label {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 650;
 }
 
 .nox-guide-label {
@@ -350,9 +400,14 @@
 }
 
 .nox-action:hover,
-.nox-ask:hover {
+.nox-ask:hover:not(:disabled) {
   color: var(--text-primary);
   border-color: var(--accent-line);
+}
+
+.nox-ask:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .ai-composer {
@@ -360,7 +415,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px;
   align-items: end;
-  padding: 10px 12px 12px;
+  padding: 10px 14px 14px;
   border-top: 1px solid var(--border-default);
   background: var(--bg-surface);
 }
@@ -368,7 +423,7 @@
 .ai-composer textarea {
   resize: none;
   border: 1px solid var(--border-default);
-  background: var(--bg-app);
+  background: var(--bg-surface-2);
   color: var(--text-primary);
   border-radius: 12px;
   padding: 10px 12px;
@@ -380,6 +435,11 @@
 .ai-composer textarea:focus {
   outline: 1px solid var(--accent-line);
   border-color: var(--accent-line);
+}
+
+.ai-composer textarea:disabled {
+  opacity: 0.7;
+  cursor: default;
 }
 
 .ai-composer button {
@@ -423,29 +483,48 @@
   }
 }
 
-/* Narrow / tablet: overlay drawer instead of splitting the workspace */
-@media (max-width: 1100px) {
-  .shell.is-ai-open {
-    grid-template-columns: 1fr;
+@keyframes nox-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nox-fab,
+  .nox-chat,
+  .shell.is-ai-open .shell-main {
+    transition: none;
   }
 
+  .nox-fab-pulse,
+  .ai-dots i {
+    animation: none;
+  }
+}
+
+/* Narrow / tablet: elevated drawer still right-aligned */
+@media (max-width: 1100px) {
   .nox-dock.is-open {
-    display: block;
-    position: fixed;
+    width: auto;
+    height: auto;
     inset: 0;
-    z-index: 80;
-    background: color-mix(in srgb, #000 35%, transparent);
+    background: color-mix(in srgb, var(--bg-app) 35%, #000);
     pointer-events: auto;
   }
 
-  .nox-dock.is-open .nox-chat {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: min(420px, 100vw);
-    border-left: 1px solid var(--border-default);
-    transform: translateX(0);
+  .nox-chat {
+    top: 10px;
+    right: 10px;
+    bottom: 10px;
+    width: min(420px, calc(100vw - 20px));
+    max-width: none;
   }
 }
 
@@ -454,8 +533,12 @@
     bottom: 12px;
   }
 
-  .nox-dock.is-open .nox-chat {
+  .nox-chat {
+    top: 0;
+    right: 0;
+    bottom: 0;
     width: 100vw;
+    border-radius: 0;
   }
 
   .nox-fab-label {

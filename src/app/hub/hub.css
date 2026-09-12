@@ -260,7 +260,7 @@
   width: 100%;
   text-align: left;
   border: 1px solid var(--border);
-  background: #0c0c16;
+  background: var(--bg-surface-2);
   color: var(--text);
   border-radius: 8px;
   padding: 10px 12px;
@@ -306,7 +306,7 @@
 .sources button span {
   display: inline;
   margin-right: 6px;
-  color: #b7a8f2;
+  color: var(--accent-secondary);
   text-transform: none;
   letter-spacing: 0;
   font-size: 10px;
@@ -326,7 +326,7 @@
 
 .follow {
   border: 1px solid var(--border);
-  background: #12121c;
+  background: var(--bg-surface-2);
   color: var(--text);
 }
 
@@ -366,7 +366,7 @@
   width: 100%;
   text-align: left;
   border: 1px solid transparent;
-  background: #0c0c16;
+  background: var(--bg-surface-2);
   color: inherit;
   font: inherit;
   cursor: pointer;
@@ -415,7 +415,7 @@
 .coverage-card small {
   display: block;
   margin-top: 8px;
-  color: #d5ccff;
+  color: var(--accent-secondary);
   font-size: 12px;
   text-transform: none;
   letter-spacing: 0;
@@ -467,7 +467,7 @@
   min-height: 92px;
   text-align: left;
   border: 1px solid var(--border);
-  background: #0c0c16;
+  background: var(--bg-surface-2);
   color: inherit;
   border-radius: 10px;
   padding: 10px 12px;
@@ -476,7 +476,7 @@
 
 .connect .connect-node span {
   display: block;
-  color: #b7a8f2;
+  color: var(--accent-secondary);
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -505,7 +505,7 @@
 .map-open {
   border: 0;
   background: none;
-  color: #d5ccff;
+  color: var(--accent-secondary);
   cursor: pointer;
   font: inherit;
   text-decoration: underline;
@@ -539,7 +539,7 @@
   width: 100%;
   text-align: left;
   border: 1px solid rgba(139, 111, 232, 0.28);
-  background: #0c0c16;
+  background: var(--bg-surface-2);
   color: var(--text);
   border-radius: 12px;
   padding: 14px 16px;
@@ -554,7 +554,7 @@
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #b7a8f2;
+  color: var(--accent-secondary);
   margin-bottom: 6px;
 }
 
@@ -581,7 +581,7 @@
 .map-card {
   text-align: left;
   border: 1px solid var(--border);
-  background: #0c0c16;
+  background: var(--bg-surface-2);
   color: inherit;
   border-radius: 10px;
   padding: 12px;
@@ -613,7 +613,7 @@
 }
 
 .legend .assured {
-  background: #3d8f6a;
+  background: var(--status-success);
 }
 
 .legend .partial {
@@ -621,7 +621,7 @@
 }
 
 .legend .attention {
-  background: #e85a45;
+  background: var(--status-critical);
 }
 
 .change-row {
@@ -635,7 +635,7 @@
 .action-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(5, 5, 8, 0.64);
+  background: color-mix(in srgb, var(--bg-app) 45%, #000);
   display: grid;
   place-items: center;
   padding: 24px;
@@ -644,7 +644,7 @@
 
 .action-dialog {
   width: min(560px, 100%);
-  background: #0c0c16;
+  background: var(--bg-surface-2);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 18px 18px 20px;
@@ -658,7 +658,7 @@
 }
 
 .action-dialog header span {
-  color: #b7a8f2;
+  color: var(--accent-secondary);
   font-size: 11px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
