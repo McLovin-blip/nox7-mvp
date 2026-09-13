@@ -149,7 +149,23 @@
         "risk-third-party",
         "risk-vendor-concentration"
       ],
-      "ownerId": "person-nadia"
+      "ownerId": "person-nadia",
+      "includeInHub": true,
+      "code": "ISO 27001 A.5.19",
+      "theme": "Third-party assurance",
+      "overallBefore": "unverifiable",
+      "overallAfter": "supported",
+      "evidenceHealthBefore": "missing",
+      "evidenceHealthAfter": "current",
+      "lastAssessed": "2026-06-21",
+      "nextReview": "2026-10-15",
+      "nextActionBefore": "Obtain current critical-supplier assessments",
+      "nextActionAfter": "Keep supplier assessments on the annual cycle",
+      "dueDate": "2026-09-26",
+      "whyBefore": "A current policy is being counted as coverage. Operating evidence for critical suppliers is missing, so this obligation is unverifiable — not failed.",
+      "whyAfter": "The same obligation is now supported by policy plus approved 2026 assessments.",
+      "whatChangedBefore": "No change this period. Assessments remain outstanding.",
+      "whatChangedAfter": "Moved from unverifiable to supported when Layla Rahman approved the 2026 pack."
     },
     {
       "id": "obl-nis2-supply",
@@ -174,7 +190,23 @@
         "risk-regulatory",
         "risk-third-party"
       ],
-      "ownerId": "person-omar"
+      "ownerId": "person-omar",
+      "includeInHub": true,
+      "code": "NIS2 Art. 21",
+      "theme": "Supply-chain security",
+      "overallBefore": "unverifiable",
+      "overallAfter": "supported",
+      "evidenceHealthBefore": "missing",
+      "evidenceHealthAfter": "current",
+      "lastAssessed": "2026-06-21",
+      "nextReview": "2026-10-15",
+      "nextActionBefore": "Close the shared supplier-assessment gap",
+      "nextActionAfter": "Maintain supply-chain security evidence",
+      "dueDate": "2026-09-26",
+      "whyBefore": "NIS2 supply-chain measures reuse the same missing assessments as ISO 27001. Policy is not enough.",
+      "whyAfter": "Supported by the same approved assessments as the ISO supplier obligation.",
+      "whatChangedBefore": "Held unverifiable with the other international supplier requirements.",
+      "whatChangedAfter": "Supported with ISO, GDPR and NCA ECC from one approval."
     },
     {
       "id": "obl-gdpr-processor",
@@ -204,7 +236,23 @@
         "risk-regulatory",
         "risk-third-party"
       ],
-      "ownerId": "person-tomas"
+      "ownerId": "person-tomas",
+      "includeInHub": true,
+      "code": "GDPR Art. 28",
+      "theme": "Privacy and processors",
+      "overallBefore": "unverifiable",
+      "overallAfter": "supported",
+      "evidenceHealthBefore": "missing",
+      "evidenceHealthAfter": "current",
+      "lastAssessed": "2026-06-21",
+      "nextReview": "2026-11-15",
+      "nextActionBefore": "Obtain processor due-diligence assessments",
+      "nextActionAfter": "Keep processor due diligence current",
+      "dueDate": "2026-09-26",
+      "whyBefore": "Retention standard is current. Processor due diligence still needs current supplier assessments.",
+      "whyAfter": "Processor due diligence is now supported. Retention review remains separately effective.",
+      "whatChangedBefore": "Held unverifiable on the supplier evidence gap.",
+      "whatChangedAfter": "Supported after the 2026 assessments were approved."
     },
     {
       "id": "obl-nca-third-party",
@@ -229,7 +277,23 @@
         "risk-regulatory",
         "risk-third-party"
       ],
-      "ownerId": "person-sara"
+      "ownerId": "person-sara",
+      "includeInHub": true,
+      "code": "NCA ECC 2-12",
+      "theme": "Third-party and outsourcing",
+      "overallBefore": "unverifiable",
+      "overallAfter": "supported",
+      "evidenceHealthBefore": "missing",
+      "evidenceHealthAfter": "current",
+      "lastAssessed": "2026-06-21",
+      "nextReview": "2026-10-15",
+      "nextActionBefore": "Obtain current critical-supplier assessments",
+      "nextActionAfter": "Keep NCA third-party evidence current",
+      "dueDate": "2026-09-26",
+      "whyBefore": "NCA third-party assurance is counted against a current policy. Current operating evidence is missing.",
+      "whyAfter": "Supported by the approved 2026 assessments.",
+      "whatChangedBefore": "Held unverifiable.",
+      "whatChangedAfter": "Supported with the other international supplier obligations."
     },
     {
       "id": "obl-iso-isms",
@@ -254,7 +318,23 @@
       "riskIds": [
         "risk-privileged-access"
       ],
-      "ownerId": "person-nadia"
+      "ownerId": "person-nadia",
+      "includeInHub": true,
+      "code": "ISO 27001 A.5.1",
+      "theme": "Information security policy",
+      "overallBefore": "supported",
+      "overallAfter": "supported",
+      "evidenceHealthBefore": "current",
+      "evidenceHealthAfter": "current",
+      "lastAssessed": "2026-07-01",
+      "nextReview": "2027-03-12",
+      "nextActionBefore": "Maintain attestations on the current policy cycle",
+      "nextActionAfter": "Maintain attestations on the current policy cycle",
+      "dueDate": "2027-03-12",
+      "whyBefore": "Policy and management attestations are current.",
+      "whyAfter": "Policy and management attestations remain current.",
+      "whatChangedBefore": "Held supported.",
+      "whatChangedAfter": "Held supported."
     },
     {
       "id": "obl-internal-contract",
@@ -282,7 +362,23 @@
         "risk-third-party",
         "risk-vendor-concentration"
       ],
-      "ownerId": "person-omar"
+      "ownerId": "person-omar",
+      "includeInHub": true,
+      "code": "Internal / contract",
+      "theme": "Contractual commitments",
+      "overallBefore": "unverifiable",
+      "overallAfter": "supported",
+      "evidenceHealthBefore": "missing",
+      "evidenceHealthAfter": "current",
+      "lastAssessed": "2026-08-15",
+      "nextReview": "2026-10-15",
+      "nextActionBefore": "Obtain current critical-supplier assessments",
+      "nextActionAfter": "Keep contractual supplier evidence current",
+      "dueDate": "2026-09-26",
+      "whyBefore": "Contractual supplier-assurance commitments are documented. Current assessments are still missing.",
+      "whyAfter": "Contractual commitments are now supported by the 2026 pack.",
+      "whatChangedBefore": "Held unverifiable.",
+      "whatChangedAfter": "Supported after approval."
     },
     {
       "id": "obl-iso-bc",
@@ -305,7 +401,382 @@
       "riskIds": [
         "risk-continuity"
       ],
-      "ownerId": "person-nadia"
+      "ownerId": "person-nadia",
+      "includeInHub": true,
+      "code": "ISO 27001 A.5.30",
+      "theme": "Operational resilience",
+      "overallBefore": "partial",
+      "overallAfter": "partial",
+      "evidenceHealthBefore": "expiring",
+      "evidenceHealthAfter": "expiring",
+      "lastAssessed": "2025-11-18",
+      "nextReview": "2026-10-30",
+      "nextActionBefore": "Re-run the business continuity test before the pack expires",
+      "nextActionAfter": "Re-run the business continuity test before the pack expires",
+      "dueDate": "2026-10-30",
+      "whyBefore": "Continuity is designed and was tested, but the test report is expiring, so current support is only partial.",
+      "whyAfter": "Supplier-assessment approval did not refresh continuity evidence. Still partial.",
+      "whatChangedBefore": "Weakened from supported to partial as the test report approached expiry.",
+      "whatChangedAfter": "Still partial. Evidence expiry is unchanged."
+    },
+    {
+      "id": "obl-iso-access",
+      "title": "Privileged access control",
+      "frameworkId": "fw-iso27001",
+      "supportBefore": "partial",
+      "supportAfter": "partial",
+      "includeInHub": false,
+      "policyIds": [
+        "ev-policy-isms"
+      ],
+      "controlIds": [
+        "ctl-privileged-access",
+        "ctl-isms-policy"
+      ],
+      "evidenceIdsBefore": [
+        "ev-privileged-review-q2",
+        "ev-iam-exception-log",
+        "ev-policy-isms"
+      ],
+      "evidenceIdsAfter": [
+        "ev-privileged-review-q2",
+        "ev-iam-exception-log",
+        "ev-policy-isms"
+      ],
+      "riskIds": [
+        "risk-privileged-access"
+      ],
+      "ownerId": "person-nadia",
+      "code": "ISO 27001 A.8.2",
+      "theme": "Access control",
+      "overallBefore": "partial",
+      "overallAfter": "partial",
+      "evidenceHealthBefore": "conflicting",
+      "evidenceHealthAfter": "conflicting",
+      "lastAssessed": "2026-07-12",
+      "nextReview": "2026-10-12",
+      "nextActionBefore": "Reconcile the Q2 access review with the IAM exception log",
+      "nextActionAfter": "Reconcile the Q2 access review with the IAM exception log",
+      "dueDate": "2026-09-30",
+      "whyBefore": "Policy is current, but two current evidence packs conflict, so privileged-access obligations cannot be fully supported.",
+      "whyAfter": "Still partial. Supplier approval did not resolve the access-evidence conflict.",
+      "whatChangedBefore": "Held partial on conflicting evidence.",
+      "whatChangedAfter": "Held partial."
+    },
+    {
+      "id": "obl-nis2-continuity",
+      "title": "Incident handling and continuity measures",
+      "frameworkId": "fw-nis2",
+      "supportBefore": "partial",
+      "supportAfter": "partial",
+      "includeInHub": false,
+      "policyIds": [
+        "ev-bc-test"
+      ],
+      "controlIds": [
+        "ctl-continuity"
+      ],
+      "evidenceIdsBefore": [
+        "ev-bc-test"
+      ],
+      "evidenceIdsAfter": [
+        "ev-bc-test"
+      ],
+      "riskIds": [
+        "risk-continuity"
+      ],
+      "ownerId": "person-nadia",
+      "code": "NIS2 Art. 21(2)(c)",
+      "theme": "Operational resilience",
+      "overallBefore": "partial",
+      "overallAfter": "partial",
+      "evidenceHealthBefore": "expiring",
+      "evidenceHealthAfter": "expiring",
+      "lastAssessed": "2025-11-18",
+      "nextReview": "2026-10-30",
+      "nextActionBefore": "Refresh the continuity test before it expires",
+      "nextActionAfter": "Refresh the continuity test before it expires",
+      "dueDate": "2026-10-30",
+      "whyBefore": "NIS2 continuity measures rest on a test report that is expiring.",
+      "whyAfter": "Still partial. Continuity evidence was not part of the supplier approval.",
+      "whatChangedBefore": "Weakened as the test report approached expiry.",
+      "whatChangedAfter": "Held partial."
+    },
+    {
+      "id": "obl-gdpr-retention",
+      "title": "Storage limitation and retention",
+      "frameworkId": "fw-gdpr",
+      "supportBefore": "supported",
+      "supportAfter": "supported",
+      "includeInHub": false,
+      "policyIds": [
+        "ev-data-retention"
+      ],
+      "controlIds": [
+        "ctl-data-retention"
+      ],
+      "evidenceIdsBefore": [
+        "ev-data-retention"
+      ],
+      "evidenceIdsAfter": [
+        "ev-data-retention"
+      ],
+      "riskIds": [
+        "risk-privacy-retention"
+      ],
+      "ownerId": "person-tomas",
+      "code": "GDPR Art. 5(1)(e)",
+      "theme": "Privacy and data protection",
+      "overallBefore": "supported",
+      "overallAfter": "supported",
+      "evidenceHealthBefore": "current",
+      "evidenceHealthAfter": "current",
+      "lastAssessed": "2026-08-15",
+      "nextReview": "2026-11-15",
+      "nextActionBefore": "Complete the Q4 retention sampling",
+      "nextActionAfter": "Complete the Q4 retention sampling",
+      "dueDate": "2026-11-15",
+      "whyBefore": "The retention standard is current and the last quarterly review completed without exception.",
+      "whyAfter": "Still supported.",
+      "whatChangedBefore": "Held supported.",
+      "whatChangedAfter": "Held supported."
+    },
+    {
+      "id": "obl-nca-physical",
+      "title": "Physical and environmental security",
+      "frameworkId": "fw-nca-ecc",
+      "supportBefore": "supported",
+      "supportAfter": "supported",
+      "includeInHub": false,
+      "policyIds": [
+        "ev-site-access-log"
+      ],
+      "controlIds": [
+        "ctl-site-access"
+      ],
+      "evidenceIdsBefore": [
+        "ev-site-access-log"
+      ],
+      "evidenceIdsAfter": [
+        "ev-site-access-log"
+      ],
+      "riskIds": [
+        "risk-privileged-access"
+      ],
+      "ownerId": "person-karim",
+      "code": "NCA ECC 2-8",
+      "theme": "Physical security",
+      "overallBefore": "supported",
+      "overallAfter": "supported",
+      "evidenceHealthBefore": "current",
+      "evidenceHealthAfter": "current",
+      "lastAssessed": "2026-08-18",
+      "nextReview": "2026-11-18",
+      "nextActionBefore": "Keep badge exception reviews on the monthly cycle",
+      "nextActionAfter": "Keep badge exception reviews on the monthly cycle",
+      "dueDate": "2026-11-18",
+      "whyBefore": "Restricted-site access logs are current and the August review was effective.",
+      "whyAfter": "Still supported.",
+      "whatChangedBefore": "Held supported.",
+      "whatChangedAfter": "Held supported."
+    },
+    {
+      "id": "obl-internal-coi",
+      "title": "Conflict-of-interest declarations",
+      "frameworkId": "fw-internal",
+      "supportBefore": "partial",
+      "supportAfter": "partial",
+      "includeInHub": false,
+      "policyIds": [
+        "ev-coi-declarations"
+      ],
+      "controlIds": [
+        "ctl-conflict-interest"
+      ],
+      "evidenceIdsBefore": [
+        "ev-coi-declarations"
+      ],
+      "evidenceIdsAfter": [
+        "ev-coi-declarations"
+      ],
+      "riskIds": [
+        "risk-key-person"
+      ],
+      "ownerId": "person-helena",
+      "code": "Internal policy",
+      "theme": "Legal and governance",
+      "overallBefore": "partial",
+      "overallAfter": "partial",
+      "evidenceHealthBefore": "awaiting-approval",
+      "evidenceHealthAfter": "awaiting-approval",
+      "lastAssessed": "2026-09-08",
+      "nextReview": "2027-01-15",
+      "nextActionBefore": "Approve the 2026 declaration pack",
+      "nextActionAfter": "Approve the 2026 declaration pack",
+      "dueDate": "2026-09-22",
+      "whyBefore": "Declarations have been collected and are awaiting approval, so support is only partial.",
+      "whyAfter": "Still awaiting approval.",
+      "whatChangedBefore": "Weakened while the annual pack waits for approval.",
+      "whatChangedAfter": "Held partial."
+    },
+    {
+      "id": "obl-internal-hse",
+      "title": "Workplace safety inspection duties",
+      "frameworkId": "fw-internal",
+      "supportBefore": "unsupported",
+      "supportAfter": "unsupported",
+      "includeInHub": false,
+      "policyIds": [
+        "ev-safety-inspections"
+      ],
+      "controlIds": [
+        "ctl-safety-inspection"
+      ],
+      "evidenceIdsBefore": [
+        "ev-safety-inspections"
+      ],
+      "evidenceIdsAfter": [
+        "ev-safety-inspections"
+      ],
+      "riskIds": [
+        "risk-continuity"
+      ],
+      "ownerId": "person-yusuf",
+      "code": "Internal HSE",
+      "theme": "Health, safety and environmental",
+      "overallBefore": "unsupported",
+      "overallAfter": "unsupported",
+      "evidenceHealthBefore": "current",
+      "evidenceHealthAfter": "current",
+      "lastAssessed": "2026-06-02",
+      "nextReview": "2026-09-20",
+      "nextActionBefore": "Close overdue plant inspections and assign an evidence owner",
+      "nextActionAfter": "Close overdue plant inspections and assign an evidence owner",
+      "dueDate": "2026-09-20",
+      "whyBefore": "Current inspection records prove inspections were not completed on time. This obligation is unsupported, not unverifiable.",
+      "whyAfter": "Still unsupported. This is independent of the supplier-assurance approval.",
+      "whatChangedBefore": "Weakened after the H1 inspection pack.",
+      "whatChangedAfter": "Held unsupported."
+    },
+    {
+      "id": "obl-internal-audit-close",
+      "title": "Internal audit management-action closure",
+      "frameworkId": "fw-internal",
+      "supportBefore": "partial",
+      "supportAfter": "partial",
+      "includeInHub": false,
+      "policyIds": [
+        "ev-audit-findings"
+      ],
+      "controlIds": [
+        "ctl-audit-followup"
+      ],
+      "evidenceIdsBefore": [
+        "ev-audit-actions-register",
+        "ev-audit-findings"
+      ],
+      "evidenceIdsAfter": [
+        "ev-audit-actions-register",
+        "ev-audit-findings"
+      ],
+      "riskIds": [
+        "risk-regulatory"
+      ],
+      "ownerId": "person-amira",
+      "code": "Internal audit programme",
+      "theme": "Internal audit",
+      "overallBefore": "unverifiable",
+      "overallAfter": "unverifiable",
+      "evidenceHealthBefore": "missing",
+      "evidenceHealthAfter": "missing",
+      "lastAssessed": "2026-08-04",
+      "nextReview": "2026-10-04",
+      "nextActionBefore": "Attach closure evidence for overdue management actions",
+      "nextActionAfter": "Attach closure evidence for overdue management actions",
+      "dueDate": "2026-09-28",
+      "whyBefore": "The follow-up process exists. Closure evidence is missing, so support cannot be verified.",
+      "whyAfter": "Still unverifiable. Supplier assessments did not close audit-action evidence.",
+      "whatChangedBefore": "Held unverifiable.",
+      "whatChangedAfter": "Held unverifiable."
+    },
+    {
+      "id": "obl-iso-jml",
+      "title": "Identity lifecycle management",
+      "frameworkId": "fw-iso27001",
+      "supportBefore": "partial",
+      "supportAfter": "partial",
+      "includeInHub": false,
+      "policyIds": [
+        "ev-jml-review"
+      ],
+      "controlIds": [
+        "ctl-jml"
+      ],
+      "evidenceIdsBefore": [
+        "ev-jml-review"
+      ],
+      "evidenceIdsAfter": [
+        "ev-jml-review"
+      ],
+      "riskIds": [
+        "risk-key-person",
+        "risk-privileged-access"
+      ],
+      "ownerId": "person-priya",
+      "code": "ISO 27001 A.5.16",
+      "theme": "People and access",
+      "overallBefore": "partial",
+      "overallAfter": "partial",
+      "evidenceHealthBefore": "current",
+      "evidenceHealthAfter": "current",
+      "lastAssessed": "2026-07-31",
+      "nextReview": "2026-09-30",
+      "nextActionBefore": "Complete mover recertification for the Q3 cycle",
+      "nextActionAfter": "Complete mover recertification for the Q3 cycle",
+      "dueDate": "2026-09-30",
+      "whyBefore": "Joiners and leavers are controlled. Mover recertification is incomplete.",
+      "whyAfter": "Still partial.",
+      "whatChangedBefore": "Held partial.",
+      "whatChangedAfter": "Held partial."
+    },
+    {
+      "id": "obl-internal-payment",
+      "title": "Payment authorisation",
+      "frameworkId": "fw-internal",
+      "supportBefore": "supported",
+      "supportAfter": "supported",
+      "includeInHub": false,
+      "policyIds": [
+        "ev-payment-auth-sample"
+      ],
+      "controlIds": [
+        "ctl-payment-auth"
+      ],
+      "evidenceIdsBefore": [
+        "ev-payment-auth-sample"
+      ],
+      "evidenceIdsAfter": [
+        "ev-payment-auth-sample"
+      ],
+      "riskIds": [
+        "risk-vendor-concentration"
+      ],
+      "ownerId": "person-daniel",
+      "code": "Internal financial control",
+      "theme": "Financial controls",
+      "overallBefore": "supported",
+      "overallAfter": "supported",
+      "evidenceHealthBefore": "current",
+      "evidenceHealthAfter": "current",
+      "lastAssessed": "2026-08-22",
+      "nextReview": "2026-09-22",
+      "nextActionBefore": "Complete the September dual-authorisation sample",
+      "nextActionAfter": "Complete the September dual-authorisation sample",
+      "dueDate": "2026-09-22",
+      "whyBefore": "Sample testing confirmed dual authorisation on in-scope payments.",
+      "whyAfter": "Still supported.",
+      "whatChangedBefore": "Held supported.",
+      "whatChangedAfter": "Held supported."
     }
   ],
   "controls": [
@@ -2319,11 +2790,12 @@
         "Summarise our current position for the board."
       ],
       "regulatory": [
-        "Where do ISO 27001, NIS2, GDPR and NCA ECC overlap?",
-        "Which obligations are not fully supported?",
-        "Which existing controls satisfy multiple requirements?",
-        "Show the evidence supporting this obligation.",
-        "Which requirements have no accountable owner?"
+        "Which obligations are actually supported?",
+        "Where are we only counting a policy?",
+        "Which cybersecurity-related obligations are currently unverifiable?",
+        "Which obligations have the greatest effect on NIS2?",
+        "What evidence is missing, expiring or conflicting for these requirements?",
+        "What should the owner do next?"
       ],
       "controls": [
         "Which controls can we rely on?",
@@ -2335,12 +2807,12 @@
         "What should the owner do next?"
       ],
       "evidence": [
+        "Which evidence can we rely on?",
+        "What evidence is missing, expiring or conflicting?",
+        "Which evidence is blocking our assurance position?",
         "Where is this evidence being used?",
-        "Is this document current and sufficient?",
-        "Can it support another compliance requirement?",
-        "What information is missing?",
-        "Is this a duplicate or a newer version?",
-        "Which controls will be affected when it expires?"
+        "Which controls will be affected when it expires?",
+        "What should I do next?"
       ],
       "risks": [
         "Which compliance gaps contribute to this risk?",

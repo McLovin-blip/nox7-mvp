@@ -400,59 +400,98 @@ export function answerFor(options: {
 
   if (module === 'regulatory') {
     const list = prompts.regulatory
-    if (q === list[0] || q === 'Where do ISO 27001, NIS2, GDPR and NCA ECC overlap?') {
-      return gapAiFor(position).obligations
-    }
-    if (q === list[1]) {
+    const selected = selectedId ? data.obligations.find((item) => item.id === selectedId) : undefined
+    if (/counting a policy|only counting/.test(q.toLowerCase()) || q === list[1]) {
       return base(
         `Regulatory · ${org}`,
         q,
         after
-          ? 'The four supplier-related obligations are now supported. Internal contractual commitments are supported. Business continuity remains supported.'
-          : 'Supplier-related obligations under ISO 27001, NIS2, GDPR, NCA ECC and internal commitments are only partially supported.',
+          ? 'Supplier obligations are no longer policy-only. Privileged access and continuity still have evidence problems, so they are only partially supported.'
+          : 'ISO 27001, NIS2, GDPR and NCA ECC supplier obligations are currently counting a current policy. Operating evidence is missing, so they are unverifiable — not failed.',
         after ? afterFacts : beforeFacts,
-        after ? 'The overlap closed together.' : 'They share one missing pack.',
+        'A documented policy is not the same as a supported requirement.',
         { prompts: list },
       )
     }
-    if (q === list[2]) {
+    if (/unverifiable|cybersecurity-related/.test(q.toLowerCase()) || q === list[2]) {
       return base(
         `Regulatory · ${org}`,
         q,
-        'Supplier assurance is the control that satisfies the overlapping supplier requirements across the four international frameworks.',
-        [{ text: 'The same control supports obligations in ISO 27001, NIS2, GDPR and NCA ECC.', citationId: 'ctl-supplier-assurance' }],
-        'Mapping once is more efficient than a control per framework.',
+        after
+          ? 'The supplier set is supported. Internal-audit action closure remains unverifiable because closure evidence is missing.'
+          : 'The four international supplier obligations are unverifiable. Internal-audit action closure is also unverifiable.',
+        [
+          { text: after ? 'Supplier relationships — information security is now supported.' : 'Supplier relationships — information security is unverifiable.', citationId: 'obl-iso-a532' },
+          { text: 'Internal audit management-action closure is unverifiable.', citationId: 'obl-internal-audit-close' },
+        ],
+        'Unverifiable means current evidence cannot prove support. Unsupported is reserved for HSE, where records prove the duty is not being met.',
         { prompts: list },
       )
     }
-    if (q === list[3] || selectedId?.startsWith('obl-')) {
+    if (/nis2/.test(q.toLowerCase()) || q === list[3]) {
       return base(
-        `${selectedTitle ?? 'Obligation'} · ${org}`,
-        list[3],
-        after
-          ? 'This obligation is supported by the supplier-assurance policy and the 2026 assessments.'
-          : 'This obligation is currently backed by the supplier-assurance policy. Current assessments are still missing.',
-        after
-          ? [
-              { text: 'Supplier assurance policy is current.', citationId: 'ev-policy-supplier' },
-              { text: '2026 critical-supplier assessments are current.', citationId: 'ev-supplier-assessments-2026' },
-            ]
-          : [
-              { text: 'Supplier assurance policy is current.', citationId: 'ev-policy-supplier' },
-              { text: 'Internal audit findings record that current assessments are missing.', citationId: 'ev-audit-findings' },
-            ],
-        'Identifiers stay in the record metadata.',
+        `NIS2 · ${org}`,
+        q,
+        'Supply-chain security measures and continuity measures are the NIS2 obligations with the greatest reach. Supplier evidence lifts the first; the continuity test report is still expiring.',
+        [
+          { text: 'NIS2 supply-chain security measures map to supplier assurance.', citationId: 'obl-nis2-supply' },
+          { text: 'NIS2 continuity measures rest on the business continuity test report.', citationId: 'obl-nis2-continuity' },
+        ],
+        after ? 'Supply-chain is now supported. Continuity remains partial.' : 'Closing supplier assessments is the highest-leverage NIS2 action still open.',
         { prompts: list },
       )
     }
-    if (q === list[4]) {
+    if (/missing, expiring or conflicting/.test(q.toLowerCase()) || q === list[4]) {
       return base(
         `Regulatory · ${org}`,
         q,
-        'Every seeded obligation has an accountable owner. Nadia, Omar, Tomas and Sara own the supplier-related set. Layla approves.',
-        beforeFacts.slice(2, 3),
-        'Owner gaps are not the material issue in this review.',
-        { prompts: list, owner: omar?.name ?? '' },
+        after
+          ? 'Supplier assessments are current. Watch the expiring continuity test, conflicting access packs, declarations awaiting approval, and missing audit-closure evidence.'
+          : 'Current critical-supplier assessments are missing. Continuity evidence is expiring and privileged-access packs conflict.',
+        [
+          { text: after ? '2026 assessments are current.' : 'Current critical-supplier assessments are missing.', citationId: after ? 'ev-supplier-assessments-2026' : 'obl-iso-a532' },
+          { text: 'The business continuity test report is expiring.', citationId: 'ev-bc-test' },
+        ],
+        'Work each evidence condition as its own record.',
+        { prompts: list },
+      )
+    }
+    if (/owner do next/.test(q.toLowerCase()) || q === list[5]) {
+      return base(
+        `Regulatory · ${org}`,
+        q,
+        after
+          ? 'Yusuf Rahman should close overdue inspections. Nadia Chen should reconcile access evidence and refresh continuity testing.'
+          : 'Omar Haddad should obtain current assessments. Layla Rahman approves.',
+        after ? afterFacts : beforeFacts,
+        'Human approval is required before support conclusions change.',
+        { prompts: list },
+      )
+    }
+    if (q === list[0] || /actually supported/.test(q.toLowerCase()) || selectedId?.startsWith('obl-')) {
+      const name = selected?.title ?? selectedTitle ?? 'This obligation'
+      const overall = after ? selected?.overallAfter : selected?.overallBefore
+      return base(
+        `${name} · ${org}`,
+        q,
+        selected
+          ? overall === 'supported'
+            ? `${name} is supported by current evidence.`
+            : overall === 'unverifiable'
+              ? `${name} is unverifiable: a policy or design exists, but current operating evidence does not.`
+              : overall === 'unsupported'
+                ? `${name} is unsupported because current records show the duty is not being met.`
+                : `${name} is only partially supported.`
+          : after
+            ? 'Policy management, retention, physical security and payment authorisation are supported. Supplier obligations are now supported too. Do not rely on HSE or unverifiable audit closure.'
+            : 'You can rely on policy management, retention, physical security and payment authorisation. You cannot yet rely on the international supplier set — those are unverifiable.',
+        selected
+          ? [{ text: selected.whyBefore && !after ? selected.whyBefore : selected.whyAfter, citationId: selected.id }]
+          : after
+            ? afterFacts
+            : beforeFacts,
+        'Support requires current evidence, not just a mapped control.',
+        { prompts: list },
       )
     }
     return list.includes(q) ? gapAiFor(position).obligations : offScript('Regulatory', list)
@@ -578,63 +617,96 @@ export function answerFor(options: {
 
   if (module === 'evidence') {
     const list = prompts.evidence
-    if (q === list[0] || selectedId?.startsWith('ev-')) {
-      return base(
-        `${selectedTitle ?? 'Evidence'} · ${org}`,
-        list[0],
-        selectedId === 'ev-policy-supplier'
-          ? 'Used by the supplier-assurance control and the overlapping supplier obligations. It does not replace assessments.'
-          : selectedId === 'ev-supplier-assessments-2026'
-            ? 'Used by supplier assurance and the four international supplier obligations after approval.'
-            : 'Open the record to see the controls, obligations and risks that reuse it.',
-        selectedId === 'ev-supplier-assessments-2026'
-          ? afterFacts
-          : beforeFacts.slice(0, 1),
-        'Reuse is visible on the record, not as a separate mapping exercise.',
-        { prompts: list },
-      )
-    }
-    if (q === list[1]) return gapAiFor(position).evidence
-    if (q === list[2]) {
-      return base(
-        `Evidence · ${org}`,
-        q,
-        'The supplier-assurance policy already supports several obligations. Current assessments, once approved, support the same set.',
-        beforeFacts,
-        'Do not duplicate the pack under each framework.',
-        { prompts: list },
-      )
-    }
-    if (q === list[3]) {
+    const selected = selectedId === 'ev-missing-supplier-2026'
+      ? { id: 'ev-missing-supplier-2026', title: 'Current critical-supplier assessments' }
+      : selectedId
+        ? data.evidence.find((item) => item.id === selectedId)
+        : undefined
+    if (q === list[1] || /missing, expiring or conflicting/.test(q.toLowerCase())) {
       return base(
         `Evidence · ${org}`,
         q,
         after
-          ? 'The approved pack is complete. A separate note in the last upload was missing owner and review date and was not required to close the gap.'
-          : 'Current assessments are missing. One upload fixture arrives without owner and review date and must be completed before it can be indexed as evidence.',
-        after ? afterFacts : beforeFacts.slice(1, 2),
-        'Missing metadata is a review item, not an automatic mapping.',
+          ? 'Supplier assessments are current. Residual conditions are the expiring continuity test, conflicting privileged-access packs, declarations awaiting approval, and the unowned HSE pack.'
+          : 'Current critical-supplier assessments are missing. The 2023 pack is expired, the continuity test is expiring, privileged-access packs conflict, and the HSE pack has no evidence owner.',
+        [
+          { text: after ? '2026 critical-supplier assessments are current and approved.' : 'Current critical-supplier assessments are missing.', citationId: after ? 'ev-supplier-assessments-2026' : 'ev-audit-findings' },
+          { text: 'The business continuity test report is expiring.', citationId: 'ev-bc-test' },
+          { text: 'Privileged-access review Q2 conflicts with the IAM exception log.', citationId: 'ev-privileged-review-q2' },
+        ],
+        'Missing, expired, conflicting and unowned are different problems. Do not collapse them into one failed pack.',
         { prompts: list },
       )
     }
-    if (q === list[4]) {
+    if (q === list[2] || /blocking our assurance/.test(q.toLowerCase())) {
       return base(
         `Evidence · ${org}`,
         q,
-        'The 2024 supplier questionnaire pack is a duplicate of an older pack and stays flagged. The 2026 assessments are a newer version, not a duplicate.',
-        [{ text: 'The 2024 supplier questionnaire pack is a duplicate of an older pack.', citationId: 'ev-supplier-q-duplicate' }],
-        'Duplicates do not close the gap.',
+        after
+          ? 'The blocking pack is no longer missing. Residual blockers are conflicting access evidence and overdue HSE inspections, not the supplier assessments.'
+          : 'The missing 2026 critical-supplier assessments are blocking supplier assurance and the four overlapping international obligations. The current policy does not close that gap.',
+        after ? afterFacts : beforeFacts,
+        after
+          ? 'Approval moved the organisation position. Remaining evidence conditions do not reopen the supplier gap.'
+          : 'Upload and approve that pack. Duplicates and expired 2023 files do not substitute for it.',
         { prompts: list },
       )
     }
-    if (q === list[5]) {
+    if (q === list[4] || /when it expires/.test(q.toLowerCase())) {
       return base(
         `Evidence · ${org}`,
         q,
-        'The business continuity test report is expiring and sits under the continuity control — not the primary supplier-assurance action.',
-        [{ text: 'Business continuity test report is expiring.', citationId: 'ev-bc-test' }],
-        'Treat it as a watch item.',
+        'The business continuity test report is the pack approaching expiry. Continuity testing and the NIS2 continuity obligation would weaken first — not the supplier-assurance control.',
+        [
+          { text: 'Business continuity test report is expiring.', citationId: 'ev-bc-test' },
+          { text: 'Business continuity testing is the connected control.', citationId: 'ctl-continuity' },
+          { text: 'NIS2 continuity measures depend on that test evidence.', citationId: 'obl-nis2-continuity' },
+        ],
+        'Treat expiry as a watch item. It is not the primary supplier-assurance action.',
         { prompts: list, owner: personLabel('person-nadia') },
+      )
+    }
+    if (q === list[5] || /should i do next/.test(q.toLowerCase())) {
+      return base(
+        `Evidence · ${org}`,
+        q,
+        after
+          ? 'Nadia Chen should reconcile the conflicting access packs and refresh the continuity test. Yusuf Rahman should assign an HSE evidence owner.'
+          : 'Omar Haddad should upload current critical-supplier assessments. Layla Rahman approves. That is the only action that changes the organisation position.',
+        after ? afterFacts : beforeFacts,
+        'Human approval is required before evidence changes Hub, Regulatory, Controls, Risks, Reports or Activity.',
+        { prompts: list },
+      )
+    }
+    if (q === list[3] || /being used/.test(q.toLowerCase()) || selectedId?.startsWith('ev-')) {
+      const name = selected?.title ?? selectedTitle ?? 'This evidence'
+      return base(
+        `${name} · ${org}`,
+        q,
+        selected?.id === 'ev-policy-supplier'
+          ? 'Used by supplier assurance and the overlapping supplier obligations. A current policy does not replace operating assessments.'
+          : selected?.id === 'ev-supplier-assessments-2026'
+            ? 'Used by supplier assurance and the four international supplier obligations after approval.'
+            : selected?.id === 'ev-missing-supplier-2026'
+              ? 'Expected by supplier assurance and the four international supplier obligations. Until it exists, those requirements stay unverifiable.'
+              : selected?.id === 'ev-bc-test'
+                ? 'Used by business continuity testing and the NIS2 continuity obligation.'
+                : 'Open the record to see the controls, obligations and risks that reuse it.',
+        selected?.id === 'ev-supplier-assessments-2026' ? afterFacts : beforeFacts.slice(0, 1),
+        'Reuse is visible on the record. Do not duplicate the pack under each framework.',
+        { prompts: list },
+      )
+    }
+    if (q === list[0] || /can we rely/.test(q.toLowerCase())) {
+      return base(
+        `Evidence · ${org}`,
+        q,
+        after
+          ? 'You can rely on the approved 2026 assessments, the supplier policy, retention, physical-security and payment packs. Do not rely on the expired 2023 pack, the duplicate questionnaire, conflicting access files, or the unowned HSE pack.'
+          : 'You can rely on the current supplier policy, retention schedule, physical-security and payment packs. You cannot yet rely on supplier-assurance operating evidence — that pack is missing.',
+        after ? afterFacts : beforeFacts,
+        'Current is not the same as missing, expired, conflicting or unowned.',
+        { prompts: list },
       )
     }
     return list.includes(q) ? gapAiFor(position).evidence : offScript('Evidence', list)
