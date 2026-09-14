@@ -74,7 +74,7 @@ function AuthenticatedApp() {
     setCanvas('hub')
     setSelectedId(recordId ?? null)
     if (id !== 'risks') setRiskDrill(null)
-    if (id !== 'controls') setControlDrill(null)
+    if (id !== 'controls' && id !== 'regulatory' && id !== 'evidence') setControlDrill(null)
     if (id !== 'hub') setOpenAction(null)
   }
 
@@ -166,7 +166,7 @@ function AuthenticatedApp() {
         hubFocus={hubFocus}
         gapStep={gapStep}
         riskDrill={module === 'risks' ? riskDrill : null}
-        controlDrill={module === 'controls' ? controlDrill : null}
+        controlDrill={module === 'controls' || module === 'regulatory' || module === 'evidence' ? controlDrill : null}
         pendingPrompt={pendingPrompt}
         onConsumePrompt={() => setPendingPrompt(null)}
         onOpenSource={openSource}
@@ -206,7 +206,23 @@ function AuthenticatedApp() {
       ) : module === 'connect' ? (
         <NoxConnect onAsk={openAi} onNavigate={navigateFromNox} />
       ) : module === 'regulatory' ? (
-        <RegulatoryModule selectedId={selectedId} onSelect={(id) => go('regulatory', id)} />
+        <RegulatoryModule
+          selectedId={selectedId}
+          onSelect={(id) => go('regulatory', id)}
+          onNavigate={(target) => {
+            if (target.type === 'obligation') {
+              go('regulatory', target.obligationId)
+              return
+            }
+            if (target.type === 'upload') {
+              startEvidenceUpload()
+              return
+            }
+            go(target.module, target.recordId)
+          }}
+          onAskNox={openAi}
+          onDrillContextChange={setControlDrill}
+        />
       ) : module === 'controls' ? (
         <ControlsModule
           selectedId={selectedId}
@@ -237,6 +253,19 @@ function AuthenticatedApp() {
             setAiOpen(true)
             setPendingPrompt('Has our position improved?')
           }}
+          onNavigate={(target) => {
+            if (target.type === 'evidence') {
+              go('evidence', target.evidenceId)
+              return
+            }
+            if (target.type === 'upload') {
+              startEvidenceUpload()
+              return
+            }
+            go(target.module, target.recordId)
+          }}
+          onAskNox={openAi}
+          onDrillContextChange={setControlDrill}
         />
       ) : module === 'risks' ? (
         <RisksModule

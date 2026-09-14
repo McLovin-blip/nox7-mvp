@@ -90,7 +90,9 @@ export function buildConnectView(position: PositionState): ConnectView {
   const risks = data.risks
   const storyControlIds = new Set(['ctl-supplier-assurance', 'ctl-isms-policy', 'ctl-data-retention', 'ctl-continuity'])
   const controls = data.controls.filter((item) => storyControlIds.has(item.id))
-  const obligations = data.obligations.filter((item) => item.frameworkId !== 'fw-internal')
+  const obligations = data.obligations.filter(
+    (item) => item.frameworkId !== 'fw-internal' && item.includeInHub !== false,
+  )
   const actions = data.actions
 
   const levelOf = (risk: (typeof risks)[number]) => (after ? risk.levelAfter : risk.levelBefore)

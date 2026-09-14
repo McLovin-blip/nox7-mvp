@@ -26,7 +26,8 @@ function toneFrom(status: string): Tone {
     value.includes('elevated') ||
     value.includes('attention') ||
     value.includes('expired') ||
-    value.includes('ineffective')
+    value.includes('ineffective') ||
+    value.includes('unsupported')
   ) {
     return 'attention'
   }
@@ -59,15 +60,24 @@ export function buildAppView(position: PositionState) {
   const coverageAverage = Math.round(frameworks.reduce((sum, item) => sum + item.coverage, 0) / frameworks.length)
   const leading = [...frameworks].sort((a, b) => b.coverage - a.coverage)[0]
   const obligations = data.obligations.map((item) => {
+    const overall = after ? item.overallAfter : item.overallBefore
     const support = after ? item.supportAfter : item.supportBefore
+    const status =
+      overall === 'supported' || support === 'supported'
+        ? 'Supported'
+        : overall === 'unverifiable'
+          ? 'Unverifiable'
+          : overall === 'unsupported'
+            ? 'Unsupported'
+            : 'Partially supported'
     return {
       id: item.id,
       kind: 'Obligation' as const,
       title: item.title,
-      status: support === 'supported' ? 'Supported' : 'Partial',
-      tone: toneFrom(support),
+      status,
+      tone: toneFrom(status),
       owner: personLabel(item.ownerId),
-      summary: `${frameworkName(item.frameworkId)} · ${support === 'supported' ? 'Supported by current evidence' : 'Policy in place; current assessments missing'}`,
+      summary: item.whyBefore && !after ? item.whyBefore : item.whyAfter ?? `${frameworkName(item.frameworkId)} · ${status}`,
       meta: frameworkName(item.frameworkId),
       neighbours: [
         ...item.policyIds.map((id) => ({ label: 'Policy', title: titleOf(data.evidence, id) })),
@@ -78,9 +88,11 @@ export function buildAppView(position: PositionState) {
       framework: frameworkName(item.frameworkId),
     }
   })
-  const partialInternational = obligations.filter(
-    (item) => item.tone === 'partial' && item.frameworkId !== 'fw-internal',
-  )
+  const partialInternational = data.obligations.filter((item) => {
+    if (item.includeInHub === false || item.frameworkId === 'fw-internal') return false
+    const support = after ? item.supportAfter : item.supportBefore
+    return support !== 'supported'
+  })
 
   const controls = data.controls.map((item) => {
     const overall = after ? item.overallAfter : item.overallBefore

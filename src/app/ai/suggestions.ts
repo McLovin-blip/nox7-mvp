@@ -44,13 +44,6 @@ function partialControls(position: PositionState) {
   })
 }
 
-function partialObligations(position: PositionState) {
-  return data.obligations.filter((item) => {
-    const support = position === 'after' ? item.supportAfter : item.supportBefore
-    return support !== 'supported'
-  })
-}
-
 function evidenceSignals(position: PositionState) {
   const after = position === 'after'
   const catalogue = data.evidence.filter((item) => {
@@ -259,7 +252,6 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
   const after = ctx.position === 'after'
   const elevated = elevatedRisks(ctx.position)
   const partial = partialControls(ctx.position)
-  const obligations = partialObligations(ctx.position)
   const evidence = evidenceSignals(ctx.position)
 
   if (ctx.module === 'gap') {
@@ -445,34 +437,33 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
           : ([{ id: 'ev-upload', label: 'Upload missing evidence', navigate: { type: 'upload' as const } }] as NoxActionChip[])),
       ],
       questions: [
-        'Which evidence is missing?',
-        'What evidence is currently under review?',
-        'Which evidence is about to expire?',
-        'What evidence is blocking our assurance position?',
+        'Which evidence can we rely on?',
+        'What evidence is missing, expiring or conflicting?',
+        'Which evidence is blocking our assurance position?',
+        'Where is this evidence being used?',
       ],
     }
   }
 
   if (ctx.module === 'regulatory') {
-    const count = obligations.filter((item) => item.frameworkId !== 'fw-internal').length
+    const unverifiable = data.obligations.filter((item) => (after ? item.overallAfter : item.overallBefore) === 'unverifiable')
+    const drill = ctx.controlDrill
     return {
-      intro: after
-        ? 'International obligations are supported by the approved assessments.'
-        : `${count} international requirements remain only partly supported by the same missing assessments.`,
+      intro: drill
+        ? `Active regulatory context: ${drill.label}. I can explain which requirements are supported, which are only counting a policy, and what to do next.`
+        : after
+          ? `Supplier-related international obligations are now supported. ${unverifiable.length} remain unverifiable elsewhere in the inventory.`
+          : `${unverifiable.length} obligations are unverifiable. A current policy is not support until operating evidence exists.`,
       actions: [
         {
-          id: 'reg-gaps',
-          label: 'Review compliance gaps',
-          navigate: { type: 'gap' as const, step: 'overview' },
+          id: 'reg-priority',
+          label: 'Open the priority obligation',
+          navigate: { type: 'module' as const, module: 'regulatory', recordId: unverifiable[0]?.id ?? 'obl-iso-a532' },
         },
         {
-          id: 'reg-uncovered',
-          label: 'Show uncovered requirements',
-          navigate: {
-            type: 'module' as const,
-            module: 'regulatory',
-            recordId: obligations.find((item) => item.frameworkId !== 'fw-internal')?.id ?? 'obl-iso-a532',
-          },
+          id: 'reg-gap',
+          label: 'Show the connected supplier gap',
+          navigate: { type: 'gap' as const, step: 'overview' },
         },
         {
           id: 'reg-controls',
@@ -480,12 +471,14 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
           navigate: { type: 'module' as const, module: 'controls', recordId: 'ctl-supplier-assurance' },
         },
       ],
-      questions: [
-        'Which regulatory requirements are not covered?',
-        'Where do we have compliance gaps?',
-        'Which requirements have the highest exposure?',
-        'Which requirements need evidence?',
-      ],
+      questions: drill?.questions?.length
+        ? drill.questions
+        : [
+            'Which obligations are actually supported?',
+            'Where are we only counting a policy?',
+            'Which obligations have the greatest effect on NIS2?',
+            'What should the owner do next?',
+          ],
     }
   }
 

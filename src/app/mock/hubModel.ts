@@ -55,7 +55,9 @@ export function buildHubView(position: PositionState) {
   const elevatedRisks = data.risks.filter((item) => (after ? item.levelAfter : item.levelBefore) === 'elevated').length
 
   const obligationRows = internationalFrameworks.map((framework) => {
-    const items = data.obligations.filter((item) => item.frameworkId === framework.id)
+    const items = data.obligations.filter(
+      (item) => item.frameworkId === framework.id && item.includeInHub !== false,
+    )
     const supported = items.filter((item) => (after ? item.supportAfter : item.supportBefore) === 'supported').length
     const partial = items.find((item) => (after ? item.supportAfter : item.supportBefore) === 'partial')
     return {
