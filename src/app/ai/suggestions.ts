@@ -27,6 +27,7 @@ export type SuggestionContext = {
   hubFocus?: HubFocus | null
   gapStep?: GapStepId
   riskDrill?: { label: string; questions: string[] } | null
+  controlDrill?: { label: string; questions: string[] } | null
 }
 
 function elevatedRisks(position: PositionState) {
@@ -143,26 +144,37 @@ function recordGuidance(ctx: SuggestionContext): NoxGuidance | null {
   if (id?.startsWith('ctl-') || (ctx.module === 'controls' && id)) {
     const control = data.controls.find((item) => item.id === id)
     const name = control?.title ?? title ?? 'this control'
+    const after = ctx.position === 'after'
+    const overall = after ? control?.overallAfter : control?.overallBefore
     return {
-      intro: `You're on ${name}. Ask why it is partial, what evidence is missing, or what to do next.`,
+      intro:
+        overall === 'unverifiable'
+          ? `You're on ${name}. It is unverifiable because current evidence is insufficient — not because the control has been found failed.`
+          : overall === 'ineffective'
+            ? `You're on ${name}. Current evidence is enough to conclude it is not operating as intended.`
+            : `You're on ${name}. I can explain the trust profile, linked risks, or the next action.`,
       actions: [
         { id: 'act-ctl-open', label: `Review ${name}`, navigate: { type: 'module' as const, module: 'controls', recordId: id } },
         {
           id: 'act-ctl-evidence',
-          label: 'Show controls missing evidence',
-          navigate: { type: 'module' as const, module: 'evidence' },
+          label: 'Open supporting evidence',
+          navigate: {
+            type: 'module' as const,
+            module: 'evidence',
+            recordId: (after ? control?.evidenceIdsAfter[0] : control?.evidenceIdsBefore[0]) ?? undefined,
+          },
         },
         {
           id: 'act-ctl-risk',
           label: 'Review related risk',
-          navigate: { type: 'module' as const, module: 'risks', recordId: 'risk-third-party' },
+          navigate: { type: 'module' as const, module: 'risks', recordId: control?.riskIds[0] ?? 'risk-third-party' },
         },
       ],
       questions: [
-        `Why is ${name} only partially assured?`,
-        'Which evidence is missing for this control?',
-        'What risk does this create?',
-        'What should I do next?',
+        `Why can ${name} not be relied upon?`,
+        'What evidence is missing, expiring or conflicting?',
+        'Which risks would be affected if this control weakened?',
+        'What should the owner do next?',
       ],
     }
   }
@@ -354,35 +366,57 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
   }
 
   if (ctx.module === 'controls') {
-    const count = partial.length
+    const unverifiable = data.controls.filter((item) => {
+      const overall = after ? item.overallAfter : item.overallBefore
+      return overall === 'unverifiable'
+    })
+    const ineffective = data.controls.filter((item) => {
+      const overall = after ? item.overallAfter : item.overallBefore
+      return overall === 'ineffective'
+    })
+    const drill = ctx.controlDrill
+    const priority = unverifiable[0] ?? ineffective[0] ?? partial[0]
     return {
-      intro:
-        count > 0
-          ? `${count} control${count === 1 ? ' is' : 's are'} only partially assured. The supplier-assurance control is the priority.`
-          : 'Controls are assured for this review. Keep evidence mappings current.',
+      intro: drill
+        ? `Active control context: ${drill.label}. I can explain what can be relied on, what is unverifiable, and what action is due.`
+        : after
+          ? `Supplier assurance is now effective. ${ineffective.length} control${ineffective.length === 1 ? '' : 's'} remain ineffective and ${unverifiable.length} unverifiable.`
+          : `${unverifiable.length} control${unverifiable.length === 1 ? ' is' : 's are'} unverifiable because evidence is missing, and ${ineffective.length} ${ineffective.length === 1 ? 'is' : 'are'} ineffective. Unverifiable is not failed.`,
       actions: [
         {
           id: 'ctl-priority',
           label: 'Open the highest-priority control',
-          navigate: { type: 'module' as const, module: 'controls', recordId: partial[0]?.id ?? 'ctl-supplier-assurance' },
+          navigate: { type: 'module' as const, module: 'controls', recordId: priority?.id ?? 'ctl-supplier-assurance' },
         },
         {
           id: 'ctl-missing-ev',
-          label: 'Show controls missing evidence',
-          navigate: { type: 'module' as const, module: 'evidence' },
+          label: after ? 'Review approved assessments' : 'Show missing supplier evidence',
+          navigate: after
+            ? { type: 'module' as const, module: 'evidence', recordId: 'ev-supplier-assessments-2026' }
+            : { type: 'upload' as const },
         },
         {
-          id: 'ctl-review',
-          label: after ? 'Review assured control' : 'Review ineffective controls',
-          navigate: { type: 'module' as const, module: 'controls', recordId: 'ctl-supplier-assurance' },
+          id: 'ctl-hse',
+          label: 'Review safety inspections',
+          navigate: { type: 'module' as const, module: 'controls', recordId: 'ctl-safety-inspection' },
+        },
+        {
+          id: 'ctl-risk',
+          label: 'Review related risk',
+          navigate: { type: 'module' as const, module: 'risks', recordId: 'risk-third-party' },
         },
       ],
-      questions: [
-        'Which controls are currently ineffective?',
-        'Which controls are missing evidence?',
-        'Which controls are overdue for review?',
-        'What is causing our control coverage gap?',
-      ],
+      questions: drill?.questions?.length
+        ? drill.questions
+        : [
+            'Which controls can we rely on?',
+            'Which cybersecurity controls are currently unverifiable?',
+            'Why can this control not be relied upon?',
+            'What evidence is missing, expiring or conflicting?',
+            'Which controls have the greatest effect on NIS2 assurance?',
+            'Which controls are insufficient for this risk?',
+            'What should the owner do next?',
+          ],
     }
   }
 

@@ -2,7 +2,6 @@ import type { AiPanelModel, GapStepId, ModuleId, PositionState } from '../mock/t
 import {
   data,
   hubAnswerBefore,
-  internationalFrameworks,
   layla,
   omar,
   organisation,
@@ -461,28 +460,116 @@ export function answerFor(options: {
 
   if (module === 'controls') {
     const list = prompts.controls
-    if (q === list[0] || selectedId === 'ctl-supplier-assurance') {
-      return base(
-        `Supplier assurance · ${org}`,
-        list[0],
-        `This control supports ${internationalFrameworks.map((item) => item.name).join(', ')} and internal commitments.`,
-        [{ text: 'The same control supports obligations in ISO 27001, NIS2, GDPR and NCA ECC.', citationId: 'ctl-supplier-assurance' }],
-        after ? 'Those frameworks now share current assessments.' : 'Those frameworks currently share a missing pack.',
-        { prompts: list },
-      )
-    }
-    if (q === list[1]) return gapAiFor(position).control
-    if (q === list[2]) return gapAiFor(position).evidence
-    if (q === list[3]) return gapAiFor(position).risks
-    if (q === list[4]) {
+    const selected = selectedId ? data.controls.find((item) => item.id === selectedId) : undefined
+    if (/unverifiable|cybersecurity controls/.test(q.toLowerCase())) {
       return base(
         `Controls · ${org}`,
         q,
         after
-          ? 'Nadia Chen remains control owner. No further pack is required for this review.'
-          : 'Omar Haddad should obtain current assessments. Layla Rahman approves. Nadia Chen owns the control.',
+          ? 'After the supplier approval, management-action follow-up remains unverifiable. Privileged-access review is only partially assured because two evidence packs conflict.'
+          : 'Supplier assurance and management-action follow-up are unverifiable. That means current evidence is missing or insufficient — not that the controls have been tested and failed.',
+        [
+          { text: after ? 'Supplier assurance is effective.' : 'Supplier assurance is unverifiable because current assessments are missing.', citationId: 'ctl-supplier-assurance' },
+          { text: 'Management action follow-up is unverifiable until closure evidence is attached.', citationId: 'ctl-audit-followup' },
+          { text: 'Privileged-access review is partially assured because current evidence conflicts.', citationId: 'ctl-privileged-access' },
+        ],
+        'Keep unverifiable separate from ineffective. Safety inspection completion is the ineffective control in this inventory.',
+        { prompts: list, owner: 'Amira Khalil' },
+      )
+    }
+    if (/not be relied|why can this control/.test(q.toLowerCase()) || selectedId?.startsWith('ctl-')) {
+      const name = selected?.title ?? selectedTitle ?? 'This control'
+      const overall = after ? selected?.overallAfter : selected?.overallBefore
+      return base(
+        `${name} · ${org}`,
+        q,
+        overall === 'unverifiable'
+          ? `${name} cannot be relied on because current operating evidence is insufficient. Design may still be sound. This is unverifiable, not failed.`
+          : overall === 'ineffective'
+            ? `${name} cannot be relied on because current evidence shows it is not operating as intended.`
+            : overall === 'effective'
+              ? `${name} can be relied on for this review. Design, operation and current evidence agree.`
+              : `${name} is only partially assured. Some evidence exists, but not enough for full reliance.`,
+        [
+          { text: `${name} overall assurance is ${overall ?? 'known from the inventory'}.`, citationId: selected?.id ?? 'ctl-supplier-assurance' },
+          { text: selected?.whyBefore && !after ? selected.whyBefore : selected?.whyAfter ?? 'See the control record for the sourced rationale.', citationId: selected?.evidenceIdsBefore?.[0] ?? selected?.id ?? 'ctl-supplier-assurance' },
+        ],
+        selected?.whatChangedBefore && !after ? selected.whatChangedBefore : selected?.whatChangedAfter ?? 'Review the control workspace for connected risks and obligations.',
+        { prompts: list, owner: selected ? undefined : 'Omar Haddad', recommendedAction: after ? selected?.nextActionAfter : selected?.nextActionBefore },
+      )
+    }
+    if (/missing, expiring or conflicting|evidence is missing/.test(q.toLowerCase())) {
+      return base(
+        `Evidence dependencies · ${org}`,
+        q,
+        after
+          ? 'Supplier assessments are current. Watch the expiring continuity test, conflicting privileged-access packs, declarations awaiting approval, and the unowned safety-inspection pack.'
+          : 'Current critical-supplier assessments are missing. The continuity test is expiring, privileged-access packs conflict, declarations await approval, and the safety-inspection pack has no evidence owner.',
+        [
+          { text: after ? '2026 critical-supplier assessments are current.' : 'Current critical-supplier assessments are missing.', citationId: after ? 'ev-supplier-assessments-2026' : 'ctl-supplier-assurance' },
+          { text: 'The business continuity test report is expiring.', citationId: 'ev-bc-test' },
+          { text: 'Privileged-access review Q2 conflicts with the IAM exception log.', citationId: 'ctl-privileged-access' },
+        ],
+        'Each evidence condition should be worked as its own record, not collapsed into a single failed control.',
+        { prompts: list },
+      )
+    }
+    if (/nis2/.test(q.toLowerCase())) {
+      return base(
+        `NIS2 leverage · ${org}`,
+        q,
+        'Supplier assurance and business continuity testing have the greatest NIS2 reach in this inventory. Improving supplier evidence lifts multiple NIS2-linked obligations at once.',
+        [
+          { text: 'Supplier assurance is mapped to NIS2 supply-chain security measures.', citationId: 'ctl-supplier-assurance' },
+          { text: 'Business continuity testing supports ISO 27001 and NIS2 continuity expectations.', citationId: 'ctl-continuity' },
+        ],
+        after
+          ? 'Supplier assurance is now effective for NIS2. Continuity evidence is still expiring.'
+          : 'Closing supplier assessments is the highest-leverage NIS2 action still open.',
+        { prompts: list },
+      )
+    }
+    if (/insufficient for this risk|controls are insufficient/.test(q.toLowerCase())) {
+      return base(
+        `Risk protection · ${org}`,
+        q,
+        after
+          ? 'Third-party assurance is now better controlled. Privileged access remains only partially controlled while access-review evidence conflicts. Continuity is weakened by overdue safety inspections.'
+          : 'Third-party assurance is unverified because the mitigating control lacks current assessments. Privileged access is only partially controlled.',
+        [
+          { text: 'Third-party assurance is linked to the supplier-assurance control.', citationId: 'risk-third-party' },
+          { text: 'Privileged access oversight is linked to privileged-access review.', citationId: 'risk-privileged-access' },
+        ],
+        'Open the risk chain on Controls to see risk → controls → evidence → obligations → frameworks.',
+        { prompts: list },
+      )
+    }
+    if (q === list[0] || /controls can we rely/.test(q.toLowerCase())) {
+      const effectiveCount = data.controls.filter((item) => (after ? item.overallAfter : item.overallBefore) === 'effective').length
+      return base(
+        `Controls · ${org}`,
+        q,
+        after
+          ? `${effectiveCount} controls are effective, including supplier assurance. Do not rely on safety inspections, unverifiable audit follow-up, or conflicting privileged-access review.`
+          : `You can rely on policy management, data-retention review, payment authorisation and site access. You cannot yet rely on supplier assurance — it is unverifiable — or on safety inspections, which are ineffective.`,
+        [
+          { text: `Effective controls in this review: ${effectiveCount} of ${data.controls.length}.`, citationId: 'ctl-isms-policy' },
+          { text: after ? 'Supplier assurance is effective.' : 'Supplier assurance is unverifiable.', citationId: 'ctl-supplier-assurance' },
+          { text: 'Safety inspection completion is ineffective.', citationId: 'ctl-safety-inspection' },
+        ],
+        'Reliance requires design, operation and current evidence. Existence alone is not enough.',
+        { prompts: list },
+      )
+    }
+    if (q === list[6] || /owner do next/.test(q.toLowerCase())) {
+      return base(
+        `Controls · ${org}`,
+        q,
+        after
+          ? 'Yusuf Rahman should close overdue plant inspections and assign an evidence owner. Nadia Chen should reconcile privileged-access evidence.'
+          : 'Omar Haddad should obtain current critical-supplier assessments. Layla Rahman approves. Yusuf Rahman still owns overdue inspections.',
         after ? afterFacts : beforeFacts,
-        'Human approval is the only trigger that changes the position.',
+        'Human approval is the only trigger that changes the organisation position.',
         { prompts: list },
       )
     }
