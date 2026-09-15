@@ -769,9 +769,9 @@ export function evidenceDependencies(controls: ControlRecord[], position: Positi
         id: `${control.id}-missing`,
         controlId: control.id,
         controlTitle: control.title,
-        evidenceId: control.id === 'ctl-supplier-assurance' ? null : control.evidenceIds[0] ?? null,
+        evidenceId: control.id === 'ctl-005' ? null : control.evidenceIds[0] ?? null,
         evidenceTitle:
-          control.id === 'ctl-supplier-assurance'
+          control.id === 'ctl-005'
             ? 'Current critical-supplier assessments'
             : `Expected operating evidence for ${control.title}`,
         health: 'missing',
@@ -878,7 +878,7 @@ export function buildBriefing(
   const scope = category ? controls.filter((item) => item.categoryId === category.id) : controls
   const lead =
     attentionControls(scope)[0] ??
-    scope.find((item) => item.id === 'ctl-supplier-assurance') ??
+    scope.find((item) => item.id === 'ctl-005') ??
     scope[0]
 
   const unverifiable = scope.filter((item) => item.overall === 'unverifiable')
@@ -940,14 +940,14 @@ function unreliableLine(scope: ControlRecord[]) {
 
 function briefingFacts(scope: ControlRecord[], after: boolean): ControlBriefing['facts'] {
   const facts: ControlBriefing['facts'] = []
-  const supplier = scope.find((item) => item.id === 'ctl-supplier-assurance')
+  const supplier = scope.find((item) => item.id === 'ctl-005')
   if (supplier) {
     facts.push({
       id: 'fact-supplier',
       text: after
         ? 'Supplier assurance is effective after the 2026 assessments were approved.'
         : 'Supplier assurance is unverifiable because current critical-supplier assessments are missing.',
-      citationId: after ? 'ev-supplier-assessments-2026' : 'ctl-supplier-assurance',
+      citationId: after ? 'evd-005' : 'ctl-005',
     })
   }
   const hse = scope.find((item) => item.id === 'ctl-safety-inspection')
@@ -970,7 +970,7 @@ function briefingFacts(scope: ControlRecord[], after: boolean): ControlBriefing[
     facts.push({
       id: 'fact-count',
       text: `${countByOverall(scope, 'effective')} of ${scope.length} controls in this view are effective.`,
-      citationId: scope[0]?.id ?? 'ctl-isms-policy',
+      citationId: scope[0]?.id ?? 'ctl-010',
     })
   }
   return facts.slice(0, 3)

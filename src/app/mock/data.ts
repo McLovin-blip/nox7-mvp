@@ -60,7 +60,7 @@ export function lookupSource(id: string, position: PositionState) {
   if (evidence) {
     const hidden = 'availableFromState' in evidence && evidence.availableFromState === 'after' && position !== 'after'
     if (!hidden) {
-      const superseded = position === 'after' && evidence.id === 'ev-supplier-assessments-2023'
+      const superseded = position === 'after' && evidence.id === 'evd-006'
       return {
         id,
         title: evidence.title,
@@ -123,11 +123,19 @@ export function lookupSource(id: string, position: PositionState) {
   return null
 }
 
-export const omar = peopleById[data.actions[0].ownerId]
+export const omar = peopleById['person-omar']
+export const maya = peopleById['person-maya']
 export const nadia = peopleById['person-nadia']
 export const layla = peopleById['person-layla']
 export const tomas = peopleById['person-tomas']
 export const sara = peopleById['person-sara']
 
-export const supplierControl = data.controls.find((item) => item.id === 'ctl-supplier-assurance')
+export const demo = data.demo
+export const phishingRisk = data.risks.find((item) => item.id === demo.focusRiskId)
+export const phishingControls = data.controls.filter((item) =>
+  (demo.focusControlIds as readonly string[]).includes(item.id),
+)
+/** Demo focus control (CTL-005). Export name kept for existing imports. */
+export const supplierControl = data.controls.find((item) => item.id === 'ctl-005')
+export const phishingControl = supplierControl
 export const hubAnswerBefore = data.ai.primaryHubAnswerBefore

@@ -569,7 +569,7 @@ function OverlayPanel({
             <p className="wx-lede">{item.nextAction}</p>
             <p className="wx-muted">{item.owner} · due {formatDate(item.dueDate)}</p>
             <div className="wx-toolbar">
-              {item.overall === 'unverifiable' && item.id.startsWith('obl-') && item.controlIds.includes('ctl-supplier-assurance') ? (
+              {item.overall === 'unverifiable' && item.id.startsWith('obl-') && item.controlIds.includes('ctl-005') ? (
                 <button type="button" className="wx-btn primary" onClick={() => onNavigate({ type: 'upload' })}>Upload current assessments</button>
               ) : (
                 <button type="button" className="wx-btn primary" onClick={() => onNavigate({ type: 'module', module: 'evidence', recordId: item.evidenceIds[0] ?? null })}>Open evidence</button>

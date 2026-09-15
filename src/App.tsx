@@ -126,7 +126,7 @@ function AuthenticatedApp() {
       return
     }
     if (target.type === 'board') {
-      go('reports', 'rep-board-summary')
+      go('reports', 'rep-phishing-summary')
       return
     }
     go(target.module, target.recordId)
@@ -149,7 +149,7 @@ function AuthenticatedApp() {
       onModule={(id) => go(id)}
       onNotification={(item) => {
         if (item.target === 'gap') openGap('overview')
-        else if (item.target === 'board') go('reports', 'rep-board-summary')
+        else if (item.target === 'board') go('reports', 'rep-phishing-summary')
         else if (item.target === 'evidence') go('evidence', item.recordId)
         else go('hub')
       }}
@@ -179,7 +179,7 @@ function AuthenticatedApp() {
           selectedStep={gapStep}
           onBack={() => go('hub')}
           onSelectStep={(id) => setGapStep(id)}
-          onContinue={position === 'after' ? () => go('reports', 'rep-board-summary') : startEvidenceUpload}
+          onContinue={position === 'after' ? () => go('reports', 'rep-phishing-summary') : startEvidenceUpload}
         />
       ) : module === 'hub' ? (
         <ExecutiveHub
@@ -197,7 +197,7 @@ function AuthenticatedApp() {
           onFocus={applyFocus}
           onAsk={openAi}
           onOpenGap={(step) => openGap(step ?? 'overview')}
-          onOpenBoard={() => go('reports', 'rep-board-summary')}
+          onOpenBoard={() => go('reports', 'rep-phishing-summary')}
           onUpload={startEvidenceUpload}
           onOpenSource={openSource}
           onOpenAction={setOpenAction}

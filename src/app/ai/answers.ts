@@ -36,7 +36,7 @@ function base(
     connected: extra.connected ?? connectedTitles,
     freshness: extra.freshness ?? (after ? 'Policy current; 2026 assessments current; 2023 pack superseded' : hubAnswerBefore.freshness),
     confidence: extra.confidence ?? 'high',
-    owner: extra.owner ?? (omar?.name ?? ''),
+    owner: extra.owner ?? (personLabel(hubAnswerBefore.ownerId).split(',')[0] || omar?.name || ''),
     recommendedAction: extra.recommendedAction ?? hubAnswerBefore.recommendedAction,
     approval: extra.approval ?? 'Human approval required before coverage or risk changes.',
     expectedImpact: extra.expectedImpact ?? hubAnswerBefore.expectedImpact,
@@ -49,37 +49,136 @@ const beforeFacts = hubAnswerBefore.sourcedFacts.map((fact) => ({
   citationId: fact.citationIds[0],
 }))
 
-const afterFacts: AiPanelModel['facts'] = [
-  {
-    text: '2026 critical-supplier assessments are current and approved.',
-    citationId: 'ev-supplier-assessments-2026',
-  },
-  {
-    text: 'Supplier assurance is assured (policy + current assessments).',
-    citationId: 'ctl-supplier-assurance',
-  },
-  {
-    text: 'Third-party assurance and regulatory exposure are reduced.',
-    citationId: 'risk-third-party',
-  },
-]
+const afterFacts: AiPanelModel['facts'] = hubAnswerBefore.sourcedFacts.map((fact) => ({
+  text: fact.text,
+  citationId: fact.citationIds[0],
+}))
 
 function afterHub(): AiPanelModel {
   return base(
     `Executive Hub · ${org}`,
-    'Why did compliance readiness change?',
-    'Readiness moved from 64 to 72 because current critical-supplier assessments were approved. Coverage rose across ISO 27001, NIS2, GDPR and NCA ECC. The change is the same approval, not four separate projects.',
+    'What should I focus on first?',
+    hubAnswerBefore.executiveAnswer,
     afterFacts,
-    'The board can now cite current assessments. A duplicate questionnaire pack is still flagged and does not reopen the gap.',
+    hubAnswerBefore.interpretation,
     {
       prompts: prompts.hub,
-      recommendedAction: 'No further approval is required for this pack. Resolve the duplicate questionnaire when convenient.',
-      approval: 'Already approved by Layla Rahman.',
-      expectedImpact: 'Coverage is 86 / 82 / 80 / 79 across the four frameworks; control assured; two risks reduced; Board Summary cites the 2026 pack.',
-      owner: layla?.name ?? '',
-      connected: ['2026 critical-supplier assessments', 'Supplier assurance', 'Third-party assurance', 'Board Summary'],
+      recommendedAction: hubAnswerBefore.recommendedAction,
+      approval: 'Already reflected in the current demo snapshot.',
+      expectedImpact: hubAnswerBefore.expectedImpact,
+      owner: personLabel(hubAnswerBefore.ownerId).split(',')[0] || layla?.name || '',
+      connected: connectedTitles,
+      freshness: hubAnswerBefore.freshness,
     },
   )
+}
+
+function riskRecordAnswer(selectedId: string | undefined, question: string): AiPanelModel | null {
+  const risk =
+    data.risks.find((item) => item.id === selectedId) ??
+    data.risks.find((item) => item.id === data.demo.focusRiskId) ??
+    data.risks.find((item) => item.demoFocus)
+  if (!risk) return null
+  const controls = risk.controlIds
+    .map((id) => data.controls.find((item) => item.id === id))
+    .filter((item): item is (typeof data.controls)[number] => Boolean(item))
+  const evidence = (risk.evidenceIdsBefore ?? [])
+    .map((id) => data.evidence.find((item) => item.id === id))
+    .filter((item): item is (typeof data.evidence)[number] => Boolean(item))
+  const owner = personLabel(risk.ownerId)
+  const q = question.toLowerCase()
+  const list = prompts.risks
+
+  if (q.includes('what is this risk') || q === list[0].toLowerCase()) {
+    return base(
+      `Risks · ${risk.code}`,
+      question,
+      `${risk.code} — ${risk.title}. ${risk.whatCouldHappen} Inherent ${risk.inherentLabel}; residual ${risk.residualLabel}; ${risk.appetiteLabel}.`,
+      [
+        { text: `${risk.code} residual is ${risk.residualLabel} and ${risk.appetiteLabel}.`, citationId: risk.id },
+        { text: risk.whatCouldHappen, citationId: risk.id },
+      ],
+      risk.contributingGap,
+      {
+        prompts: list,
+        owner: owner.split(',')[0],
+        recommendedAction: `Open ${risk.code} and review linked controls and evidence.`,
+        approval: 'Not required for this explanation.',
+      },
+    )
+  }
+
+  if (q.includes('protecting against') || q === list[1].toLowerCase()) {
+    const blurb =
+      risk.id === data.demo.focusRiskId || risk.demoFocus
+        ? data.demo.controlBlurb
+        : controls.map((item) => item.purpose).filter(Boolean).join(' ')
+    return base(
+      `Risks · ${risk.code}`,
+      question,
+      controls.length
+        ? `${blurb ? `${blurb} ` : ''}Linked controls: ${controls.map((item) => `${item.code} ${item.title} (${item.effectivenessLabel})`).join('; ')}.`
+        : 'No linked controls are seeded for this risk.',
+      controls.map((item) => ({
+        text: `${item.code} ${item.title} is ${item.effectivenessLabel}.`,
+        citationId: item.id,
+      })),
+      blurb || risk.contributingGap,
+      {
+        prompts: list,
+        owner: owner.split(',')[0],
+        recommendedAction: `Review ${controls.map((item) => item.code).join(' and ') || 'linked controls'} from the risk record.`,
+        approval: 'Not required for this explanation.',
+        connected: controls.map((item) => item.title),
+      },
+    )
+  }
+
+  if (q.includes('evidence do we have') || q === list[2].toLowerCase()) {
+    return base(
+      `Risks · ${risk.code}`,
+      question,
+      evidence.length
+        ? evidence.map((item) => `${item.code} ${item.title}: ${item.statusLabel} — ${item.resultOrGap ?? item.summary}`).join(' ')
+        : 'No linked evidence is seeded for this risk.',
+      evidence.map((item) => ({
+        text: `${item.code}: ${item.statusLabel} — ${item.resultOrGap ?? item.summary}`,
+        citationId: item.id,
+      })),
+      'Accepted evidence shows the linked phishing protections are working within their stated scope.',
+      {
+        prompts: list,
+        owner: owner.split(',')[0],
+        recommendedAction: `Open ${evidence.map((item) => item.code).join(' and ') || 'linked evidence'} from the risk record.`,
+        approval: 'Not required for this explanation.',
+        connected: evidence.map((item) => item.title),
+      },
+    )
+  }
+
+  if (q.includes('do next') || q === list[3].toLowerCase()) {
+    return base(
+      `Risks · ${risk.code}`,
+      question,
+      `Next action: ${risk.nextAction} Owner: ${owner}. Due: ${risk.dueDate}. Status: ${risk.actionStatus}.`,
+      [
+        {
+          text: `Next action: ${risk.nextAction}. Owner: ${owner}. Due: ${risk.dueDate}.`,
+          citationId: risk.id,
+        },
+      ],
+      'Keep residual phishing exposure within appetite by completing the owned coaching action.',
+      {
+        prompts: list,
+        owner: owner.split(',')[0],
+        recommendedAction: risk.nextAction,
+        approval: 'Owner accountability is recorded on the risk.',
+        freshness: `Due ${risk.dueDate}`,
+      },
+    )
+  }
+
+  return null
 }
 
 function beforeHub(): AiPanelModel {
@@ -119,8 +218,8 @@ export function gapAiFor(position: PositionState): Record<GapStepId, AiPanelMode
         'Does a current policy close this gap?',
         'The policy is still current. The gap is closed because current assessments now sit beside it.',
         [
-          { text: 'The supplier assurance policy is current (version 3.0).', citationId: 'ev-policy-supplier' },
-          { text: '2026 critical-supplier assessments are current.', citationId: 'ev-supplier-assessments-2026' },
+          { text: 'The supplier assurance policy is current (version 3.0).', citationId: 'evd-005' },
+          { text: '2026 critical-supplier assessments are current.', citationId: 'evd-005' },
         ],
         'Policy alone was never enough; the pair is what the review needs.',
         shared,
@@ -130,8 +229,8 @@ export function gapAiFor(position: PositionState): Record<GapStepId, AiPanelMode
         'Where do ISO 27001, NIS2, GDPR and NCA ECC overlap?',
         'They overlap on supplier assurance. That overlap is now supported by the same current assessments.',
         [
-          { text: 'The same control supports obligations in ISO 27001, NIS2, GDPR and NCA ECC.', citationId: 'ctl-supplier-assurance' },
-          { text: '2026 critical-supplier assessments support those obligations.', citationId: 'ev-supplier-assessments-2026' },
+          { text: 'The same control supports obligations in ISO 27001, NIS2, GDPR and NCA ECC.', citationId: 'ctl-005' },
+          { text: '2026 critical-supplier assessments support those obligations.', citationId: 'evd-005' },
         ],
         'One approval moved four obligations together.',
         shared,
@@ -149,9 +248,9 @@ export function gapAiFor(position: PositionState): Record<GapStepId, AiPanelMode
         'Which evidence is missing or outdated?',
         'The critical pack is current. The 2023 pack is superseded. A 2024 questionnaire pack is still a duplicate.',
         [
-          { text: '2026 critical-supplier assessments are current.', citationId: 'ev-supplier-assessments-2026' },
-          { text: '2023 critical-supplier assessments are superseded.', citationId: 'ev-supplier-assessments-2023' },
-          { text: 'The 2024 supplier questionnaire pack is a duplicate.', citationId: 'ev-supplier-q-duplicate' },
+          { text: '2026 critical-supplier assessments are current.', citationId: 'evd-005' },
+          { text: '2023 critical-supplier assessments are superseded.', citationId: 'evd-006' },
+          { text: 'The 2024 supplier questionnaire pack is a duplicate.', citationId: 'evd-006' },
         ],
         'The duplicate does not reopen the material gap.',
         shared,
@@ -161,8 +260,8 @@ export function gapAiFor(position: PositionState): Record<GapStepId, AiPanelMode
         'Which compliance gaps contribute to this risk?',
         'The contributing gap is closed. Third-party and regulatory exposure are reduced. Continuity evidence remains a watch item.',
         [
-          { text: 'Third-party assurance is reduced.', citationId: 'risk-third-party' },
-          { text: 'Regulatory exposure ahead of the review is reduced.', citationId: 'risk-regulatory' },
+          { text: 'Third-party assurance is reduced.', citationId: 'risk-002' },
+          { text: 'Regulatory exposure ahead of the review is reduced.', citationId: 'risk-002' },
         ],
         'Both elevated risks moved on the same approval.',
         shared,
@@ -193,7 +292,7 @@ export function gapAiFor(position: PositionState): Record<GapStepId, AiPanelMode
       'Where do ISO 27001, NIS2, GDPR and NCA ECC overlap?',
       'All four have a supplier-related obligation that is only partly supported. They share the same policy and the same control.',
       [
-        { text: 'The same control supports obligations in ISO 27001, NIS2, GDPR and NCA ECC.', citationId: 'ctl-supplier-assurance' },
+        { text: 'The same control supports obligations in ISO 27001, NIS2, GDPR and NCA ECC.', citationId: 'ctl-005' },
         { text: 'Supplier relationships — information security is only partially supported.', citationId: 'obl-iso-a532' },
       ],
       'Because the overlap is the same missing evidence, closing one pack improves all four obligations together.',
@@ -204,8 +303,8 @@ export function gapAiFor(position: PositionState): Record<GapStepId, AiPanelMode
       'Why is this control only partially assured?',
       supplierControl?.partialReason ?? 'Policy is current. Current assessments for critical suppliers are missing.',
       [
-        { text: 'Supplier assurance is partially assured.', citationId: 'ctl-supplier-assurance' },
-        { text: 'Internal audit findings record that current critical-supplier assessments are missing.', citationId: 'ev-audit-findings' },
+        { text: 'Supplier assurance is partially assured.', citationId: 'ctl-005' },
+        { text: 'Internal audit findings record that current critical-supplier assessments are missing.', citationId: 'evd-005' },
       ],
       'The control cannot move to assured until current assessments are uploaded and approved.',
       shared,
@@ -215,9 +314,9 @@ export function gapAiFor(position: PositionState): Record<GapStepId, AiPanelMode
       'Which evidence is missing or outdated?',
       'Current critical-supplier assessments are missing. The 2023 pack is expired and is not acceptable for the review. A 2024 questionnaire pack is flagged as a duplicate.',
       [
-        { text: 'Internal audit findings record that current critical-supplier assessments are missing.', citationId: 'ev-audit-findings' },
-        { text: '2023 critical-supplier assessments are expired.', citationId: 'ev-supplier-assessments-2023' },
-        { text: 'The 2024 supplier questionnaire pack is a duplicate of an older pack.', citationId: 'ev-supplier-q-duplicate' },
+        { text: 'Internal audit findings record that current critical-supplier assessments are missing.', citationId: 'evd-005' },
+        { text: '2023 critical-supplier assessments are expired.', citationId: 'evd-006' },
+        { text: 'The 2024 supplier questionnaire pack is a duplicate of an older pack.', citationId: 'evd-006' },
       ],
       'Fresh assessments are the missing piece. The current policy and the expired pack do not close the gap.',
       shared,
@@ -227,8 +326,8 @@ export function gapAiFor(position: PositionState): Record<GapStepId, AiPanelMode
       'Which compliance gaps contribute to this risk?',
       'Third-party assurance and regulatory exposure are elevated because current assessments are missing. The same gap appears across several frameworks.',
       [
-        { text: 'Third-party assurance is elevated because current assessments for critical suppliers are missing.', citationId: 'risk-third-party' },
-        { text: 'Regulatory exposure ahead of the review is elevated by the same supplier-assurance gap.', citationId: 'risk-regulatory' },
+        { text: 'Third-party assurance is elevated because current assessments for critical suppliers are missing.', citationId: 'risk-002' },
+        { text: 'Regulatory exposure ahead of the review is elevated by the same supplier-assurance gap.', citationId: 'risk-002' },
       ],
       'Approving current assessments reduces both risks together, rather than remediating them as separate issues.',
       shared,
@@ -284,7 +383,7 @@ export function answerFor(options: {
           : base(
               `Executive Hub · ${org}`,
               q,
-              'The highest-impact item is missing current critical-supplier assessments. Continuity evidence is expiring and a 2024 questionnaire pack is a duplicate — neither is the primary action.',
+              hubAnswerBefore.executiveAnswer,
               beforeFacts,
               hubAnswerBefore.interpretation,
               { prompts: prompts.hub },
@@ -295,8 +394,8 @@ export function answerFor(options: {
           `Executive Hub · ${org}`,
           q,
           after
-            ? 'That action is complete. Layla Rahman approved the 2026 assessments.'
-            : 'Obtain and approve current critical-supplier assessments. Omar Haddad is accountable. Layla Rahman approves.',
+            ? hubAnswerBefore.executiveAnswer
+            : hubAnswerBefore.recommendedAction,
           after ? afterFacts : beforeFacts,
           after
             ? 'Coverage, assurance and risk already reflect the approval.'
@@ -309,8 +408,8 @@ export function answerFor(options: {
           `Executive Hub · ${org}`,
           q,
           after
-            ? 'The material gap is closed for this review. Readiness 72 (Improved). Four frameworks up. Control assured. Two risks reduced. Duplicate pack still flagged.'
-            : 'Needs attention (64). Policy current. Current assessments missing. Four international obligations partial. Two risks elevated. Omar Haddad accountable.',
+            ? hubAnswerBefore.executiveAnswer
+            : hubAnswerBefore.executiveAnswer,
           after ? afterFacts : beforeFacts,
           'Open the Board Summary for the sourced narrative.',
           { prompts: prompts.hub },
@@ -333,13 +432,13 @@ export function answerFor(options: {
         after
           ? [
               { text: `Readiness is ${readiness} (Improved).`, citationId: 'rep-board-summary' },
-              { text: '2026 critical-supplier assessments are current and approved.', citationId: 'ev-supplier-assessments-2026' },
-              { text: 'Supplier assurance is assured after approval.', citationId: 'ctl-supplier-assurance' },
+              { text: '2026 critical-supplier assessments are current and approved.', citationId: 'evd-005' },
+              { text: 'Supplier assurance is assured after approval.', citationId: 'ctl-005' },
             ]
           : [
               { text: `Readiness is ${readiness} (Needs attention).`, citationId: 'rep-board-summary' },
-              { text: 'Current critical-supplier assessments are missing.', citationId: 'ev-audit-findings' },
-              { text: 'Supplier assurance remains partially assured.', citationId: 'ctl-supplier-assurance' },
+              { text: 'Current critical-supplier assessments are missing.', citationId: 'evd-005' },
+              { text: 'Supplier assurance remains partially assured.', citationId: 'ctl-005' },
             ],
         after
           ? 'One evidence approval moved control, regulatory and risk position together.'
@@ -365,12 +464,12 @@ export function answerFor(options: {
           : 'Focus on the supplier evidence gap first — it links the highest risks, partially assured control, and regulatory obligations with insufficient coverage.',
         after
           ? [
-              { text: 'Third-party and regulatory exposure are reduced.', citationId: 'risk-third-party' },
-              { text: 'International obligations are supported by the approved assessments.', citationId: 'ctl-supplier-assurance' },
+              { text: 'Third-party and regulatory exposure are reduced.', citationId: 'risk-002' },
+              { text: 'International obligations are supported by the approved assessments.', citationId: 'ctl-005' },
             ]
           : [
-              { text: 'Missing current assessments keep supplier assurance partial.', citationId: 'ctl-supplier-assurance' },
-              { text: 'Two organisational risks remain elevated on the same gap.', citationId: 'risk-third-party' },
+              { text: 'Missing current assessments keep supplier assurance partial.', citationId: 'ctl-005' },
+              { text: 'Two organisational risks remain elevated on the same gap.', citationId: 'risk-002' },
             ],
         'Nox Connect summarises the estate so executives see exposure, cause and next action without opening every module.',
         {
@@ -391,7 +490,7 @@ export function answerFor(options: {
         ? `Nox Connect shows the organisation estate after approval. Overall assurance is ${readiness}%.`
         : `Nox Connect shows where ${org} is exposed across risks, controls, regulatory obligations, evidence and actions. Overall assurance is ${readiness}%.`,
       [
-        { text: after ? 'The material supplier-assurance gap is closed for this review.' : 'The material gap is missing current critical-supplier assessments.', citationId: after ? 'ev-supplier-assessments-2026' : 'ctl-supplier-assurance' },
+        { text: after ? 'The material supplier-assurance gap is closed for this review.' : 'The material gap is missing current critical-supplier assessments.', citationId: after ? 'evd-005' : 'ctl-005' },
       ],
       'Ask about assurance, priorities, regulatory exposure, or connected gaps.',
       { prompts: prompts.hub, connected: connectedTitles },
@@ -449,8 +548,8 @@ export function answerFor(options: {
           ? 'Supplier assessments are current. Watch the expiring continuity test, conflicting access packs, declarations awaiting approval, and missing audit-closure evidence.'
           : 'Current critical-supplier assessments are missing. Continuity evidence is expiring and privileged-access packs conflict.',
         [
-          { text: after ? '2026 assessments are current.' : 'Current critical-supplier assessments are missing.', citationId: after ? 'ev-supplier-assessments-2026' : 'obl-iso-a532' },
-          { text: 'The business continuity test report is expiring.', citationId: 'ev-bc-test' },
+          { text: after ? '2026 assessments are current.' : 'Current critical-supplier assessments are missing.', citationId: after ? 'evd-005' : 'obl-iso-a532' },
+          { text: 'The business continuity test report is expiring.', citationId: 'evd-006' },
         ],
         'Work each evidence condition as its own record.',
         { prompts: list },
@@ -508,7 +607,7 @@ export function answerFor(options: {
           ? 'After the supplier approval, management-action follow-up remains unverifiable. Privileged-access review is only partially assured because two evidence packs conflict.'
           : 'Supplier assurance and management-action follow-up are unverifiable. That means current evidence is missing or insufficient — not that the controls have been tested and failed.',
         [
-          { text: after ? 'Supplier assurance is effective.' : 'Supplier assurance is unverifiable because current assessments are missing.', citationId: 'ctl-supplier-assurance' },
+          { text: after ? 'Supplier assurance is effective.' : 'Supplier assurance is unverifiable because current assessments are missing.', citationId: 'ctl-005' },
           { text: 'Management action follow-up is unverifiable until closure evidence is attached.', citationId: 'ctl-audit-followup' },
           { text: 'Privileged-access review is partially assured because current evidence conflicts.', citationId: 'ctl-privileged-access' },
         ],
@@ -530,8 +629,8 @@ export function answerFor(options: {
               ? `${name} can be relied on for this review. Design, operation and current evidence agree.`
               : `${name} is only partially assured. Some evidence exists, but not enough for full reliance.`,
         [
-          { text: `${name} overall assurance is ${overall ?? 'known from the inventory'}.`, citationId: selected?.id ?? 'ctl-supplier-assurance' },
-          { text: selected?.whyBefore && !after ? selected.whyBefore : selected?.whyAfter ?? 'See the control record for the sourced rationale.', citationId: selected?.evidenceIdsBefore?.[0] ?? selected?.id ?? 'ctl-supplier-assurance' },
+          { text: `${name} overall assurance is ${overall ?? 'known from the inventory'}.`, citationId: selected?.id ?? 'ctl-005' },
+          { text: selected?.whyBefore && !after ? selected.whyBefore : selected?.whyAfter ?? 'See the control record for the sourced rationale.', citationId: selected?.evidenceIdsBefore?.[0] ?? selected?.id ?? 'ctl-005' },
         ],
         selected?.whatChangedBefore && !after ? selected.whatChangedBefore : selected?.whatChangedAfter ?? 'Review the control workspace for connected risks and obligations.',
         { prompts: list, owner: selected ? undefined : 'Omar Haddad', recommendedAction: after ? selected?.nextActionAfter : selected?.nextActionBefore },
@@ -545,8 +644,8 @@ export function answerFor(options: {
           ? 'Supplier assessments are current. Watch the expiring continuity test, conflicting privileged-access packs, declarations awaiting approval, and the unowned safety-inspection pack.'
           : 'Current critical-supplier assessments are missing. The continuity test is expiring, privileged-access packs conflict, declarations await approval, and the safety-inspection pack has no evidence owner.',
         [
-          { text: after ? '2026 critical-supplier assessments are current.' : 'Current critical-supplier assessments are missing.', citationId: after ? 'ev-supplier-assessments-2026' : 'ctl-supplier-assurance' },
-          { text: 'The business continuity test report is expiring.', citationId: 'ev-bc-test' },
+          { text: after ? '2026 critical-supplier assessments are current.' : 'Current critical-supplier assessments are missing.', citationId: after ? 'evd-005' : 'ctl-005' },
+          { text: 'The business continuity test report is expiring.', citationId: 'evd-006' },
           { text: 'Privileged-access review Q2 conflicts with the IAM exception log.', citationId: 'ctl-privileged-access' },
         ],
         'Each evidence condition should be worked as its own record, not collapsed into a single failed control.',
@@ -559,8 +658,8 @@ export function answerFor(options: {
         q,
         'Supplier assurance and business continuity testing have the greatest NIS2 reach in this inventory. Improving supplier evidence lifts multiple NIS2-linked obligations at once.',
         [
-          { text: 'Supplier assurance is mapped to NIS2 supply-chain security measures.', citationId: 'ctl-supplier-assurance' },
-          { text: 'Business continuity testing supports ISO 27001 and NIS2 continuity expectations.', citationId: 'ctl-continuity' },
+          { text: 'Supplier assurance is mapped to NIS2 supply-chain security measures.', citationId: 'ctl-005' },
+          { text: 'Business continuity testing supports ISO 27001 and NIS2 continuity expectations.', citationId: 'ctl-010' },
         ],
         after
           ? 'Supplier assurance is now effective for NIS2. Continuity evidence is still expiring.'
@@ -576,8 +675,8 @@ export function answerFor(options: {
           ? 'Third-party assurance is now better controlled. Privileged access remains only partially controlled while access-review evidence conflicts. Continuity is weakened by overdue safety inspections.'
           : 'Third-party assurance is unverified because the mitigating control lacks current assessments. Privileged access is only partially controlled.',
         [
-          { text: 'Third-party assurance is linked to the supplier-assurance control.', citationId: 'risk-third-party' },
-          { text: 'Privileged access oversight is linked to privileged-access review.', citationId: 'risk-privileged-access' },
+          { text: 'Third-party assurance is linked to the supplier-assurance control.', citationId: 'risk-002' },
+          { text: 'Privileged access oversight is linked to privileged-access review.', citationId: 'risk-004' },
         ],
         'Open the risk chain on Controls to see risk → controls → evidence → obligations → frameworks.',
         { prompts: list },
@@ -592,8 +691,8 @@ export function answerFor(options: {
           ? `${effectiveCount} controls are effective, including supplier assurance. Do not rely on safety inspections, unverifiable audit follow-up, or conflicting privileged-access review.`
           : `You can rely on policy management, data-retention review, payment authorisation and site access. You cannot yet rely on supplier assurance — it is unverifiable — or on safety inspections, which are ineffective.`,
         [
-          { text: `Effective controls in this review: ${effectiveCount} of ${data.controls.length}.`, citationId: 'ctl-isms-policy' },
-          { text: after ? 'Supplier assurance is effective.' : 'Supplier assurance is unverifiable.', citationId: 'ctl-supplier-assurance' },
+          { text: `Effective controls in this review: ${effectiveCount} of ${data.controls.length}.`, citationId: 'ctl-001' },
+          { text: after ? 'Supplier assurance is effective.' : 'Supplier assurance is unverifiable.', citationId: 'ctl-005' },
           { text: 'Safety inspection completion is ineffective.', citationId: 'ctl-safety-inspection' },
         ],
         'Reliance requires design, operation and current evidence. Existence alone is not enough.',
@@ -617,8 +716,8 @@ export function answerFor(options: {
 
   if (module === 'evidence') {
     const list = prompts.evidence
-    const selected = selectedId === 'ev-missing-supplier-2026'
-      ? { id: 'ev-missing-supplier-2026', title: 'Current critical-supplier assessments' }
+    const selected = selectedId === 'evd-005'
+      ? { id: 'evd-005', title: 'Current critical-supplier assessments' }
       : selectedId
         ? data.evidence.find((item) => item.id === selectedId)
         : undefined
@@ -630,9 +729,9 @@ export function answerFor(options: {
           ? 'Supplier assessments are current. Residual conditions are the expiring continuity test, conflicting privileged-access packs, declarations awaiting approval, and the unowned HSE pack.'
           : 'Current critical-supplier assessments are missing. The 2023 pack is expired, the continuity test is expiring, privileged-access packs conflict, and the HSE pack has no evidence owner.',
         [
-          { text: after ? '2026 critical-supplier assessments are current and approved.' : 'Current critical-supplier assessments are missing.', citationId: after ? 'ev-supplier-assessments-2026' : 'ev-audit-findings' },
-          { text: 'The business continuity test report is expiring.', citationId: 'ev-bc-test' },
-          { text: 'Privileged-access review Q2 conflicts with the IAM exception log.', citationId: 'ev-privileged-review-q2' },
+          { text: after ? '2026 critical-supplier assessments are current and approved.' : 'Current critical-supplier assessments are missing.', citationId: after ? 'evd-005' : 'evd-005' },
+          { text: 'The business continuity test report is expiring.', citationId: 'evd-006' },
+          { text: 'Privileged-access review Q2 conflicts with the IAM exception log.', citationId: 'evd-005' },
         ],
         'Missing, expired, conflicting and unowned are different problems. Do not collapse them into one failed pack.',
         { prompts: list },
@@ -658,8 +757,8 @@ export function answerFor(options: {
         q,
         'The business continuity test report is the pack approaching expiry. Continuity testing and the NIS2 continuity obligation would weaken first — not the supplier-assurance control.',
         [
-          { text: 'Business continuity test report is expiring.', citationId: 'ev-bc-test' },
-          { text: 'Business continuity testing is the connected control.', citationId: 'ctl-continuity' },
+          { text: 'Business continuity test report is expiring.', citationId: 'evd-006' },
+          { text: 'Business continuity testing is the connected control.', citationId: 'ctl-010' },
           { text: 'NIS2 continuity measures depend on that test evidence.', citationId: 'obl-nis2-continuity' },
         ],
         'Treat expiry as a watch item. It is not the primary supplier-assurance action.',
@@ -683,16 +782,16 @@ export function answerFor(options: {
       return base(
         `${name} · ${org}`,
         q,
-        selected?.id === 'ev-policy-supplier'
+        selected?.id === 'evd-005'
           ? 'Used by supplier assurance and the overlapping supplier obligations. A current policy does not replace operating assessments.'
-          : selected?.id === 'ev-supplier-assessments-2026'
+          : selected?.id === 'evd-005'
             ? 'Used by supplier assurance and the four international supplier obligations after approval.'
-            : selected?.id === 'ev-missing-supplier-2026'
+            : selected?.id === 'evd-005'
               ? 'Expected by supplier assurance and the four international supplier obligations. Until it exists, those requirements stay unverifiable.'
-              : selected?.id === 'ev-bc-test'
+              : selected?.id === 'evd-006'
                 ? 'Used by business continuity testing and the NIS2 continuity obligation.'
                 : 'Open the record to see the controls, obligations and risks that reuse it.',
-        selected?.id === 'ev-supplier-assessments-2026' ? afterFacts : beforeFacts.slice(0, 1),
+        selected?.id === 'evd-005' ? afterFacts : beforeFacts.slice(0, 1),
         'Reuse is visible on the record. Do not duplicate the pack under each framework.',
         { prompts: list },
       )
@@ -714,43 +813,15 @@ export function answerFor(options: {
 
   if (module === 'risks') {
     const list = prompts.risks
-    if (q === list[0]) return gapAiFor(position).risks
-    if (q === list[1]) {
-      return base(
-        `Risks · ${org}`,
-        q,
-        'Supplier assurance is the control that reduces third-party and regulatory exposure. Continuity testing covers the watch item.',
-        [{ text: 'Supplier assurance is the control connected to both elevated risks.', citationId: 'ctl-supplier-assurance' }],
-        after ? 'That control is now assured.' : 'That control is still partial.',
-        { prompts: list },
-      )
+    const curated = riskRecordAnswer(selectedId, q)
+    if (curated) return curated
+    if (/protecting against phishing|phishing risk|open the phishing/i.test(q)) {
+      return riskRecordAnswer(data.demo.focusRiskId, list[0]) ?? beforeHub()
     }
-    if (q === list[2]) return gapAiFor(position).evidence
-    if (q === list[3]) {
-      return base(
-        `Risks · ${org}`,
-        q,
-        after
-          ? 'The efficient remediation is complete: one approved pack reduced both elevated risks.'
-          : 'Upload and approve current critical-supplier assessments. That is more efficient than treating each framework or risk as a separate project.',
-        after ? afterFacts : beforeFacts,
-        hubAnswerBefore.interpretation,
-        { prompts: list },
-      )
+    if (list.includes(q) || /what is this risk|protecting against|evidence do we have|should we do next/i.test(q)) {
+      return riskRecordAnswer(selectedId ?? data.demo.focusRiskId, q) ?? beforeHub()
     }
-    if (q === list[4]) {
-      return after
-        ? afterHub()
-        : base(
-            `Risks · ${org}`,
-            q,
-            hubAnswerBefore.expectedImpact,
-            beforeFacts,
-            'Nothing in the position changes until a human approves.',
-            { prompts: list },
-          )
-    }
-    return list.includes(q) ? gapAiFor(position).risks : offScript('Risks', list)
+    return offScript('Risks', list)
   }
 
   if (module === 'reports') {
@@ -759,9 +830,7 @@ export function answerFor(options: {
       return base(
         `Board Summary · ${org}`,
         q,
-        after
-          ? 'The material movement is the closed supplier-assurance gap: readiness 72, four frameworks up, control assured, two risks reduced, citing the 2026 assessments.'
-          : 'The material movement to explain is the missing current assessments under four frameworks, with readiness at 64 and two elevated risks.',
+        hubAnswerBefore.executiveAnswer,
         after ? afterFacts : beforeFacts,
         'The summary is generated from the same position as Hub.',
         { prompts: list, recommendedAction: after ? 'Cite the 2026 assessments in the board pack.' : hubAnswerBefore.recommendedAction, approval: after ? 'Already approved by Layla Rahman.' : 'Human approval required before coverage or risk changes.' },

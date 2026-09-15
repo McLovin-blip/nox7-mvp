@@ -364,6 +364,63 @@
   line-height: 1.5;
 }
 
+.report-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.report-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.report-list li:last-child {
+  border-bottom: 0;
+}
+
+.report-list strong {
+  display: block;
+  font-size: 15px;
+}
+
+.report-list p {
+  margin: 6px 0;
+  color: var(--text-2);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.report-list em {
+  font-style: normal;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.report-section {
+  display: grid;
+  gap: 8px;
+}
+
+.report-section h3 {
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+}
+
+.report-section ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 8px;
+}
+
 .cite {
   appearance: none;
   border: 0;

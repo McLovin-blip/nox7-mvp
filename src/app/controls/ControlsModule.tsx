@@ -407,7 +407,7 @@ export function ControlsModule({
               {briefing.owner} · due {briefing.due} · {briefing.approval}
             </p>
             <div className="ctl-toolbar">
-              <button type="button" className="ctl-btn primary" onClick={() => openOverlay({ kind: 'action', controlId: attention[0]?.id ?? 'ctl-supplier-assurance' })}>
+              <button type="button" className="ctl-btn primary" onClick={() => openOverlay({ kind: 'action', controlId: attention[0]?.id ?? 'ctl-005' })}>
                 Open recommended action
               </button>
               <button type="button" className="ctl-btn" onClick={() => onAskNox?.(briefing.askPrompt)}>
@@ -1226,7 +1226,7 @@ function ActionPanel({
   onClose: () => void
 }) {
   const action = control.openActions[0]
-  const needsUpload = control.id === 'ctl-supplier-assurance' && control.overall === 'unverifiable'
+  const needsUpload = control.id === 'ctl-005' && control.overall === 'unverifiable'
   return (
     <div className="ctl-blocks">
       <p className="ctl-lede">{control.nextAction}</p>

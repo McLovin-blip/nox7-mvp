@@ -1,6 +1,5 @@
 import type { HubAction } from '../mock/hubModel.ts'
 import type { HubFocus, MapFilter, MapNodeId } from '../mock/types.ts'
-import { useSession } from '../state/SessionProvider.tsx'
 import { ActionDetail } from './ActionDetail.tsx'
 import { AiBriefing } from './AiBriefing.tsx'
 import { ConnectedAssurance } from './ConnectedAssurance.tsx'
@@ -46,8 +45,6 @@ export function ExecutiveHub({
   onOpenAction: (action: HubAction) => void
   onCloseAction: () => void
 }) {
-  const { view } = useSession()
-  const closed = view.position === 'after'
   const indicatorId = hubFocus?.kind === 'indicator' ? hubFocus.id : null
   const frameworkId = hubFocus?.kind === 'framework' ? hubFocus.id : null
   const actionId = hubFocus?.kind === 'action' ? hubFocus.id : openAction?.id
@@ -61,7 +58,7 @@ export function ExecutiveHub({
         selected={hubFocus?.kind === 'briefing'}
         onSelect={(prompt) => onFocus({ kind: 'briefing', id: 'briefing', title: 'Nox AI briefing' }, prompt)}
         onOpenSource={onOpenSource}
-        onPrimary={closed ? onOpenBoard : () => onOpenGap('overview')}
+        onPrimary={() => onOpenSource('risk-002')}
       />
       <PriorityActions
         selectedId={actionId}

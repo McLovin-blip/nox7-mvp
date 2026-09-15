@@ -24,7 +24,7 @@ export function PositionStrip({
                 kind: 'indicator',
                 id: item.id,
                 title: item.label,
-                recordId: item.id === 'gaps' ? 'ctl-supplier-assurance' : undefined,
+                recordId: item.id === 'gaps' ? 'risk-002' : undefined,
               },
               item.askPrompt,
             )

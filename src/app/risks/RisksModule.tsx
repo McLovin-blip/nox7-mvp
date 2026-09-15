@@ -783,25 +783,30 @@ function RiskDetail({
         <h1>{risk.title}</h1>
         <div className="risk-pill-row">
           <Pill className={`sev-${risk.severity}`}>{severityLabel(risk.severity)}</Pill>
-          <Pill className="neutral">{`Residual ${risk.residual.rating}`}</Pill>
-          <Pill className={`appetite-${risk.appetiteStatus}`}>{appetiteLabel(risk.appetiteStatus)}</Pill>
-          <Pill className={`treatment-${risk.treatment.status}`}>{treatmentLabel(risk.treatment.status)}</Pill>
+          <Pill className="neutral">{`Inherent ${risk.inherentLabel}`}</Pill>
+          <Pill className="neutral">{`Residual ${risk.residualLabel}`}</Pill>
+          <Pill className={`appetite-${risk.appetiteStatus}`}>{risk.appetiteLabel}</Pill>
+          <Pill className={`treatment-${risk.treatment.status}`}>{risk.actionStatus}</Pill>
+          {risk.demoFocus ? <Pill className="neutral">Demo focus</Pill> : null}
         </div>
         <div className="risk-detail-meta">
           <span>Owner · {risk.owner}</span>
           <span>Business unit · {risk.businessUnit}</span>
           <span>Next review · {formatDate(risk.nextReview)}</span>
+          <span>
+            Next action · {risk.nextAction} · Due {formatDate(risk.dueDate)}
+          </span>
         </div>
         <p className="risk-ai-hint">{riskContextIntro(risk)}</p>
       </header>
 
       <div className="risk-metric-row">
-        <Metric label="Inherent risk" score={risk.inherent.score} rating={risk.inherent.rating} />
-        <Metric label="Residual risk" score={risk.residual.score} rating={risk.residual.rating} />
+        <Metric label="Inherent risk" score={risk.inherentLabel} rating={`${risk.inherent.score}`} />
+        <Metric label="Residual risk" score={risk.residualLabel} rating={`${risk.residual.score}`} />
         <Metric label="Target risk" score={risk.target.score} rating={risk.target.rating} />
-        <Metric label="Appetite" score={appetiteLabel(risk.appetiteStatus)} />
+        <Metric label="Appetite" score={risk.appetiteLabel} />
         <Metric label="Control coverage" score={coverageLabel(risk.controlCoverage)} />
-        <Metric label="Compliance impact" score={`${risk.obligationIds.length} obligations`} />
+        <Metric label="Next action" score={risk.actionStatus} rating={formatDate(risk.dueDate)} />
         <Metric label="Treatment" score={`${risk.treatment.progress}%`} rating={treatmentLabel(risk.treatment.status)} />
       </div>
 
@@ -828,6 +833,10 @@ function RiskDetail({
               <h2>Risk statement</h2>
             </header>
             <div className="risk-statement">
+              <div>
+                <h3>What could happen</h3>
+                <p>{risk.whatCouldHappen}</p>
+              </div>
               <div>
                 <h3>Cause</h3>
                 <p>{risk.cause}</p>
@@ -867,8 +876,17 @@ function RiskDetail({
                 </dd>
               </div>
               <div>
-                <dt>Status</dt>
-                <dd>{risk.level}</dd>
+                <dt>Appetite</dt>
+                <dd>{risk.appetiteLabel}</dd>
+              </div>
+              <div>
+                <dt>Next action</dt>
+                <dd>
+                  {risk.nextAction}
+                  <small>
+                    Due {formatDate(risk.dueDate)} · {risk.actionStatus}
+                  </small>
+                </dd>
               </div>
               <div>
                 <dt>Last assessment</dt>
@@ -878,12 +896,46 @@ function RiskDetail({
                 <dt>Next review</dt>
                 <dd>{formatDate(risk.nextReview)}</dd>
               </div>
-              <div>
-                <dt>Updated</dt>
-                <dd>{formatDate(risk.updatedAt)}</dd>
-              </div>
             </dl>
           </section>
+          {risk.demoFocus ? (
+            <section className="risk-card">
+              <header>
+                <h2>Connected protections</h2>
+                <p>Open controls or evidence without leaving this risk walkthrough.</p>
+              </header>
+              <p>{controls[0]?.purposeBlurb || risk.contributingGap}</p>
+              <ul className="risk-link-list">
+                {controls.map((item) => (
+                  <li key={item.id}>
+                    <button type="button" onClick={() => go('controls', item.id)}>
+                      <div>
+                        <strong>
+                          {item.code} · {item.title}
+                        </strong>
+                        <em>{item.purposeBlurb}</em>
+                      </div>
+                      <div>
+                        <span>{item.effectiveness}</span>
+                        <small>{item.evidenceStatus}</small>
+                      </div>
+                    </button>
+                  </li>
+                ))}
+                {evidence.map((item) => (
+                  <li key={item.id}>
+                    <button type="button" onClick={() => go('evidence', item.id)}>
+                      <div>
+                        <strong>{item.title}</strong>
+                        <em>{item.resultOrGap ?? item.freshness}</em>
+                      </div>
+                      <span>{item.statusLabel ?? item.freshness}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
         </div>
       ) : null}
 
@@ -902,13 +954,17 @@ function RiskDetail({
           </div>
           <div className="risk-appetite-panel">
             <h3>Risk appetite</h3>
-            <Pill className={`appetite-${risk.appetiteStatus}`}>{appetiteLabel(risk.appetiteStatus)}</Pill>
+            <Pill className={`appetite-${risk.appetiteStatus}`}>{risk.appetiteLabel}</Pill>
             <p>
               {risk.appetiteStatus === 'above'
                 ? 'Residual exposure is outside the approved appetite and needs active treatment.'
                 : risk.appetiteStatus === 'near'
                   ? 'Residual exposure is close to appetite and should remain under close review.'
                   : 'Residual exposure is currently within the approved appetite.'}
+            </p>
+            <p>
+              Next action: {risk.nextAction} · Owner {risk.owner} · Due {formatDate(risk.dueDate)} ·{' '}
+              {risk.actionStatus}
             </p>
           </div>
         </section>
@@ -947,9 +1003,11 @@ function RiskDetail({
                 <li key={item.id}>
                   <button type="button" onClick={() => go('controls', item.id)}>
                     <div>
-                      <strong>{item.title}</strong>
+                      <strong>
+                        {item.code} · {item.title}
+                      </strong>
                       <em>
-                        {item.id} · {item.owner}
+                        {item.purposeBlurb || `${item.id} · ${item.owner}`}
                       </em>
                     </div>
                     <div>
@@ -996,10 +1054,11 @@ function RiskDetail({
                     <div>
                       <strong>{item.title}</strong>
                       <em>
-                        {item.id} · {item.date ? formatDate(item.date) : 'n/a'}
+                        {item.resultOrGap ?? item.id}
+                        {item.date ? ` · ${formatDate(item.date)}` : ''}
                       </em>
                     </div>
-                    <span>{item.freshness}</span>
+                    <span>{item.statusLabel ?? item.freshness}</span>
                   </button>
                 </li>
               ))}

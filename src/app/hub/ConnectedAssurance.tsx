@@ -53,13 +53,13 @@ export function ConnectedAssurance({
                     title: item.title,
                     recordId:
                       item.id === 'controls'
-                        ? 'ctl-supplier-assurance'
+                        ? 'ctl-005'
                         : item.id === 'evidence'
                           ? view.position === 'after'
-                            ? 'ev-supplier-assessments-2026'
-                            : 'ev-audit-findings'
+                            ? 'evd-006'
+                            : 'evd-005'
                           : item.id === 'risks'
-                            ? 'risk-third-party'
+                            ? 'risk-002'
                             : item.id === 'obligations'
                               ? 'obl-iso-a532'
                               : undefined,

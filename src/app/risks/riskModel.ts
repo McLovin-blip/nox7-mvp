@@ -72,16 +72,26 @@ export type RiskRecord = {
     actions: RiskAction[]
   }
   history: { date: string; text: string }[]
+  whatCouldHappen: string
+  nextAction: string
+  dueDate: string
+  actionStatus: string
+  appetiteLabel: string
+  inherentLabel: string
+  residualLabel: string
+  demoFocus: boolean
 }
 
 export type LinkedControl = {
   id: string
   title: string
+  code: string
   effectiveness: string
   tone: 'assured' | 'partial' | 'attention'
   owner: string
   evidenceStatus: string
   testingStatus: string
+  purposeBlurb: string
 }
 
 export type LinkedObligation = {
@@ -99,6 +109,8 @@ export type LinkedEvidence = {
   freshness: string
   tone: 'assured' | 'partial' | 'attention'
   date: string
+  statusLabel?: string
+  resultOrGap?: string
 }
 
 export type RiskFilters = {
@@ -299,12 +311,23 @@ export function buildRiskRecords(position: PositionState): RiskRecord[] {
         date: entry.date,
         text: pick(entry.textBefore, entry.textAfter, position),
       })),
+      whatCouldHappen: item.whatCouldHappen ?? item.businessImpact,
+      nextAction: item.nextAction ?? treatment.latestUpdateBefore,
+      dueDate: item.dueDate ?? treatment.targetDate,
+      actionStatus: item.actionStatus ?? 'Open',
+      appetiteLabel:
+        item.appetiteLabel ??
+        appetiteLabel(asAppetite(pick(item.appetiteStatusBefore, item.appetiteStatusAfter, position))),
+      inherentLabel: item.inherentLabel ?? item.inherent.rating,
+      residualLabel: item.residualLabel ?? residual.rating,
+      demoFocus: Boolean(item.demoFocus),
     }
   })
 }
 
 export function rankRisk(risk: RiskRecord) {
   let score = risk.residual.score
+  if (risk.demoFocus || risk.id === data.demo.focusRiskId) score += 1000
   score += severityRank[risk.severity] * 8
   if (risk.appetiteStatus === 'above') score += 18
   else if (risk.appetiteStatus === 'near') score += 8
@@ -413,17 +436,20 @@ export function buildRiskSummary(risks: RiskRecord[]) {
 export type RiskSummary = ReturnType<typeof buildRiskSummary>
 
 export function linkedControlsFor(risk: RiskRecord, position: PositionState): LinkedControl[] {
+  const focusBlurb = risk.demoFocus || risk.id === data.demo.focusRiskId ? data.demo.controlBlurb : ''
   return risk.controlIds.map((id) => {
     const control = data.controls.find((item) => item.id === id)
     if (!control) {
       return {
         id,
         title: id,
+        code: id.toUpperCase(),
         effectiveness: 'Unknown',
         tone: 'partial',
         owner: '',
         evidenceStatus: 'Unknown',
         testingStatus: 'Unknown',
+        purposeBlurb: focusBlurb,
       }
     }
     const assurance = position === 'after' ? control.assuranceAfter : control.assuranceBefore
@@ -434,11 +460,13 @@ export function linkedControlsFor(risk: RiskRecord, position: PositionState): Li
     return {
       id,
       title: control.title,
-      effectiveness: assurance === 'assured' ? 'Effective' : 'Partially effective',
+      code: control.code,
+      effectiveness: control.effectivenessLabel ?? (assurance === 'assured' ? 'Effective' : 'Partially effective'),
       tone: assurance === 'assured' ? 'assured' : 'partial',
       owner: personLabel(control.ownerId),
       evidenceStatus: missing ? 'Evidence missing' : expired ? 'Evidence expired' : evidenceIds.length ? 'Evidence current' : 'No evidence linked',
       testingStatus: assurance === 'assured' ? 'Testing current' : 'Testing due',
+      purposeBlurb: control.purpose ?? focusBlurb,
     }
   })
 }
@@ -498,12 +526,12 @@ export function linkedEvidenceFor(risk: RiskRecord, position: PositionState): Li
         freshness: 'Missing',
         tone: 'attention',
         date: evidence.date,
+        statusLabel: evidence.statusLabel,
+        resultOrGap: evidence.resultOrGap ?? evidence.summary,
       }
     }
-    const superseded = position === 'after' && evidence.id === 'ev-supplier-assessments-2023'
-    const freshness = superseded
-      ? 'Superseded'
-      : evidence.freshness === 'expired'
+    const freshness =
+      evidence.freshness === 'expired'
         ? 'Expired'
         : evidence.freshness === 'expiring'
           ? 'Expiring'
@@ -512,8 +540,10 @@ export function linkedEvidenceFor(risk: RiskRecord, position: PositionState): Li
       id,
       title: evidence.title,
       freshness,
-      tone: freshness === 'Current' ? 'assured' : freshness === 'Expiring' || freshness === 'Superseded' ? 'partial' : 'attention',
+      tone: freshness === 'Current' ? 'assured' : freshness === 'Expiring' ? 'partial' : 'attention',
       date: evidence.date,
+      statusLabel: evidence.statusLabel,
+      resultOrGap: evidence.resultOrGap ?? evidence.summary,
     }
   })
 }
@@ -555,6 +585,9 @@ export function filterRisks(risks: RiskRecord[], filters: RiskFilters) {
 
 export function sortRisks(risks: RiskRecord[], sortKey: RiskSortKey, direction: 'asc' | 'desc') {
   return [...risks].sort((a, b) => {
+    const aFocus = a.demoFocus || a.id === data.demo.focusRiskId ? 1 : 0
+    const bFocus = b.demoFocus || b.id === data.demo.focusRiskId ? 1 : 0
+    if (aFocus !== bFocus) return bFocus - aFocus
     let cmp = 0
     if (sortKey === 'residual') cmp = a.residual.score - b.residual.score
     else if (sortKey === 'severity') cmp = severityRank[a.severity] - severityRank[b.severity]

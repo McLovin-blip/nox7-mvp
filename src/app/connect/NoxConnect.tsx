@@ -263,6 +263,60 @@ export function NoxConnect
         </div>
       </section>
 
+      <section className="connect-card connect-story" aria-label="Focused phishing relationship">
+        <header className="connect-section-head">
+          <div>
+            <h2>Focused relationship</h2>
+            <p>
+              {model.relationshipStrip.story} — {model.relationshipStrip.risk.code} →{' '}
+              {model.relationshipStrip.controls.map((item) => item.code).join(' / ')} →{' '}
+              {model.relationshipStrip.evidence.map((item) => item.code).join(' / ')}
+            </p>
+          </div>
+        </header>
+        <p className="connect-story-blurb">{model.relationshipStrip.controlBlurb}</p>
+        <div className="connect-story-track">
+          <button type="button" className="connect-story-node" onClick={() => onNavigate(model.relationshipStrip.risk.navigate)}>
+            <span>{model.relationshipStrip.risk.kind}</span>
+            <strong>
+              {model.relationshipStrip.risk.code} · {model.relationshipStrip.risk.title}
+            </strong>
+            <em>{model.relationshipStrip.risk.summary}</em>
+            {model.relationshipStrip.risk.status ? <i>{model.relationshipStrip.risk.status}</i> : null}
+          </button>
+          <span className="connect-pipe-arrow" aria-hidden="true">
+            →
+          </span>
+          <div className="connect-story-group">
+            {model.relationshipStrip.controls.map((control) => (
+              <button key={control.id} type="button" className="connect-story-node" onClick={() => onNavigate(control.navigate)}>
+                <span>{control.kind}</span>
+                <strong>
+                  {control.code} · {control.title}
+                </strong>
+                <em>{control.summary}</em>
+                {control.status ? <i>{control.status}</i> : null}
+              </button>
+            ))}
+          </div>
+          <span className="connect-pipe-arrow" aria-hidden="true">
+            →
+          </span>
+          <div className="connect-story-group">
+            {model.relationshipStrip.evidence.map((evidence) => (
+              <button key={evidence.id} type="button" className="connect-story-node" onClick={() => onNavigate(evidence.navigate)}>
+                <span>{evidence.kind}</span>
+                <strong>
+                  {evidence.code} · {evidence.title}
+                </strong>
+                <em>{evidence.summary}</em>
+                {evidence.status ? <i>{evidence.status}</i> : null}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="connect-row-3" aria-label="Exposure and priorities">
         <article className="connect-card">
           <header className="connect-section-head tight">
