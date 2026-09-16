@@ -1,12 +1,14 @@
 .risk-page,
 .risk-detail {
-  padding: 24px 24px 96px;
+  padding: 24px 24px 32px;
   display: grid;
   gap: 20px;
   color: var(--text-primary);
   min-width: 0;
   max-width: 100%;
   overflow-x: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .risk-page-head,
@@ -168,7 +170,6 @@
 .risk-bars,
 .risk-frameworks,
 .risk-emerging,
-.risk-top-list,
 .risk-link-list,
 .risk-action-list,
 .risk-history {
@@ -186,7 +187,6 @@
 
 .risk-bars button,
 .risk-emerging button,
-.risk-top-row,
 .risk-link-list button {
   width: 100%;
   appearance: none;
@@ -236,7 +236,6 @@
 
 .risk-frameworks li,
 .risk-emerging li button,
-.risk-top-row,
 .risk-link-list li button,
 .risk-action-list li {
   border: 1px solid var(--border-default);
@@ -245,37 +244,22 @@
   background: var(--bg-surface-2);
 }
 
-.risk-top-list {
-  display: grid;
-  gap: 8px;
-}
-
-.risk-top-row {
-  display: grid;
-  grid-template-columns: 28px minmax(0, 1fr) auto;
+.risk-priority-panel {
+  width: 100%;
+  min-width: 0;
   gap: 12px;
-  align-items: center;
 }
 
-.risk-top-row b {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--accent-soft);
-  color: var(--accent-secondary);
-  font-size: 12px;
+.risk-priority-panel > .risk-register-head {
+  margin: 0;
 }
 
-.risk-top-row strong,
 .risk-emerging strong,
 .risk-link-list strong,
 .risk-action-list strong {
   display: block;
 }
 
-.risk-top-row em,
 .risk-emerging em,
 .risk-link-list em,
 .risk-action-list em,
@@ -291,6 +275,8 @@
 .risk-register {
   display: grid;
   gap: 12px;
+  width: 100%;
+  min-width: 0;
 }
 
 .risk-register-head {
@@ -298,6 +284,14 @@
   justify-content: space-between;
   gap: 16px;
   align-items: end;
+}
+
+.risk-register-head em {
+  flex: 0 0 auto;
+  font-style: normal;
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
 }
 
 .risk-toolbar {
@@ -335,6 +329,7 @@
 .risk-table-wrap {
   min-width: 0;
   max-width: 100%;
+  width: 100%;
   overflow-x: auto;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
@@ -345,6 +340,11 @@
   width: 100%;
   border-collapse: collapse;
   min-width: 1080px;
+  table-layout: fixed;
+}
+
+.risk-table-priority {
+  min-width: 980px;
 }
 
 .risk-table th,
@@ -352,8 +352,10 @@
   padding: 12px 14px;
   border-bottom: 1px solid var(--border-default);
   text-align: left;
-  vertical-align: top;
+  vertical-align: middle;
   font-size: 13px;
+  line-height: 1.4;
+  word-break: break-word;
 }
 
 .risk-table th {
@@ -362,6 +364,8 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   background: var(--bg-surface-2);
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .risk-table th button {
@@ -370,6 +374,7 @@
   background: transparent;
   color: inherit;
   font: inherit;
+  font-weight: inherit;
   text-transform: inherit;
   letter-spacing: inherit;
   padding: 0;
@@ -377,14 +382,131 @@
 
 .risk-table tbody tr {
   cursor: pointer;
+  height: 56px;
 }
 
 .risk-table tbody tr:hover {
   background: var(--bg-hover);
 }
 
+.risk-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
 .risk-table strong {
   display: block;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.risk-table td:first-child strong,
+.risk-table-priority td:nth-child(2) strong {
+  color: var(--text-primary);
+}
+
+.risk-table small {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.risk-rank-cell {
+  width: 48px;
+}
+
+.risk-rank-cell b {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--accent-soft);
+  color: var(--accent-secondary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Shared column proportions — Risk Register */
+.risk-table:not(.risk-table-priority) th:nth-child(1),
+.risk-table:not(.risk-table-priority) td:nth-child(1) {
+  width: 18%;
+}
+
+.risk-table:not(.risk-table-priority) th:nth-child(2),
+.risk-table:not(.risk-table-priority) td:nth-child(2) {
+  width: 9%;
+}
+
+.risk-table:not(.risk-table-priority) th:nth-child(3),
+.risk-table:not(.risk-table-priority) td:nth-child(3) {
+  width: 11%;
+}
+
+.risk-table:not(.risk-table-priority) th:nth-child(4),
+.risk-table:not(.risk-table-priority) td:nth-child(4),
+.risk-table:not(.risk-table-priority) th:nth-child(5),
+.risk-table:not(.risk-table-priority) td:nth-child(5),
+.risk-table:not(.risk-table-priority) th:nth-child(6),
+.risk-table:not(.risk-table-priority) td:nth-child(6),
+.risk-table:not(.risk-table-priority) th:nth-child(7),
+.risk-table:not(.risk-table-priority) td:nth-child(7) {
+  width: 8%;
+}
+
+.risk-table:not(.risk-table-priority) th:nth-child(8),
+.risk-table:not(.risk-table-priority) td:nth-child(8) {
+  width: 9%;
+}
+
+.risk-table:not(.risk-table-priority) th:nth-child(9),
+.risk-table:not(.risk-table-priority) td:nth-child(9) {
+  width: 8%;
+}
+
+.risk-table:not(.risk-table-priority) th:nth-child(10),
+.risk-table:not(.risk-table-priority) td:nth-child(10) {
+  width: 8%;
+}
+
+.risk-table:not(.risk-table-priority) th:nth-child(11),
+.risk-table:not(.risk-table-priority) td:nth-child(11) {
+  width: 8%;
+}
+
+/* Priority table — same shared fields, rank column first */
+.risk-table-priority th:nth-child(2),
+.risk-table-priority td:nth-child(2) {
+  width: 22%;
+}
+
+.risk-table-priority th:nth-child(3),
+.risk-table-priority td:nth-child(3) {
+  width: 12%;
+}
+
+.risk-table-priority th:nth-child(4),
+.risk-table-priority td:nth-child(4),
+.risk-table-priority th:nth-child(5),
+.risk-table-priority td:nth-child(5),
+.risk-table-priority th:nth-child(6),
+.risk-table-priority td:nth-child(6),
+.risk-table-priority th:nth-child(7),
+.risk-table-priority td:nth-child(7) {
+  width: 9%;
+}
+
+.risk-table-priority th:nth-child(8),
+.risk-table-priority td:nth-child(8) {
+  width: 10%;
+}
+
+.risk-table-priority th:nth-child(9),
+.risk-table-priority td:nth-child(9),
+.risk-table-priority th:nth-child(10),
+.risk-table-priority td:nth-child(10) {
+  width: 9%;
 }
 
 .risk-empty {
@@ -597,7 +719,7 @@
 @media (max-width: 820px) {
   .risk-page,
   .risk-detail {
-    padding: 18px 16px 96px;
+    padding: 18px 16px 24px;
   }
 
   .risk-kpi-row,
@@ -609,12 +731,9 @@
     grid-template-columns: 1fr;
   }
 
-  .risk-top-row {
-    grid-template-columns: 28px minmax(0, 1fr);
-  }
-
-  .risk-top-row .risk-pill-row {
-    grid-column: 2;
+  .risk-register-head {
+    flex-direction: column;
+    align-items: start;
   }
 }
 
@@ -625,8 +744,6 @@
 .risk-bars button:focus-visible,
 .risk-frameworks button:hover,
 .risk-frameworks button:focus-visible,
-.risk-top-row:hover,
-.risk-top-row:focus-visible,
 .risk-emerging-main:hover,
 .risk-emerging-main:focus-visible,
 .risk-coverage-hero:hover,
@@ -641,7 +758,6 @@
 .risk-kpi:focus-visible,
 .risk-bars button:focus-visible,
 .risk-frameworks button:focus-visible,
-.risk-top-row:focus-visible,
 .risk-pill:focus-visible,
 .risk-ghost-btn:focus-visible,
 .risk-coverage-hero:focus-visible,

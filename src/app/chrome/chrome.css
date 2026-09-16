@@ -15,6 +15,11 @@
   --sidebar-width: var(--sidebar-collapsed-width);
 }
 
+/* Hover peek expands the reserved rail so content gently reflows beside it */
+.shell.is-sidebar-collapsed.is-sidebar-peek {
+  --sidebar-width: var(--sidebar-expanded-width);
+}
+
 .shell.is-ai-open {
   --nox-panel-width: calc(var(--nox-rail-width) + 24px);
 }
@@ -41,11 +46,6 @@
     width 260ms cubic-bezier(0.22, 1, 0.36, 1),
     min-width 260ms cubic-bezier(0.22, 1, 0.36, 1),
     max-width 260ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* Hover peek: freeze slot width transitions so the page does not reflow */
-.shell.is-sidebar-peek .rail-slot {
-  transition: none;
 }
 
 .nox-slot {
@@ -76,17 +76,6 @@
   border-right: 1px solid rgba(255, 255, 255, 0.06);
   color: #e8e8f2;
   box-sizing: border-box;
-}
-
-.shell.is-sidebar-collapsed.is-sidebar-peek .rail {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: var(--sidebar-expanded-width);
-  z-index: 90;
-  box-shadow: var(--shadow-panel);
-  padding: 18px 12px 14px;
 }
 
 /* —— Collapsed icon-only rail —— */
@@ -338,14 +327,64 @@
   z-index: 1;
 }
 
+.ask-nox-launcher {
+  appearance: none;
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 18px 4px 4px;
+  border-radius: 999px;
+  border: 1px solid var(--accent-line);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-fab);
+  cursor: pointer;
+  font-family: 'Space Grotesk', Inter, sans-serif;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.ask-nox-launcher:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-primary);
+}
+
+.ask-nox-launcher:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.ask-nox-owl {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail-slot,
+  .nox-slot {
+    transition: none;
+  }
+}
+
 .mobile-nav {
   display: none;
 }
 
 .top {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   padding: 0 20px;
   border-bottom: 1px solid var(--border-default);
@@ -360,46 +399,7 @@
   min-width: 0;
   display: flex;
   justify-content: flex-start;
-}
-
-.top-center {
-  display: flex;
-  justify-content: center;
-  justify-self: center;
-}
-
-.top-ask-nox {
-  appearance: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 36px;
-  padding: 4px 14px 4px 4px;
-  border-radius: 999px;
-  border: 1px solid var(--accent-line);
-  background: var(--bg-elevated);
-  color: var(--text-primary);
-  box-shadow: var(--shadow-fab);
-  cursor: pointer;
-  font-family: 'Space Grotesk', Inter, sans-serif;
-  font-size: 13px;
-  font-weight: 650;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-}
-
-.top-ask-nox:hover,
-.top-ask-nox.is-active {
-  background: var(--accent-soft);
-  border-color: var(--accent-primary);
-}
-
-.top-ask-owl {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
 }
 
 .top-search {
@@ -563,7 +563,6 @@
   min-width: 0;
   position: relative;
   z-index: 1;
-  justify-self: end;
 }
 
 .top-chip {
@@ -742,6 +741,12 @@
   overflow: auto;
   overflow-x: hidden;
   position: relative;
+  /* Keep page actions / table footers clear of the floating Ask Nox launcher */
+  padding-bottom: 72px;
+}
+
+.shell.is-ai-open .shell-body {
+  padding-bottom: 24px;
 }
 
 .top button:focus-visible,
@@ -826,24 +831,18 @@
     height: auto;
     min-height: var(--header-height);
     padding: 10px 14px;
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas:
-      'ask meta'
-      'search search';
+    flex-wrap: wrap;
     gap: 10px 12px;
   }
 
   .top-start {
-    grid-area: search;
-  }
-
-  .top-center {
-    grid-area: ask;
-    justify-self: start;
+    order: 2;
+    flex: 1 1 100%;
   }
 
   .top-meta {
-    grid-area: meta;
+    order: 1;
+    margin-left: auto;
   }
 
   .top-search {

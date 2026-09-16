@@ -102,14 +102,20 @@ export function AppShell({
         />
       </div>
       <div className="shell-main">
-        <TopBar
-          aiOpen={aiOpen}
-          onAskNox={onAskNox}
-          onNotification={onNotification}
-          onSearchResult={onSearchResult}
-        />
+        <TopBar onNotification={onNotification} onSearchResult={onSearchResult} />
         <MobileNav module={module} onModule={onModule} />
         <div className="shell-body">{children}</div>
+        {!aiOpen ? (
+          <button
+            type="button"
+            className="ask-nox-launcher"
+            aria-label="Ask Nox AI"
+            onClick={onAskNox}
+          >
+            <Owl className="ask-nox-owl" />
+            <span>Ask Nox</span>
+          </button>
+        ) : null}
       </div>
       <div className={`nox-slot${aiOpen ? ' is-open' : ''}`} aria-hidden={!aiOpen}>
         {ai}
@@ -347,13 +353,9 @@ function MobileNav({
 }
 
 function TopBar({
-  aiOpen,
-  onAskNox,
   onNotification,
   onSearchResult,
 }: {
-  aiOpen: boolean
-  onAskNox: () => void
   onNotification: (item: HubNotification) => void
   onSearchResult: (result: { module: ModuleId; id: string; type: GlobalSearchResult['type'] }) => void
 }) {
@@ -394,19 +396,6 @@ function TopBar({
             onSearchResult(result)
           }}
         />
-      </div>
-
-      <div className="top-center">
-        <button
-          type="button"
-          className={`top-ask-nox${aiOpen ? ' is-active' : ''}`}
-          aria-label="Ask Nox AI"
-          aria-expanded={aiOpen}
-          onClick={onAskNox}
-        >
-          <Owl className="top-ask-owl" />
-          <span>Ask Nox</span>
-        </button>
       </div>
 
       <div className="top-meta">

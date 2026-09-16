@@ -326,30 +326,72 @@ function ExecutiveSummary({
 
       <ComplianceImpactPanel risks={risks} position={position} onOpenRisk={onOpenRisk} onNavigate={onNavigate} />
 
-      <section className="risk-card">
-        <header>
-          <h2>Top risks requiring attention</h2>
-          <p>Ranked by residual exposure, appetite, control weakness, treatment pressure and compliance impact.</p>
+      <section className="risk-card risk-priority-panel">
+        <header className="risk-register-head">
+          <div>
+            <h2>Top risks requiring attention</h2>
+            <p>Ranked by residual exposure, appetite, control weakness, treatment pressure and compliance impact.</p>
+          </div>
+          <em>
+            Showing {summary.topRisks.length} priority risk{summary.topRisks.length === 1 ? '' : 's'}
+          </em>
         </header>
-        <div className="risk-top-list">
-          {summary.topRisks.map((item, index) => (
-            <button key={item.id} type="button" className="risk-top-row" onClick={() => onOpenRisk(item.id)}>
-              <b>{index + 1}</b>
-              <div>
-                <strong>{item.title}</strong>
-                <em>
-                  {item.businessUnit} · Residual {item.residual.score} (
-                  <span className={riskRatingClass(item.residual.rating)}>{item.residual.rating}</span>) ·{' '}
-                  {treatmentLabel(item.treatment.status)}
-                </em>
-              </div>
-              <div className="risk-pill-row">
-                <Pill className={`sev-${item.severity}`}>{severityLabel(item.severity)}</Pill>
-                <Pill className={`appetite-${item.appetiteStatus}`}>{appetiteLabel(item.appetiteStatus)}</Pill>
-                <Pill className={`coverage-${item.controlCoverage}`}>{coverageLabel(item.controlCoverage)}</Pill>
-              </div>
-            </button>
-          ))}
+        <div className="risk-table-wrap">
+          <table className="risk-table risk-table-priority">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Risk</th>
+                <th scope="col">Business unit</th>
+                <th scope="col">Severity</th>
+                <th scope="col">Residual</th>
+                <th scope="col">Appetite</th>
+                <th scope="col">Coverage</th>
+                <th scope="col">Treatment</th>
+                <th scope="col">Owner</th>
+                <th scope="col">Next review</th>
+              </tr>
+            </thead>
+            <tbody>
+              {summary.topRisks.map((item, index) => (
+                <tr key={item.id} onClick={() => onOpenRisk(item.id)}>
+                  <td className="risk-rank-cell">
+                    <b>{index + 1}</b>
+                  </td>
+                  <td>
+                    <strong>{item.title}</strong>
+                    <small>{item.code}</small>
+                  </td>
+                  <td>{item.businessUnit}</td>
+                  <td>
+                    <Pill className={`sev-${item.severity}`}>{severityLabel(item.severity)}</Pill>
+                  </td>
+                  <td>
+                    <strong>{item.residual.score}</strong>
+                    <small className={riskRatingClass(item.residual.rating)}>{item.residual.rating}</small>
+                  </td>
+                  <td>
+                    <Pill className={`appetite-${item.appetiteStatus}`}>{appetiteLabel(item.appetiteStatus)}</Pill>
+                  </td>
+                  <td>
+                    <Pill className={`coverage-${item.controlCoverage}`}>{coverageLabel(item.controlCoverage)}</Pill>
+                  </td>
+                  <td>
+                    <Pill className={`treatment-${item.treatment.status}`}>{treatmentLabel(item.treatment.status)}</Pill>
+                    <small>{item.treatment.progress}%</small>
+                  </td>
+                  <td>{item.owner}</td>
+                  <td>{formatDate(item.nextReview)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {summary.topRisks.length === 0 ? (
+            <div className="risk-empty-state">
+              <strong>No priority risks</strong>
+              <p>There are no risks currently ranked for executive attention.</p>
+            </div>
+          ) : null}
         </div>
       </section>
     </div>
