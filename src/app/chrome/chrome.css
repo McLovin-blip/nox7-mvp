@@ -1,9 +1,8 @@
 .shell {
   --sidebar-width: var(--sidebar-expanded-width);
-  --nox-panel-width: 0px;
   height: 100svh;
   display: grid;
-  grid-template-columns: var(--sidebar-width) minmax(0, 1fr) var(--nox-panel-width);
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   background: var(--bg-app);
   color: var(--text-primary);
   transition: grid-template-columns 260ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -16,8 +15,9 @@
   --sidebar-width: var(--sidebar-collapsed-width);
 }
 
-.shell.is-ai-open {
-  --nox-panel-width: min(var(--nox-rail-width), 42vw);
+/* Hover peek must not change grid columns or animate page width */
+.shell.is-sidebar-peek {
+  transition: none;
 }
 
 .shell.is-ai-open .top-chip.subtle {
@@ -28,9 +28,18 @@
   display: none;
 }
 
+/* Slot always occupies the grid column so absolute peek never steals layout space */
+.rail-slot {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  z-index: 60;
+}
+
 .rail {
   display: flex;
   flex-direction: column;
+  height: 100%;
   min-height: 0;
   min-width: 0;
   width: 100%;
@@ -38,11 +47,7 @@
   background: var(--bg-sidebar);
   border-right: 1px solid rgba(255, 255, 255, 0.06);
   color: #e8e8f2;
-  z-index: 60;
-  transition:
-    width 220ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 220ms ease,
-    padding 220ms ease;
+  box-sizing: border-box;
 }
 
 .shell.is-sidebar-collapsed.is-sidebar-peek .rail {
@@ -51,6 +56,7 @@
   top: 0;
   bottom: 0;
   width: var(--sidebar-expanded-width);
+  z-index: 90;
   box-shadow: var(--shadow-panel);
 }
 
@@ -71,7 +77,10 @@
 }
 
 .rail.is-icon-only .rail-brand {
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
+  gap: 4px;
   padding-left: 0;
   padding-right: 0;
 }
@@ -81,9 +90,8 @@
 }
 
 .rail.is-icon-only .rail-toggle {
-  position: absolute;
-  top: 14px;
-  right: 8px;
+  position: static;
+  margin: 8px auto 0;
 }
 
 .rail.is-icon-only .rail-item {
@@ -122,6 +130,11 @@
 
 .rail-toggle:hover {
   background: rgba(139, 111, 232, 0.2);
+}
+
+.rail-toggle:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
 .rail-owl {
@@ -625,10 +638,6 @@
 }
 
 @media (max-width: 1280px) {
-  .shell.is-ai-open {
-    --nox-rail-width: 360px;
-  }
-
   .top-chip.subtle {
     display: none;
   }
@@ -636,14 +645,12 @@
 
 @media (max-width: 1100px) {
   .shell,
-  .shell.is-ai-open,
   .shell.is-sidebar-collapsed,
-  .shell.is-sidebar-collapsed.is-ai-open {
+  .shell.is-sidebar-collapsed.is-sidebar-peek {
     grid-template-columns: minmax(0, 1fr);
-    --nox-panel-width: 0px;
   }
 
-  .rail {
+  .rail-slot {
     display: none;
   }
 

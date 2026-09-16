@@ -88,15 +88,17 @@ export function AppShell({
 
   return (
     <div className={shellClass}>
-      <Sidebar
-        module={module}
-        onModule={onModule}
-        collapsed={collapsedPreferred}
-        peeking={peeking}
-        onToggle={toggleCollapsed}
-        onPointerEnter={onRailEnter}
-        onPointerLeave={onRailLeave}
-      />
+      <div className="rail-slot">
+        <Sidebar
+          module={module}
+          onModule={onModule}
+          collapsed={collapsedPreferred}
+          peeking={peeking}
+          onToggle={toggleCollapsed}
+          onPointerEnter={onRailEnter}
+          onPointerLeave={onRailLeave}
+        />
+      </div>
       <div className="shell-main">
         <TopBar onNotification={onNotification} onSearchResult={onSearchResult} />
         <MobileNav module={module} onModule={onModule} />

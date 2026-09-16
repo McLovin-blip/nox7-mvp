@@ -704,6 +704,13 @@
   outline-offset: 2px;
 }
 
+@media (max-width: 1480px) {
+  .strip,
+  .coverage-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 @media (max-width: 1280px) {
   .strip,
   .coverage-grid,
