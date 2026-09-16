@@ -23,6 +23,7 @@ export function AppShell({
   onModule,
   onNotification,
   onSearchResult,
+  onAskNox,
   aiOpen = false,
   ai,
   children,
@@ -31,6 +32,7 @@ export function AppShell({
   onModule: (id: ModuleId) => void
   onNotification: (item: HubNotification) => void
   onSearchResult: (result: { module: ModuleId; id: string; type: GlobalSearchResult['type'] }) => void
+  onAskNox: () => void
   aiOpen?: boolean
   ai?: ReactNode
   children: ReactNode
@@ -87,27 +89,32 @@ export function AppShell({
     .join(' ')
 
   return (
-    <>
-      <div className={shellClass}>
-        <div className="rail-slot">
-          <Sidebar
-            module={module}
-            onModule={onModule}
-            collapsed={collapsedPreferred}
-            peeking={peeking}
-            onToggle={toggleCollapsed}
-            onPointerEnter={onRailEnter}
-            onPointerLeave={onRailLeave}
-          />
-        </div>
-        <div className="shell-main">
-          <TopBar onNotification={onNotification} onSearchResult={onSearchResult} />
-          <MobileNav module={module} onModule={onModule} />
-          <div className="shell-body">{children}</div>
-        </div>
+    <div className={shellClass}>
+      <div className="rail-slot">
+        <Sidebar
+          module={module}
+          onModule={onModule}
+          collapsed={collapsedPreferred}
+          peeking={peeking}
+          onToggle={toggleCollapsed}
+          onPointerEnter={onRailEnter}
+          onPointerLeave={onRailLeave}
+        />
       </div>
-      {ai}
-    </>
+      <div className="shell-main">
+        <TopBar
+          aiOpen={aiOpen}
+          onAskNox={onAskNox}
+          onNotification={onNotification}
+          onSearchResult={onSearchResult}
+        />
+        <MobileNav module={module} onModule={onModule} />
+        <div className="shell-body">{children}</div>
+      </div>
+      <div className={`nox-slot${aiOpen ? ' is-open' : ''}`} aria-hidden={!aiOpen}>
+        {ai}
+      </div>
+    </div>
   )
 }
 
@@ -340,9 +347,13 @@ function MobileNav({
 }
 
 function TopBar({
+  aiOpen,
+  onAskNox,
   onNotification,
   onSearchResult,
 }: {
+  aiOpen: boolean
+  onAskNox: () => void
   onNotification: (item: HubNotification) => void
   onSearchResult: (result: { module: ModuleId; id: string; type: GlobalSearchResult['type'] }) => void
 }) {
@@ -374,14 +385,29 @@ function TopBar({
 
   return (
     <header className="top">
-      <GlobalSearch
-        position={position as PositionState}
-        onOpenResult={(result) => {
-          setNotesOpen(false)
-          setProfileOpen(false)
-          onSearchResult(result)
-        }}
-      />
+      <div className="top-start">
+        <GlobalSearch
+          position={position as PositionState}
+          onOpenResult={(result) => {
+            setNotesOpen(false)
+            setProfileOpen(false)
+            onSearchResult(result)
+          }}
+        />
+      </div>
+
+      <div className="top-center">
+        <button
+          type="button"
+          className={`top-ask-nox${aiOpen ? ' is-active' : ''}`}
+          aria-label="Ask Nox AI"
+          aria-expanded={aiOpen}
+          onClick={onAskNox}
+        >
+          <Owl className="top-ask-owl" />
+          <span>Ask Nox</span>
+        </button>
+      </div>
 
       <div className="top-meta">
         <span className="top-chip">{view.organisation.name}</span>

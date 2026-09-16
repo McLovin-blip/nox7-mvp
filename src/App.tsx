@@ -161,6 +161,7 @@ function AuthenticatedApp() {
         go(result.module, result.id)
       }}
       aiOpen={aiOpen}
+      onAskNox={() => setAiOpen(true)}
       ai={
         <NoxAiPanel
         open={aiOpen}

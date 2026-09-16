@@ -1,89 +1,28 @@
-/* Ask Nox — floating bottom-right popup. Does not reserve shell width. */
+/* Ask Nox — right-side popup that reserves shell space when open. */
 
 .nox-dock {
-  position: fixed;
-  inset: 0;
-  width: 0;
-  height: 0;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
   margin: 0;
   padding: 0;
   overflow: visible;
   pointer-events: none;
-  z-index: 70;
 }
 
-.nox-fab,
-.nox-chat {
+.nox-dock.is-open {
   pointer-events: auto;
 }
 
-.nox-fab {
-  position: fixed;
-  right: 22px;
-  bottom: 22px;
-  left: auto;
-  transform: none;
-  z-index: 70;
-  appearance: none;
-  border: 0;
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  transition:
-    opacity 220ms ease,
-    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
-    visibility 220ms ease;
-}
-
-.nox-fab-pulse {
-  position: absolute;
-  inset: -8px;
-  border-radius: 999px;
-  background: radial-gradient(circle, color-mix(in srgb, var(--accent-primary) 30%, transparent) 0%, transparent 70%);
-  animation: nox-breathe 3.2s ease-in-out infinite;
-  pointer-events: none;
-}
-
-.nox-fab-core {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 48px;
-  padding: 8px 16px 8px 8px;
-  border-radius: 999px;
-  border: 1px solid var(--accent-line);
-  background: var(--bg-elevated);
-  box-shadow: var(--shadow-fab);
-  color: var(--text-primary);
-}
-
-.nox-fab-owl {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.nox-fab-label {
-  font-family: 'Space Grotesk', Inter, sans-serif;
-  font-size: 14px;
-  font-weight: 650;
-  letter-spacing: -0.02em;
-  padding-right: 4px;
-}
-
 .nox-chat {
-  position: fixed;
-  right: 18px;
-  bottom: 18px;
-  top: auto;
-  width: min(420px, calc(100vw - 36px));
-  max-width: 440px;
-  height: min(640px, calc(100svh - 36px));
-  max-height: calc(100svh - 36px);
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  bottom: 12px;
+  width: calc(100% - 24px);
+  max-width: 420px;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto auto;
   min-height: 0;
@@ -94,7 +33,7 @@
   overflow: hidden;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(14px) scale(0.98);
+  transform: translateX(16px);
   pointer-events: none;
   transition:
     transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -102,17 +41,10 @@
     visibility 220ms ease;
 }
 
-.nox-dock.is-open .nox-fab {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transform: translateY(12px) scale(0.9);
-}
-
 .nox-dock.is-open .nox-chat {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0) scale(1);
+  transform: translateX(0);
   pointer-events: auto;
 }
 
@@ -280,7 +212,6 @@
   font-size: 13px;
   line-height: 1.55;
   white-space: pre-wrap;
-  color: var(--text-primary);
 }
 
 .ai-thinking {
@@ -288,15 +219,13 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
   color: var(--text-secondary);
-  font-style: italic;
+  font-size: 13px;
 }
 
 .ai-dots {
   display: inline-flex;
-  gap: 3px;
-  align-items: center;
+  gap: 4px;
 }
 
 .ai-dots i {
@@ -345,7 +274,7 @@
   font-size: 9px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  margin-bottom: 1px;
+  margin-bottom: 2px;
 }
 
 .nox-guides {
@@ -394,6 +323,8 @@
   font-size: 11px;
   cursor: pointer;
   text-align: left;
+  max-width: 100%;
+  white-space: normal;
 }
 
 .nox-action {
@@ -421,35 +352,31 @@
 }
 
 .ai-composer {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
   gap: 8px;
-  align-items: end;
-  padding: 10px 14px 14px;
+  padding: 12px 14px 14px;
   border-top: 1px solid var(--border-default);
   background: var(--bg-surface);
 }
 
 .ai-composer textarea {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 40px;
+  max-height: 96px;
   resize: none;
+  border-radius: 10px;
   border: 1px solid var(--border-default);
-  background: var(--bg-surface-2);
+  background: var(--bg-app);
   color: var(--text-primary);
-  border-radius: 12px;
   padding: 10px 12px;
-  font-size: 13px;
+  font: inherit;
   line-height: 1.4;
-  min-height: 56px;
 }
 
 .ai-composer textarea:focus {
-  outline: 1px solid var(--accent-line);
-  border-color: var(--accent-line);
-}
-
-.ai-composer textarea:disabled {
-  opacity: 0.7;
-  cursor: default;
+  outline: 2px solid var(--accent-line);
+  outline-offset: 1px;
 }
 
 .ai-composer button {
@@ -462,6 +389,7 @@
   font-weight: 650;
   font-size: 12px;
   cursor: pointer;
+  align-self: flex-end;
 }
 
 .ai-composer button:disabled {
@@ -481,18 +409,6 @@
   border: 0;
 }
 
-@keyframes nox-breathe {
-  0%,
-  100% {
-    transform: scale(0.92);
-    opacity: 0.55;
-  }
-  50% {
-    transform: scale(1.08);
-    opacity: 1;
-  }
-}
-
 @keyframes nox-dot {
   0%,
   80%,
@@ -506,51 +422,60 @@
   }
 }
 
+@keyframes nox-breathe {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .nox-fab,
   .nox-chat {
     transition: none;
   }
 
-  .nox-fab-pulse,
   .ai-dots i {
     animation: none;
   }
 }
 
-/* Narrow / tablet: keep a floating popup — no full-app dimmer */
+/* Narrow screens: overlay popup instead of squeezing content */
 @media (max-width: 1100px) {
-  .nox-chat {
-    right: 12px;
-    bottom: 12px;
-    width: min(420px, calc(100vw - 24px));
-    height: min(620px, calc(100svh - 24px));
-    max-height: calc(100svh - 24px);
+  .nox-dock {
+    position: fixed;
+    inset: 0;
+    width: auto;
+    height: auto;
+    z-index: 80;
+    pointer-events: none;
   }
 
-  .nox-fab {
-    right: 16px;
-    bottom: 16px;
+  .nox-dock.is-open {
+    pointer-events: auto;
+    background: color-mix(in srgb, var(--bg-app) 28%, transparent);
+  }
+
+  .nox-chat {
+    top: 12px;
+    right: 12px;
+    bottom: 12px;
+    left: auto;
+    width: min(420px, calc(100vw - 24px));
+    max-width: none;
   }
 }
 
 @media (max-width: 720px) {
-  .nox-fab {
-    right: 12px;
-    bottom: 12px;
-  }
-
-  .nox-fab-label {
-    font-size: 13px;
-  }
-
   .nox-chat {
+    top: 8px;
     right: 8px;
     bottom: 8px;
     left: 8px;
     width: auto;
-    max-width: none;
-    height: min(560px, calc(100svh - 16px));
-    max-height: calc(100svh - 16px);
   }
 }
