@@ -87,25 +87,27 @@ export function AppShell({
     .join(' ')
 
   return (
-    <div className={shellClass}>
-      <div className="rail-slot">
-        <Sidebar
-          module={module}
-          onModule={onModule}
-          collapsed={collapsedPreferred}
-          peeking={peeking}
-          onToggle={toggleCollapsed}
-          onPointerEnter={onRailEnter}
-          onPointerLeave={onRailLeave}
-        />
-      </div>
-      <div className="shell-main">
-        <TopBar onNotification={onNotification} onSearchResult={onSearchResult} />
-        <MobileNav module={module} onModule={onModule} />
-        <div className="shell-body">{children}</div>
+    <>
+      <div className={shellClass}>
+        <div className="rail-slot">
+          <Sidebar
+            module={module}
+            onModule={onModule}
+            collapsed={collapsedPreferred}
+            peeking={peeking}
+            onToggle={toggleCollapsed}
+            onPointerEnter={onRailEnter}
+            onPointerLeave={onRailLeave}
+          />
+        </div>
+        <div className="shell-main">
+          <TopBar onNotification={onNotification} onSearchResult={onSearchResult} />
+          <MobileNav module={module} onModule={onModule} />
+          <div className="shell-body">{children}</div>
+        </div>
       </div>
       {ai}
-    </div>
+    </>
   )
 }
 
