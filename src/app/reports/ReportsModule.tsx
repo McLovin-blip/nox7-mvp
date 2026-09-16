@@ -1,6 +1,10 @@
+import { useMemo } from 'react'
 import { ModuleFrame, Pill } from '../modules/Records.tsx'
 import '../modules/modules.css'
 import { useSession } from '../state/SessionProvider.tsx'
+import { riskRatingClass } from '../ui/riskRating.ts'
+import { TablePagination } from '../ui/TablePagination.tsx'
+import { usePagination } from '../ui/usePagination.ts'
 
 function formatDate(value: string) {
   if (!value) return '—'
@@ -24,6 +28,11 @@ export function ReportsModule({
   const showPhishing = selected?.preview === 'phishing' || (selected?.primary && selected?.preview !== 'board')
   const showBoard = selected?.preview === 'board'
   const phishing = view.phishingPreview
+  const reportPagination = usePagination(view.reports)
+  const controlRows = useMemo(() => phishing?.controls ?? [], [phishing])
+  const evidenceRows = useMemo(() => phishing?.evidence ?? [], [phishing])
+  const controlPagination = usePagination(controlRows)
+  const evidencePagination = usePagination(evidenceRows)
 
   return (
     <ModuleFrame
@@ -36,7 +45,7 @@ export function ReportsModule({
           <span>Available reports</span>
         </header>
         <ul className="report-list">
-          {view.reports.map((item) => (
+          {reportPagination.pageItems.map((item) => (
             <li key={item.id}>
               <div>
                 <strong>{item.title}</strong>
@@ -53,6 +62,18 @@ export function ReportsModule({
             </li>
           ))}
         </ul>
+        <TablePagination
+          page={reportPagination.page}
+          pageSize={reportPagination.pageSize}
+          pageCount={reportPagination.pageCount}
+          total={reportPagination.total}
+          start={reportPagination.start}
+          end={reportPagination.end}
+          canPrev={reportPagination.canPrev}
+          canNext={reportPagination.canNext}
+          onPage={reportPagination.setPage}
+          onPageSize={reportPagination.setPageSize}
+        />
       </section>
 
       {showPhishing && phishing ? (
@@ -71,7 +92,10 @@ export function ReportsModule({
             </p>
             <p>{phishing.risk.whatCouldHappen}</p>
             <p>
-              Inherent {phishing.risk.inherentLabel} · Residual {phishing.risk.residualLabel} ·{' '}
+              Inherent <span className={riskRatingClass(phishing.risk.inherentLabel)}>{phishing.risk.inherentLabel}</span>
+              {' · '}
+              Residual <span className={riskRatingClass(phishing.risk.residualLabel)}>{phishing.risk.residualLabel}</span>
+              {' · '}
               {phishing.risk.appetiteLabel}
             </p>
           </section>
@@ -80,7 +104,7 @@ export function ReportsModule({
             <h3>Controls</h3>
             <p>{phishing.controlBlurb}</p>
             <ul>
-              {phishing.controls.map((control) => (
+              {controlPagination.pageItems.map((control) => (
                 <li key={control.id}>
                   <button type="button" className="cite" onClick={() => onOpenSource(control.id)}>
                     {control.code}
@@ -89,12 +113,24 @@ export function ReportsModule({
                 </li>
               ))}
             </ul>
+            <TablePagination
+              page={controlPagination.page}
+              pageSize={controlPagination.pageSize}
+              pageCount={controlPagination.pageCount}
+              total={controlPagination.total}
+              start={controlPagination.start}
+              end={controlPagination.end}
+              canPrev={controlPagination.canPrev}
+              canNext={controlPagination.canNext}
+              onPage={controlPagination.setPage}
+              onPageSize={controlPagination.setPageSize}
+            />
           </section>
 
           <section className="report-section">
             <h3>Evidence status / findings</h3>
             <ul>
-              {phishing.evidence.map((item) => (
+              {evidencePagination.pageItems.map((item) => (
                 <li key={item.id}>
                   <button type="button" className="cite" onClick={() => onOpenSource(item.id)}>
                     {item.code}
@@ -104,6 +140,18 @@ export function ReportsModule({
                 </li>
               ))}
             </ul>
+            <TablePagination
+              page={evidencePagination.page}
+              pageSize={evidencePagination.pageSize}
+              pageCount={evidencePagination.pageCount}
+              total={evidencePagination.total}
+              start={evidencePagination.start}
+              end={evidencePagination.end}
+              canPrev={evidencePagination.canPrev}
+              canNext={evidencePagination.canNext}
+              onPage={evidencePagination.setPage}
+              onPageSize={evidencePagination.setPageSize}
+            />
           </section>
 
           <section className="report-section">

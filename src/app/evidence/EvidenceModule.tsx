@@ -3,6 +3,8 @@ import { data } from '../mock/data.ts'
 import { ModuleFrame, Pill as LegacyPill } from '../modules/Records.tsx'
 import '../modules/modules.css'
 import { useSession } from '../state/SessionProvider.tsx'
+import { TablePagination } from '../ui/TablePagination.tsx'
+import { usePagination } from '../ui/usePagination.ts'
 import {
   attentionEvidence,
   buildEvidenceBriefing,
@@ -61,6 +63,7 @@ export function EvidenceModule({
 
   const records = useMemo(() => buildEvidenceRecords(position), [position])
   const visible = useMemo(() => filterEvidence(records, filters), [records, filters])
+  const pagination = usePagination(visible)
   const indicators = useMemo(() => evidenceIndicators(records), [records])
   const briefing = useMemo(() => buildEvidenceBriefing(records, position), [records, position])
   const attention = useMemo(() => attentionEvidence(visible.length ? visible : records), [visible, records])
@@ -369,6 +372,7 @@ export function EvidenceModule({
             <button type="button" className="wx-btn" onClick={() => patch(defaultEvidenceFilters())}>Clear filters</button>
           </div>
         ) : (
+          <>
           <div className="wx-table-wrap">
             <table className="wx-table">
               <thead>
@@ -383,7 +387,7 @@ export function EvidenceModule({
                 </tr>
               </thead>
               <tbody>
-                {visible.map((item) => (
+                {pagination.pageItems.map((item) => (
                   <tr key={item.id}>
                     <td>
                       <button type="button" onClick={() => (item.synthetic ? go({ type: 'upload' }) : onSelect(item.id))}>
@@ -403,6 +407,19 @@ export function EvidenceModule({
               </tbody>
             </table>
           </div>
+          <TablePagination
+            page={pagination.page}
+            pageSize={pagination.pageSize}
+            pageCount={pagination.pageCount}
+            total={pagination.total}
+            start={pagination.start}
+            end={pagination.end}
+            canPrev={pagination.canPrev}
+            canNext={pagination.canNext}
+            onPage={pagination.setPage}
+            onPageSize={pagination.setPageSize}
+          />
+          </>
         )}
       </section>
       <EvidenceOverlay overlay={overlay} records={records} onClose={() => setOverlay({ kind: 'none' })} onNavigate={go} onFilter={(next) => { setOverlay({ kind: 'none' }); patch(next, true) }} onAskNox={(prompt) => onAskNox?.(prompt)} />

@@ -153,6 +153,13 @@ function AuthenticatedApp() {
         else if (item.target === 'evidence') go('evidence', item.recordId)
         else go('hub')
       }}
+      onSearchResult={(result) => {
+        if (result.type === 'framework') {
+          go('regulatory', null)
+          return
+        }
+        go(result.module, result.id)
+      }}
       aiOpen={aiOpen}
       ai={
         <NoxAiPanel

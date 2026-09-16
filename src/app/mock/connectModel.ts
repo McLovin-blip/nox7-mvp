@@ -73,10 +73,6 @@ export type ConnectView = {
   insightPrompts: string[]
 }
 
-function titleCase(value: string): string {
-  return value.charAt(0).toUpperCase() + value.slice(1)
-}
-
 function severityRank(level: string): number {
   if (level === 'elevated') return 0
   if (level === 'watch') return 1
@@ -184,12 +180,13 @@ export function buildConnectView(position: PositionState): ConnectView {
     .slice(0, 5)
     .map((risk) => {
       const level = levelOf(risk)
+      const residual = position === 'after' ? risk.residualAfter : risk.residualBefore
       return {
         id: risk.id,
         title: risk.title,
         domain: risk.contributingGap,
         level,
-        severity: titleCase(level),
+        severity: residual.rating,
         assurance: riskAssurance(risk, position),
       }
     })

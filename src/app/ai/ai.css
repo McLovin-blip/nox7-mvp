@@ -1,15 +1,23 @@
-/* Ask Nox — floating right-docked copilot (not a center modal, not a plain sidebar). */
+/* Ask Nox — right-docked panel that reserves shell space when open. */
 
 .nox-dock {
-  position: fixed;
-  inset: 0;
-  width: 0;
-  height: 0;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
   margin: 0;
   padding: 0;
   overflow: visible;
   pointer-events: none;
-  z-index: 70;
+  z-index: 55;
+}
+
+.shell.is-ai-open .nox-dock {
+  overflow: hidden;
+  pointer-events: auto;
+  border-left: 1px solid var(--border-default);
+  background: var(--bg-elevated);
 }
 
 .nox-fab,
@@ -75,19 +83,17 @@
 }
 
 .nox-chat {
-  position: fixed;
-  top: calc(var(--header-height) + 16px);
-  right: 18px;
-  bottom: 18px;
-  width: min(var(--nox-rail-width), calc(100vw - 36px));
-  max-width: 430px;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  max-width: none;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto auto;
   min-height: 0;
-  border-radius: 18px;
-  border: 1px solid var(--border-default);
+  border-radius: 0;
+  border: 0;
   background: var(--bg-elevated);
-  box-shadow: var(--shadow-panel);
+  box-shadow: none;
   overflow: hidden;
   opacity: 0;
   visibility: hidden;
@@ -511,20 +517,35 @@
 
 /* Narrow / tablet: elevated drawer still right-aligned */
 @media (max-width: 1100px) {
+  .nox-dock {
+    position: fixed;
+    inset: 0;
+    width: 0;
+    height: 0;
+    border: 0;
+    background: transparent;
+    overflow: visible;
+  }
+
   .nox-dock.is-open {
     width: auto;
     height: auto;
     inset: 0;
     background: color-mix(in srgb, var(--bg-app) 35%, #000);
     pointer-events: auto;
+    overflow: visible;
   }
 
   .nox-chat {
+    position: fixed;
     top: 10px;
     right: 10px;
     bottom: 10px;
     width: min(420px, calc(100vw - 20px));
     max-width: none;
+    border-radius: 18px;
+    border: 1px solid var(--border-default);
+    box-shadow: var(--shadow-panel);
   }
 }
 

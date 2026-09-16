@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSession } from '../state/SessionProvider.tsx'
+import { TablePagination } from '../ui/TablePagination.tsx'
+import { usePagination } from '../ui/usePagination.ts'
 import { ControlDetail, Pill } from './ControlDetail.tsx'
 import {
   activeFilterChips,
@@ -83,6 +85,7 @@ export function ControlsModule({
   const previous = useMemo(() => previousRecords(position, drafts), [position, drafts])
   const categories = useMemo(() => buildCategorySummaries(controls, previous), [controls, previous])
   const visible = useMemo(() => filterControls(controls, filters), [controls, filters])
+  const pagination = usePagination(visible)
   const scoped = useMemo(
     () =>
       filterControls(controls, {
@@ -713,6 +716,7 @@ export function ControlsModule({
             </button>
           </div>
         ) : (
+          <>
           <div className="ctl-table-wrap">
             <table className="ctl-table">
               <thead>
@@ -732,7 +736,7 @@ export function ControlsModule({
                 </tr>
               </thead>
               <tbody>
-                {visible.map((item) => (
+                {pagination.pageItems.map((item) => (
                   <tr key={item.id} className={selectedId === item.id ? 'is-active' : undefined}>
                     <td>
                       <button type="button" onClick={() => openControl(item.id)}>
@@ -783,6 +787,19 @@ export function ControlsModule({
               </tbody>
             </table>
           </div>
+          <TablePagination
+            page={pagination.page}
+            pageSize={pagination.pageSize}
+            pageCount={pagination.pageCount}
+            total={pagination.total}
+            start={pagination.start}
+            end={pagination.end}
+            canPrev={pagination.canPrev}
+            canNext={pagination.canNext}
+            onPage={pagination.setPage}
+            onPageSize={pagination.setPageSize}
+          />
+          </>
         )}
       </section>
 

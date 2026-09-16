@@ -1,7 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { organisation, reportingPeriod } from '../mock/data.ts'
 import type { ModuleId, PositionState } from '../mock/types.ts'
 import { useSession } from '../state/SessionProvider.tsx'
+import { riskRatingClass } from '../ui/riskRating.ts'
+import { TablePagination } from '../ui/TablePagination.tsx'
+import { usePagination } from '../ui/usePagination.ts'
 import {
   activeFilterChips,
   appetiteLabel,
@@ -335,7 +338,8 @@ function ExecutiveSummary({
               <div>
                 <strong>{item.title}</strong>
                 <em>
-                  {item.businessUnit} · Residual {item.residual.score} ({item.residual.rating}) ·{' '}
+                  {item.businessUnit} · Residual {item.residual.score} (
+                  <span className={riskRatingClass(item.residual.rating)}>{item.residual.rating}</span>) ·{' '}
                   {treatmentLabel(item.treatment.status)}
                 </em>
               </div>
@@ -367,6 +371,7 @@ function ComplianceImpactPanel({
   const rows = useMemo(() => buildComplianceImpactRows(risks, position), [risks, position])
   const options = useMemo(() => complianceFilterOptions(rows), [rows])
   const visible = useMemo(() => filterComplianceImpactRows(rows, filters), [rows, filters])
+  const pagination = usePagination(visible)
   const active =
     filters.query.trim() !== '' ||
     filters.residualRating !== 'all' ||
@@ -484,7 +489,7 @@ function ComplianceImpactPanel({
             </tr>
           </thead>
           <tbody>
-            {visible.map((row) => (
+            {pagination.pageItems.map((row) => (
               <ComplianceImpactTableRow
                 key={row.riskId}
                 row={row}
@@ -499,6 +504,18 @@ function ComplianceImpactPanel({
           <p className="risk-compliance-empty">No risks match the current compliance filters.</p>
         ) : null}
       </div>
+      <TablePagination
+        page={pagination.page}
+        pageSize={pagination.pageSize}
+        pageCount={pagination.pageCount}
+        total={pagination.total}
+        start={pagination.start}
+        end={pagination.end}
+        canPrev={pagination.canPrev}
+        canNext={pagination.canNext}
+        onPage={pagination.setPage}
+        onPageSize={pagination.setPageSize}
+      />
     </section>
   )
 }
@@ -523,7 +540,7 @@ function ComplianceImpactTableRow({
         </button>
       </td>
       <td>
-        <span className="risk-compliance-rating">{row.residualRating}</span>
+        <span className={riskRatingClass(row.residualRating)}>{row.residualRating}</span>
       </td>
       <td>
         <div className="risk-compliance-stack">
@@ -613,6 +630,7 @@ function Register({
   const categories = unique(allRisks.map((item) => item.category))
   const owners = unique(allRisks.map((item) => item.owner))
   const active = hasActiveFilters(filters)
+  const pagination = usePagination(risks)
 
   return (
     <section className="risk-register" id="risk-register">
@@ -622,7 +640,8 @@ function Register({
           <p>Review and manage all organisational risks.</p>
         </div>
         <em>
-          Showing {risks.length} of {allRisks.length}
+          Showing {pagination.total === 0 ? 0 : `${pagination.start}–${pagination.end}`} of {pagination.total} filtered
+          · {allRisks.length} total
         </em>
       </header>
 
@@ -875,7 +894,7 @@ function Register({
             </tr>
           </thead>
           <tbody>
-            {risks.map((item) => (
+            {pagination.pageItems.map((item) => (
               <tr key={item.id} onClick={() => onOpenRisk(item.id)}>
                 <td>
                   <strong>{item.title}</strong>
@@ -888,7 +907,7 @@ function Register({
                 </td>
                 <td>
                   <strong>{item.residual.score}</strong>
-                  <small>{item.residual.rating}</small>
+                  <small className={riskRatingClass(item.residual.rating)}>{item.residual.rating}</small>
                 </td>
                 <td>
                   <Pill className={`appetite-${item.appetiteStatus}`}>{appetiteLabel(item.appetiteStatus)}</Pill>
@@ -917,6 +936,18 @@ function Register({
           </div>
         ) : null}
       </div>
+      <TablePagination
+        page={pagination.page}
+        pageSize={pagination.pageSize}
+        pageCount={pagination.pageCount}
+        total={pagination.total}
+        start={pagination.start}
+        end={pagination.end}
+        canPrev={pagination.canPrev}
+        canNext={pagination.canNext}
+        onPage={pagination.setPage}
+        onPageSize={pagination.setPageSize}
+      />
     </section>
   )
 }
@@ -952,8 +983,8 @@ function RiskDetail({
         <h1>{risk.title}</h1>
         <div className="risk-pill-row">
           <Pill className={`sev-${risk.severity}`}>{severityLabel(risk.severity)}</Pill>
-          <Pill className="neutral">{`Inherent ${risk.inherentLabel}`}</Pill>
-          <Pill className="neutral">{`Residual ${risk.residualLabel}`}</Pill>
+          <span className={riskRatingClass(risk.inherentLabel)}>Inherent {risk.inherentLabel}</span>
+          <span className={riskRatingClass(risk.residualLabel)}>Residual {risk.residualLabel}</span>
           <Pill className={`appetite-${risk.appetiteStatus}`}>{risk.appetiteLabel}</Pill>
           <Pill className={`treatment-${risk.treatment.status}`}>{risk.actionStatus}</Pill>
           {risk.demoFocus ? <Pill className="neutral">Demo focus</Pill> : null}
@@ -970,9 +1001,9 @@ function RiskDetail({
       </header>
 
       <div className="risk-metric-row">
-        <Metric label="Inherent risk" score={risk.inherentLabel} rating={`${risk.inherent.score}`} />
-        <Metric label="Residual risk" score={risk.residualLabel} rating={`${risk.residual.score}`} />
-        <Metric label="Target risk" score={risk.target.score} rating={risk.target.rating} />
+        <Metric label="Inherent risk" score={<span className={riskRatingClass(risk.inherentLabel)}>{risk.inherentLabel}</span>} rating={`${risk.inherent.score}`} />
+        <Metric label="Residual risk" score={<span className={riskRatingClass(risk.residualLabel)}>{risk.residualLabel}</span>} rating={`${risk.residual.score}`} />
+        <Metric label="Target risk" score={<span className={riskRatingClass(risk.target.rating)}>{risk.target.rating}</span>} rating={`${risk.target.score}`} />
         <Metric label="Appetite" score={risk.appetiteLabel} />
         <Metric label="Control coverage" score={coverageLabel(risk.controlCoverage)} />
         <Metric label="Next action" score={risk.actionStatus} rating={formatDate(risk.dueDate)} />
@@ -1313,7 +1344,7 @@ function RiskDetail({
   )
 }
 
-function Metric({ label, score, rating }: { label: string; score: string | number; rating?: string }) {
+function Metric({ label, score, rating }: { label: string; score: ReactNode; rating?: string }) {
   return (
     <div className="risk-metric">
       <span>{label}</span>
@@ -1328,7 +1359,7 @@ function AssessmentBlock({ title, score }: { title: string; score: RiskRecord['r
     <div className="risk-assessment-block">
       <span>{title}</span>
       <strong>
-        {score.score} — {score.rating}
+        {score.score} — <span className={riskRatingClass(score.rating)}>{score.rating}</span>
       </strong>
       <em>
         Likelihood {score.likelihood} · Impact {score.impact}

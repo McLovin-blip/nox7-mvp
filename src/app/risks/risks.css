@@ -409,23 +409,26 @@
 .risk-pill.appetite-above,
 .risk-pill.treatment-overdue,
 .risk-pill.coverage-insufficient {
-  color: var(--status-critical);
-  border-color: color-mix(in srgb, var(--status-critical) 35%, var(--border-default));
+  background: color-mix(in srgb, var(--risk-critical) 16%, var(--bg-surface));
+  color: var(--risk-critical);
+  border-color: color-mix(in srgb, var(--risk-critical) 40%, var(--border-default));
 }
 
 .risk-pill.sev-high,
 .risk-pill.treatment-at-risk,
 .risk-pill.appetite-near {
-  color: var(--status-high);
-  border-color: color-mix(in srgb, var(--status-high) 35%, var(--border-default));
+  background: color-mix(in srgb, var(--risk-high) 16%, var(--bg-surface));
+  color: var(--risk-high);
+  border-color: color-mix(in srgb, var(--risk-high) 40%, var(--border-default));
 }
 
 .risk-pill.sev-medium,
 .risk-pill.coverage-partial,
 .risk-pill.treatment-in-progress,
 .risk-pill.trend-stable {
-  color: var(--status-warning);
-  border-color: color-mix(in srgb, var(--status-warning) 35%, var(--border-default));
+  background: color-mix(in srgb, var(--risk-medium) 16%, var(--bg-surface));
+  color: var(--risk-medium);
+  border-color: color-mix(in srgb, var(--risk-medium) 40%, var(--border-default));
 }
 
 .risk-pill.sev-low,
@@ -433,18 +436,22 @@
 .risk-pill.coverage-adequate,
 .risk-pill.treatment-completed,
 .risk-pill.trend-improving {
-  color: var(--status-success);
-  border-color: color-mix(in srgb, var(--status-success) 35%, var(--border-default));
+  background: color-mix(in srgb, var(--risk-low) 16%, var(--bg-surface));
+  color: var(--risk-low);
+  border-color: color-mix(in srgb, var(--risk-low) 40%, var(--border-default));
 }
 
 .risk-pill.trend-worsening {
-  color: var(--status-critical);
-  border-color: color-mix(in srgb, var(--status-critical) 35%, var(--border-default));
+  background: color-mix(in srgb, var(--risk-critical) 16%, var(--bg-surface));
+  color: var(--risk-critical);
+  border-color: color-mix(in srgb, var(--risk-critical) 40%, var(--border-default));
 }
 
 .risk-pill.neutral,
 .risk-pill.treatment-not-started {
-  color: var(--text-secondary);
+  background: color-mix(in srgb, var(--risk-unknown) 12%, var(--bg-surface));
+  color: var(--risk-unknown);
+  border-color: color-mix(in srgb, var(--risk-unknown) 35%, var(--border-default));
 }
 
 .risk-back {

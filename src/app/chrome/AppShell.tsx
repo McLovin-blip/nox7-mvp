@@ -2,15 +2,27 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Owl } from '../brand/Brand.tsx'
 import { personInitials } from '../mock/data.ts'
 import type { HubNotification } from '../mock/hubModel.ts'
-import type { ModuleId } from '../mock/types.ts'
+import type { ModuleId, PositionState } from '../mock/types.ts'
 import { useSession } from '../state/SessionProvider.tsx'
 import { useTheme } from '../state/ThemeProvider.tsx'
+import { GlobalSearch } from './GlobalSearch.tsx'
+import type { GlobalSearchResult } from './globalSearch.ts'
 import './chrome.css'
+
+const SIDEBAR_STORAGE_KEY = 'nox7.sidebarCollapsed'
+const HOVER_OPEN_DELAY_MS = 120
+const HOVER_CLOSE_DELAY_MS = 180
+
+function readSidebarCollapsed(): boolean {
+  if (typeof window === 'undefined') return false
+  return window.localStorage.getItem(SIDEBAR_STORAGE_KEY) === '1'
+}
 
 export function AppShell({
   module,
   onModule,
   onNotification,
+  onSearchResult,
   aiOpen = false,
   ai,
   children,
@@ -18,15 +30,75 @@ export function AppShell({
   module: ModuleId
   onModule: (id: ModuleId) => void
   onNotification: (item: HubNotification) => void
+  onSearchResult: (result: { module: ModuleId; id: string; type: GlobalSearchResult['type'] }) => void
   aiOpen?: boolean
   ai?: ReactNode
   children: ReactNode
 }) {
+  const [collapsedPreferred, setCollapsedPreferred] = useState(() => readSidebarCollapsed())
+  const [peeking, setPeeking] = useState(false)
+  const openTimer = useRef<number | null>(null)
+  const closeTimer = useRef<number | null>(null)
+
+  const clearHoverTimers = () => {
+    if (openTimer.current) window.clearTimeout(openTimer.current)
+    if (closeTimer.current) window.clearTimeout(closeTimer.current)
+    openTimer.current = null
+    closeTimer.current = null
+  }
+
+  useEffect(() => () => clearHoverTimers(), [])
+
+  useEffect(() => {
+    window.localStorage.setItem(SIDEBAR_STORAGE_KEY, collapsedPreferred ? '1' : '0')
+  }, [collapsedPreferred])
+
+  const toggleCollapsed = () => {
+    clearHoverTimers()
+    setPeeking(false)
+    setCollapsedPreferred((value) => !value)
+  }
+
+  const onRailEnter = () => {
+    if (!collapsedPreferred) return
+    if (closeTimer.current) {
+      window.clearTimeout(closeTimer.current)
+      closeTimer.current = null
+    }
+    openTimer.current = window.setTimeout(() => setPeeking(true), HOVER_OPEN_DELAY_MS)
+  }
+
+  const onRailLeave = () => {
+    if (!collapsedPreferred) return
+    if (openTimer.current) {
+      window.clearTimeout(openTimer.current)
+      openTimer.current = null
+    }
+    closeTimer.current = window.setTimeout(() => setPeeking(false), HOVER_CLOSE_DELAY_MS)
+  }
+
+  const shellClass = [
+    'shell',
+    aiOpen ? 'is-ai-open' : '',
+    collapsedPreferred ? 'is-sidebar-collapsed' : '',
+    collapsedPreferred && peeking ? 'is-sidebar-peek' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
   return (
-    <div className={`shell${aiOpen ? ' is-ai-open' : ''}`}>
-      <Sidebar module={module} onModule={onModule} />
+    <div className={shellClass}>
+      <Sidebar
+        module={module}
+        onModule={onModule}
+        collapsed={collapsedPreferred}
+        peeking={peeking}
+        onToggle={toggleCollapsed}
+        onPointerEnter={onRailEnter}
+        onPointerLeave={onRailLeave}
+      />
       <div className="shell-main">
-        <TopBar onNotification={onNotification} />
+        <TopBar onNotification={onNotification} onSearchResult={onSearchResult} />
         <MobileNav module={module} onModule={onModule} />
         <div className="shell-body">{children}</div>
       </div>
@@ -126,21 +198,52 @@ function NavIcon({ id }: { id: ModuleId }) {
 function Sidebar({
   module,
   onModule,
+  collapsed,
+  peeking,
+  onToggle,
+  onPointerEnter,
+  onPointerLeave,
 }: {
   module: ModuleId
   onModule: (id: ModuleId) => void
+  collapsed: boolean
+  peeking: boolean
+  onToggle: () => void
+  onPointerEnter: () => void
+  onPointerLeave: () => void
 }) {
   const { view } = useSession()
   const primary = view.nav.filter((item) => item.id === 'hub' || item.id === 'connect')
   const modules = view.nav.filter((item) => item.id !== 'hub' && item.id !== 'connect')
+  const expandedVisual = !collapsed || peeking
 
   return (
-    <aside className="rail">
+    <aside
+      className={`rail${!expandedVisual ? ' is-icon-only' : ''}${peeking ? ' is-peeking' : ''}`}
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
+    >
       <div className="rail-brand">
         <Owl className="rail-owl" />
         <span className="rail-word">
           Nox<em>7</em>
         </span>
+        <button
+          type="button"
+          className="rail-toggle"
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-pressed={!collapsed}
+          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          onClick={onToggle}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+            {collapsed ? (
+              <path d="M9 6l6 6-6 6M4 4v16" />
+            ) : (
+              <path d="M15 6l-6 6 6 6M20 4v16" />
+            )}
+          </svg>
+        </button>
       </div>
 
       <nav className="rail-nav" aria-label="Product">
@@ -151,6 +254,8 @@ function Sidebar({
             type="button"
             className={`rail-item${item.id === 'connect' ? ' rail-item-emphasis' : ''}`}
             aria-current={module === item.id ? 'page' : undefined}
+            aria-label={item.label}
+            title={item.label}
             onClick={() => onModule(item.id)}
           >
             <span className="rail-ico">
@@ -168,6 +273,8 @@ function Sidebar({
             type="button"
             className="rail-item"
             aria-current={module === item.id ? 'page' : undefined}
+            aria-label={item.label}
+            title={item.label}
             onClick={() => onModule(item.id)}
           >
             <span className="rail-ico">
@@ -180,7 +287,7 @@ function Sidebar({
       </nav>
 
       <div className="rail-foot">
-        <button type="button" className="rail-item rail-item-quiet" disabled title="Coming soon">
+        <button type="button" className="rail-item rail-item-quiet" disabled title="Coming soon" aria-label="Settings">
           <span className="rail-ico">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
               <circle cx="12" cy="12" r="3" />
@@ -189,7 +296,7 @@ function Sidebar({
           </span>
           <span className="rail-copy">Settings</span>
         </button>
-        <button type="button" className="rail-item rail-item-quiet" disabled title="Coming soon">
+        <button type="button" className="rail-item rail-item-quiet" disabled title="Coming soon" aria-label="Help">
           <span className="rail-ico">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
               <circle cx="12" cy="12" r="9" />
@@ -230,10 +337,12 @@ function MobileNav({
 
 function TopBar({
   onNotification,
+  onSearchResult,
 }: {
   onNotification: (item: HubNotification) => void
+  onSearchResult: (result: { module: ModuleId; id: string; type: GlobalSearchResult['type'] }) => void
 }) {
-  const { view } = useSession()
+  const { view, position } = useSession()
   const { theme, toggleTheme } = useTheme()
   const [notesOpen, setNotesOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
@@ -261,13 +370,14 @@ function TopBar({
 
   return (
     <header className="top">
-      <div className="top-search" role="search">
-        <span className="top-search-ico" aria-hidden="true">
-          ⌕
-        </span>
-        <input type="search" placeholder="Search across your GRC estate…" disabled aria-disabled="true" />
-        <kbd>⌘K</kbd>
-      </div>
+      <GlobalSearch
+        position={position as PositionState}
+        onOpenResult={(result) => {
+          setNotesOpen(false)
+          setProfileOpen(false)
+          onSearchResult(result)
+        }}
+      />
 
       <div className="top-meta">
         <span className="top-chip">{view.organisation.name}</span>

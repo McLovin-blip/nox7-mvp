@@ -1,5 +1,6 @@
 import type { ConnectNavigate } from '../mock/connectModel.ts'
 import { useSession } from '../state/SessionProvider.tsx'
+import { riskRatingClass } from '../ui/riskRating.ts'
 import './connect.css'
 
 function AssuranceRing({ value }: { value: number }) {
@@ -334,7 +335,7 @@ export function NoxConnect
                     <strong>{risk.title}</strong>
                     <em>{risk.domain}</em>
                   </span>
-                  <i className={`sev ${risk.level}`}>{risk.severity}</i>
+                  <i className={riskRatingClass(risk.severity)}>{risk.severity}</i>
                   <u>{risk.assurance}% assurance</u>
                 </button>
               </li>
