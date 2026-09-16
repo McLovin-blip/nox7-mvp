@@ -12,7 +12,7 @@
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
 }
 
-.shell.is-ai-open .shell-main {
+.shell.is-ai-open .shell-body {
   padding-right: calc(var(--nox-rail-width) + 36px);
   transition: padding-right 240ms ease;
 }
@@ -167,6 +167,7 @@
   display: grid;
   grid-template-rows: var(--header-height) minmax(0, 1fr);
   background: var(--bg-app);
+  overflow: visible;
 }
 
 .mobile-nav {
@@ -182,6 +183,9 @@
   border-bottom: 1px solid var(--border-default);
   background: var(--bg-header);
   backdrop-filter: blur(12px);
+  position: relative;
+  z-index: 80;
+  overflow: visible;
 }
 
 .top-search {
@@ -229,6 +233,9 @@
   align-items: center;
   gap: 8px;
   flex: 0 0 auto;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .top-chip {
@@ -269,6 +276,8 @@
 .note-wrap,
 .profile-wrap {
   position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
 }
 
 .note-btn b {
@@ -347,7 +356,9 @@
   position: absolute;
   right: 0;
   top: calc(100% + 8px);
-  width: min(320px, 72vw);
+  width: min(320px, calc(100vw - 32px));
+  max-height: min(70vh, 420px);
+  overflow: auto;
   padding: 8px;
   border-radius: 12px;
   border: 1px solid var(--border-default);
@@ -355,7 +366,7 @@
   box-shadow: var(--shadow-panel);
   display: grid;
   gap: 2px;
-  z-index: 50;
+  z-index: 90;
 }
 
 .profile-menu {
@@ -415,8 +426,12 @@
     --nox-rail-width: 360px;
   }
 
-  .shell.is-ai-open .shell-main {
+  .shell.is-ai-open .shell-body {
     padding-right: calc(var(--nox-rail-width) + 20px);
+  }
+
+  .shell.is-ai-open .profile-copy {
+    display: none;
   }
 
   .top-chip.subtle {
@@ -430,7 +445,7 @@
     grid-template-columns: 1fr;
   }
 
-  .shell.is-ai-open .shell-main {
+  .shell.is-ai-open .shell-body {
     padding-right: 0;
   }
 

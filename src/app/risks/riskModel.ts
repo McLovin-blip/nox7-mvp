@@ -2,6 +2,7 @@ import {
   data,
   evidenceFor,
   frameworkName,
+  obligationIdsForRisk,
   organisation,
   personById,
   personLabel,
@@ -287,7 +288,7 @@ export function buildRiskRecords(position: PositionState): RiskRecord[] {
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
       controlIds: item.controlIds,
-      obligationIds: item.obligationIds,
+      obligationIds: obligationIdsForRisk(item.id, item.obligationIds),
       evidenceIds: pick(item.evidenceIdsBefore, item.evidenceIdsAfter, position),
       treatment: {
         strategy: treatment.strategy,
@@ -917,4 +918,153 @@ export function riskContextIntro(risk: RiskRecord) {
     return `You're reviewing ${risk.title}. Residual risk is ${risk.residual.score} (${risk.residual.rating}).`
   }
   return `You're reviewing ${risk.title}. This risk needs attention because ${pressure.join(' and ')}.`
+}
+
+export type ComplianceLink = {
+  id: string
+  code?: string
+  title: string
+  status?: string
+}
+
+export type ComplianceImpactRow = {
+  riskId: string
+  riskCode: string
+  riskTitle: string
+  residualRating: string
+  controls: ComplianceLink[]
+  evidence: ComplianceLink[]
+  frameworkLabel: string
+  frameworkKind: 'regulatory' | 'alignment' | 'none'
+  impact: string
+  ownerId: string
+  owner: string
+  nextAction: string
+  dueDate: string
+  evidenceStatuses: string[]
+}
+
+export type ComplianceImpactFilters = {
+  query: string
+  residualRating: 'all' | string
+  framework: 'all' | string
+  evidenceStatus: 'all' | string
+  ownerId: 'all' | string
+}
+
+export function defaultComplianceFilters(): ComplianceImpactFilters {
+  return {
+    query: '',
+    residualRating: 'all',
+    framework: 'all',
+    evidenceStatus: 'all',
+    ownerId: 'all',
+  }
+}
+
+function formatDueDate(value: string) {
+  if (!value) return '—'
+  const date = new Date(`${value}T00:00:00`)
+  if (Number.isNaN(date.getTime())) return value
+  return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).format(date)
+}
+
+export function buildComplianceImpactRows(risks: RiskRecord[], position: PositionState): ComplianceImpactRow[] {
+  const ranked = [...risks].sort((a, b) => rankRisk(b) - rankRisk(a))
+  return ranked.map((risk) => {
+    const controls = linkedControlsFor(risk, position).map((item) => ({
+      id: item.id,
+      code: item.code,
+      title: item.title,
+      status: item.effectiveness,
+    }))
+    const evidence = linkedEvidenceFor(risk, position).map((item) => ({
+      id: item.id,
+      title: item.title,
+      status: item.statusLabel ?? item.freshness,
+    }))
+    const obligations = linkedObligationsFor(risk, position)
+    const alignmentLabels = [
+      ...new Set(
+        risk.controlIds.flatMap((controlId) => {
+          const control = data.controls.find((item) => item.id === controlId)
+          if (!control) return [] as string[]
+          if (control.frameworkRef) return [control.frameworkRef]
+          return control.mappingLabels ?? []
+        }),
+      ),
+    ]
+
+    let frameworkLabel = 'Not linked'
+    let frameworkKind: ComplianceImpactRow['frameworkKind'] = 'none'
+    let impact =
+      'Not linked to a regulatory requirement in the current organisation position. Keep residual exposure and supporting evidence under review.'
+
+    if (obligations.length > 0) {
+      const primary = obligations[0]
+      const requirement = data.obligations.find((item) => item.id === primary.id)
+      frameworkLabel = requirement?.code
+        ? `${requirement.code} · ${primary.framework}`
+        : `${primary.framework} · ${primary.title}`
+      frameworkKind = 'regulatory'
+      impact =
+        primary.support === 'Supported'
+          ? `Residual ${risk.residual.rating} exposure remains relevant to ${primary.title}. Current linked controls and evidence keep this regulatory requirement supported.`
+          : `Residual ${risk.residual.rating} exposure and control gaps could leave ${primary.title} only partly supported until linked evidence stays current.`
+    } else if (alignmentLabels.length > 0) {
+      frameworkLabel = alignmentLabels.join(' · ')
+      frameworkKind = 'alignment'
+      impact = `Framework alignment to ${alignmentLabels.join(' and ')}. This is control-framework mapping, not a regulatory compliance claim.`
+    }
+
+    return {
+      riskId: risk.id,
+      riskCode: risk.code,
+      riskTitle: risk.title,
+      residualRating: risk.residualLabel || risk.residual.rating,
+      controls,
+      evidence,
+      frameworkLabel,
+      frameworkKind,
+      impact,
+      ownerId: risk.ownerId,
+      owner: risk.owner,
+      nextAction: risk.nextAction || risk.treatment.latestUpdate || '—',
+      dueDate: formatDueDate(risk.dueDate || risk.treatment.targetDate),
+      evidenceStatuses: [...new Set(evidence.map((item) => item.status ?? 'Unknown'))],
+    }
+  })
+}
+
+export function filterComplianceImpactRows(rows: ComplianceImpactRow[], filters: ComplianceImpactFilters) {
+  const query = filters.query.trim().toLowerCase()
+  return rows.filter((row) => {
+    if (filters.residualRating !== 'all' && row.residualRating !== filters.residualRating) return false
+    if (filters.framework !== 'all' && row.frameworkLabel !== filters.framework) return false
+    if (filters.evidenceStatus !== 'all' && !row.evidenceStatuses.includes(filters.evidenceStatus)) return false
+    if (filters.ownerId !== 'all' && row.ownerId !== filters.ownerId) return false
+    if (!query) return true
+    const haystack = [
+      row.riskCode,
+      row.riskTitle,
+      row.frameworkLabel,
+      row.owner,
+      row.nextAction,
+      ...row.controls.flatMap((item) => [item.id, item.code ?? '', item.title]),
+      ...row.evidence.flatMap((item) => [item.id, item.title, item.status ?? '']),
+    ]
+      .join(' ')
+      .toLowerCase()
+    return haystack.includes(query)
+  })
+}
+
+export function complianceFilterOptions(rows: ComplianceImpactRow[]) {
+  const ratings = [...new Set(rows.map((item) => item.residualRating))].sort()
+  const frameworks = [...new Set(rows.map((item) => item.frameworkLabel))].sort()
+  const evidenceStatuses = [...new Set(rows.flatMap((item) => item.evidenceStatuses))].sort()
+  const owners = [...new Map(rows.map((item) => [item.ownerId, item.owner])).entries()]
+    .map(([id, name]) => ({ id, name }))
+    .sort((a, b) => a.name.localeCompare(b.name))
+  return { ratings, frameworks, evidenceStatuses, owners }
 }

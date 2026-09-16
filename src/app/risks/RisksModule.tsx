@@ -5,15 +5,19 @@ import { useSession } from '../state/SessionProvider.tsx'
 import {
   activeFilterChips,
   appetiteLabel,
+  buildComplianceImpactRows,
   buildFrameworkImpact,
   buildRiskRecords,
   buildRiskSummary,
   clearFilterChip,
+  complianceFilterOptions,
   coverageLabel,
   coverageRowsFor,
+  defaultComplianceFilters,
   defaultFilters,
   describeRiskDrill,
   emptyStateForFilters,
+  filterComplianceImpactRows,
   filterRisks,
   hasActiveFilters,
   linkedControlsFor,
@@ -23,7 +27,8 @@ import {
   severityLabel,
   sortRisks,
   treatmentLabel,
-  trendLabel,
+  type ComplianceImpactFilters,
+  type ComplianceImpactRow,
   type FilterChip,
   type FrameworkImpact,
   type RiskFilters,
@@ -150,11 +155,14 @@ export function RisksModule({
 
       <ExecutiveSummary
         summary={summary}
+        risks={risks}
+        position={position}
         onDrill={applyDrill}
         onOpenRisk={(id) => {
           setTab('overview')
           onSelect(id)
         }}
+        onNavigate={onNavigate}
       />
 
       <Register
@@ -186,12 +194,18 @@ export function RisksModule({
 
 function ExecutiveSummary({
   summary,
+  risks,
+  position,
   onDrill,
   onOpenRisk,
+  onNavigate,
 }: {
   summary: ReturnType<typeof buildRiskSummary>
+  risks: RiskRecord[]
+  position: PositionState
   onDrill: (filters: RiskFilters, panel?: DrillPanel) => void
   onOpenRisk: (id: string) => void
+  onNavigate?: (target: RiskNavigateTarget) => void
 }) {
   const unitMax = Math.max(...summary.byUnit.map((item) => item.count), 1)
   const categoryMax = Math.max(...summary.byCategory.map((item) => item.count), 1)
@@ -307,70 +321,7 @@ function ExecutiveSummary({
         </section>
       </div>
 
-      <div className="risk-exec-grid two">
-        <section className="risk-card">
-          <header>
-            <h2>Compliance impact</h2>
-            <p>{summary.complianceCount} risks affect active regulatory obligations.</p>
-          </header>
-          <ul className="risk-frameworks">
-            {summary.frameworks.map((item) => (
-              <li key={item.name}>
-                <button type="button" onClick={() => drill({ framework: item.name }, 'framework')}>
-                  <strong>{item.name}</strong>
-                  <span>
-                    {item.count} linked risk{item.count === 1 ? '' : 's'}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="risk-card">
-          <header>
-            <h2>Emerging / changing risks</h2>
-            <p>Material movement supported by current position data.</p>
-          </header>
-          <ul className="risk-emerging">
-            {summary.emerging.map((item) => (
-              <li key={item.id}>
-                <div className="risk-emerging-row">
-                  <button type="button" className="risk-emerging-main" onClick={() => onOpenRisk(item.id)}>
-                    <strong>{item.title}</strong>
-                    <em>
-                      {item.businessUnit} · Residual {item.residual.score} · {appetiteLabel(item.appetiteStatus)}
-                    </em>
-                  </button>
-                  <div className="risk-pill-row">
-                    <button
-                      type="button"
-                      className={`risk-pill sev-${item.severity}`}
-                      onClick={() => drill({ severity: item.severity })}
-                    >
-                      {severityLabel(item.severity)}
-                    </button>
-                    <button
-                      type="button"
-                      className={`risk-pill trend-${item.trend}`}
-                      onClick={() => drill({ trend: item.trend })}
-                    >
-                      {trendLabel(item.trend)}
-                    </button>
-                    <button
-                      type="button"
-                      className={`risk-pill treatment-${item.treatment.status}`}
-                      onClick={() => drill({ treatment: item.treatment.status }, 'treatment')}
-                    >
-                      {treatmentLabel(item.treatment.status)}
-                    </button>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-      </div>
+      <ComplianceImpactPanel risks={risks} position={position} onOpenRisk={onOpenRisk} onNavigate={onNavigate} />
 
       <section className="risk-card">
         <header>
@@ -398,6 +349,224 @@ function ExecutiveSummary({
         </div>
       </section>
     </div>
+  )
+}
+
+function ComplianceImpactPanel({
+  risks,
+  position,
+  onOpenRisk,
+  onNavigate,
+}: {
+  risks: RiskRecord[]
+  position: PositionState
+  onOpenRisk: (id: string) => void
+  onNavigate?: (target: RiskNavigateTarget) => void
+}) {
+  const [filters, setFilters] = useState<ComplianceImpactFilters>(defaultComplianceFilters)
+  const rows = useMemo(() => buildComplianceImpactRows(risks, position), [risks, position])
+  const options = useMemo(() => complianceFilterOptions(rows), [rows])
+  const visible = useMemo(() => filterComplianceImpactRows(rows, filters), [rows, filters])
+  const active =
+    filters.query.trim() !== '' ||
+    filters.residualRating !== 'all' ||
+    filters.framework !== 'all' ||
+    filters.evidenceStatus !== 'all' ||
+    filters.ownerId !== 'all'
+
+  const openModule = (module: ModuleId, recordId: string) => {
+    onNavigate?.({ type: 'module', module, recordId })
+  }
+
+  return (
+    <section className="risk-card risk-compliance-panel" aria-label="Compliance impact">
+      <header className="risk-compliance-head">
+        <div>
+          <h2>Compliance impact</h2>
+          <p>
+            How organisational risks connect to controls, evidence, and framework or regulatory references in the
+            shared demo dataset.
+          </p>
+        </div>
+        <em>
+          Showing {visible.length} of {rows.length} risk{rows.length === 1 ? '' : 's'}
+        </em>
+      </header>
+
+      <div className="risk-compliance-filters">
+        <label className="risk-compliance-search">
+          <span>Search</span>
+          <input
+            type="search"
+            value={filters.query}
+            placeholder="Risk, control, or evidence name / ID"
+            onChange={(event) => setFilters((current) => ({ ...current, query: event.target.value }))}
+          />
+        </label>
+        <label>
+          <span>Risk rating</span>
+          <select
+            value={filters.residualRating}
+            onChange={(event) => setFilters((current) => ({ ...current, residualRating: event.target.value }))}
+          >
+            <option value="all">All ratings</option>
+            {options.ratings.map((rating) => (
+              <option key={rating} value={rating}>
+                {rating}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Framework / requirement</span>
+          <select
+            value={filters.framework}
+            onChange={(event) => setFilters((current) => ({ ...current, framework: event.target.value }))}
+          >
+            <option value="all">All references</option>
+            {options.frameworks.map((framework) => (
+              <option key={framework} value={framework}>
+                {framework}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Evidence status</span>
+          <select
+            value={filters.evidenceStatus}
+            onChange={(event) => setFilters((current) => ({ ...current, evidenceStatus: event.target.value }))}
+          >
+            <option value="all">All statuses</option>
+            {options.evidenceStatuses.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Owner</span>
+          <select
+            value={filters.ownerId}
+            onChange={(event) => setFilters((current) => ({ ...current, ownerId: event.target.value }))}
+          >
+            <option value="all">All owners</option>
+            {options.owners.map((owner) => (
+              <option key={owner.id} value={owner.id}>
+                {owner.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button
+          type="button"
+          className="risk-compliance-clear"
+          disabled={!active}
+          onClick={() => setFilters(defaultComplianceFilters())}
+        >
+          Clear filters
+        </button>
+      </div>
+
+      <div className="risk-compliance-table-wrap">
+        <table className="risk-compliance-table">
+          <thead>
+            <tr>
+              <th scope="col">Risk</th>
+              <th scope="col">Risk rating</th>
+              <th scope="col">Related controls</th>
+              <th scope="col">Related evidence</th>
+              <th scope="col">Framework / requirement</th>
+              <th scope="col">Compliance impact</th>
+              <th scope="col">Owner</th>
+              <th scope="col">Next action and due date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {visible.map((row) => (
+              <ComplianceImpactTableRow
+                key={row.riskId}
+                row={row}
+                onOpenRisk={onOpenRisk}
+                onOpenControl={(id) => openModule('controls', id)}
+                onOpenEvidence={(id) => openModule('evidence', id)}
+              />
+            ))}
+          </tbody>
+        </table>
+        {visible.length === 0 ? (
+          <p className="risk-compliance-empty">No risks match the current compliance filters.</p>
+        ) : null}
+      </div>
+    </section>
+  )
+}
+
+function ComplianceImpactTableRow({
+  row,
+  onOpenRisk,
+  onOpenControl,
+  onOpenEvidence,
+}: {
+  row: ComplianceImpactRow
+  onOpenRisk: (id: string) => void
+  onOpenControl: (id: string) => void
+  onOpenEvidence: (id: string) => void
+}) {
+  return (
+    <tr>
+      <td>
+        <button type="button" className="risk-compliance-link" onClick={() => onOpenRisk(row.riskId)}>
+          <strong>{row.riskCode}</strong>
+          <span>{row.riskTitle}</span>
+        </button>
+      </td>
+      <td>
+        <span className="risk-compliance-rating">{row.residualRating}</span>
+      </td>
+      <td>
+        <div className="risk-compliance-stack">
+          {row.controls.length ? (
+            row.controls.map((item) => (
+              <button key={item.id} type="button" className="risk-compliance-chip" onClick={() => onOpenControl(item.id)}>
+                <strong>{item.code ?? item.id}</strong>
+                <span>{item.title}</span>
+              </button>
+            ))
+          ) : (
+            <em>None linked</em>
+          )}
+        </div>
+      </td>
+      <td>
+        <div className="risk-compliance-stack">
+          {row.evidence.length ? (
+            row.evidence.map((item) => (
+              <button key={item.id} type="button" className="risk-compliance-chip" onClick={() => onOpenEvidence(item.id)}>
+                <strong>{item.title}</strong>
+                <span>{item.status}</span>
+              </button>
+            ))
+          ) : (
+            <em>None linked</em>
+          )}
+        </div>
+      </td>
+      <td>
+        <span className={`risk-compliance-framework kind-${row.frameworkKind}`}>{row.frameworkLabel}</span>
+      </td>
+      <td>
+        <p className="risk-compliance-impact">{row.impact}</p>
+      </td>
+      <td>{row.owner}</td>
+      <td>
+        <div className="risk-compliance-action">
+          <span>{row.nextAction}</span>
+          <em>Due {row.dueDate}</em>
+        </div>
+      </td>
+    </tr>
   )
 }
 

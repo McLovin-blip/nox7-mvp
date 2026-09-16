@@ -10,6 +10,13 @@ export const uploadFixtures = data.uploadFixtures
 export const peopleById = Object.fromEntries(data.people.map((person) => [person.id, person]))
 export const internationalFrameworks = data.frameworks.filter((item) => item.id !== 'fw-internal')
 
+export function obligationIdsForRisk(riskId: string, declared: string[] = []) {
+  const inverted = data.obligations
+    .filter((item) => item.riskIds.includes(riskId))
+    .map((item) => item.id)
+  return [...new Set([...declared, ...inverted])]
+}
+
 export function personById(id: string) {
   return peopleById[id]
 }
