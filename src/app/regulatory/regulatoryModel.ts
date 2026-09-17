@@ -357,8 +357,8 @@ export function buildObligationBriefing(rows: ObligationRecord[], filters: Oblig
     askPrompt: framework ? `Which obligations have the greatest effect on ${framework}?` : 'Where are we only counting a policy?',
     sources: [
       lead ? { id: lead.id, kind: 'Obligation', title: lead.title } : null,
-      { id: lead?.controlIds[0] ?? 'ctl-supplier-assurance', kind: 'Control', title: titleOf(data.controls, lead?.controlIds[0] ?? 'ctl-supplier-assurance') },
-      { id: lead?.riskIds[0] ?? 'risk-third-party', kind: 'Risk', title: titleOf(data.risks, lead?.riskIds[0] ?? 'risk-third-party') },
+      { id: lead?.controlIds[0] ?? 'ctl-005', kind: 'Control', title: titleOf(data.controls, lead?.controlIds[0] ?? 'ctl-005') },
+      { id: lead?.riskIds[0] ?? 'risk-002', kind: 'Risk', title: titleOf(data.risks, lead?.riskIds[0] ?? 'risk-002') },
     ].filter(Boolean) as { id: string; kind: string; title: string }[],
   }
 }

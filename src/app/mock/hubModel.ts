@@ -1,18 +1,20 @@
-import type { IndicatorDirection, MapNodeId, PositionState, Tone } from './types.ts'
+import type { IndicatorDirection, MapNodeId, NotificationTarget, PositionState, Tone } from './types.ts'
 import {
   coverageOf,
   currentUser,
   data,
+  demo,
   frameworkName,
   hubAnswerBefore,
   internationalFrameworks,
   layla,
   lookupSource,
-  nadia,
-  omar,
+  maya,
   organisation,
   personLabel,
+  phishingRisk,
   reportingPeriod,
+  supplierControl,
 } from './data.ts'
 
 function directionTone(direction: IndicatorDirection): Tone {
@@ -30,9 +32,24 @@ function sourceRef(id: string, position: PositionState) {
   return { id, title: id, kind: 'Record' as const }
 }
 
+function appetiteLabel(status: string | undefined) {
+  if (status === 'within') return 'Within Appetite'
+  if (status === 'above') return 'Above Appetite'
+  return status ?? 'Appetite reviewed'
+}
+
 export function buildHubView(position: PositionState) {
   const after = position === 'after'
   const pos = after ? data.position.after : data.position.before
+  const risk = phishingRisk
+  const residual = after ? risk?.residualAfter : risk?.residualBefore
+  const appetite = appetiteLabel(after ? risk?.appetiteStatusAfter : risk?.appetiteStatusBefore)
+  const residualLine = residual?.rating ?? 'Moderate'
+  const nextAction =
+    (after ? risk?.treatment.latestUpdateAfter : risk?.treatment.latestUpdateBefore) ??
+    data.actions[0]?.title ??
+    pos.accountableAction
+  const dueDate = risk?.treatment.targetDate ?? risk?.nextReview ?? '15 Oct 2026'
   const frameworks = internationalFrameworks.map((item) => ({
     id: item.id,
     name: item.name,
@@ -45,14 +62,13 @@ export function buildHubView(position: PositionState) {
     if ('availableFromState' in item && item.availableFromState === 'after') return after
     return true
   })
-  const missing = after ? 0 : 1
-  const expired = catalogue.filter(
-    (item) => item.freshness === 'expired' && !item.duplicateOf && !(after && item.id === 'ev-supplier-assessments-2023'),
-  ).length
-  const duplicate = catalogue.filter((item) => item.duplicateOf).length
+  const focusEvidence = catalogue.filter((item) => demo.focusEvidenceIds.includes(item.id))
+  const expired = catalogue.filter((item) => item.freshness === 'expired' && !item.duplicateOf).length
   const expiring = catalogue.filter((item) => item.freshness === 'expiring').length
-  const superseded = after ? 1 : 0
   const elevatedRisks = data.risks.filter((item) => (after ? item.levelAfter : item.levelBefore) === 'elevated').length
+  const aboveAppetite = data.risks.filter(
+    (item) => (after ? item.appetiteStatusAfter : item.appetiteStatusBefore) === 'above',
+  ).length
 
   const obligationRows = internationalFrameworks.map((framework) => {
     const items = data.obligations.filter(
@@ -70,14 +86,16 @@ export function buildHubView(position: PositionState) {
       direction: (after ? 'improved' : 'requires-attention') as IndicatorDirection,
       directionLabel: after
         ? `Improved +${coverageOf(framework.id, 'after') - framework.coverageBefore}`
-        : 'Limited by supplier gap',
+        : partial
+          ? 'Partial support remains'
+          : 'Supported',
       materialGap: after
-        ? 'Supplier assessments now support this framework'
-        : (partial?.title ?? 'Supplier assurance'),
+        ? demo.controlBlurb
+        : (partial?.title ?? pos.materialGap),
       askPrompt: after
         ? `How did ${framework.name} coverage change?`
         : `Why is ${framework.name} only partly covered?`,
-      tone: directionTone(after ? 'improved' : 'requires-attention'),
+      tone: directionTone(after ? 'improved' : partial ? 'requires-attention' : 'held'),
       obligationId: partial?.id ?? items[0]?.id,
     }
   })
@@ -85,11 +103,15 @@ export function buildHubView(position: PositionState) {
   const greeting = {
     kicker: 'Executive Hub',
     lede: after
-      ? 'The supplier-assurance gap is closed for this review.'
-      : 'One material gap requires attention before the governance review.',
+      ? `${demo.focusRiskCode} ${risk?.title ?? demo.story} remains ${residualLine} and ${appetite}. Linked phishing protections stay evidenced.`
+      : `${demo.focusRiskCode} ${risk?.title ?? demo.story} — residual ${residualLine}, ${appetite}. Next: ${nextAction}`,
   }
 
-  const evidenceLabel = missing ? 'Attention' : duplicate || expiring ? 'Watch' : 'Current'
+  const evidenceLabel = focusEvidence.every((item) => item.freshness === 'current')
+    ? 'Current'
+    : expiring
+      ? 'Watch'
+      : 'Attention'
 
   const indicators = [
     {
@@ -98,10 +120,10 @@ export function buildHubView(position: PositionState) {
       value: String(pos.readinessValue),
       status: pos.readinessLabel,
       direction: (after ? 'improved' : 'requires-attention') as IndicatorDirection,
-      directionLabel: after ? 'Improved from 64' : 'Requires attention',
+      directionLabel: after ? `Improved from ${data.position.before.readinessValue}` : 'Requires attention',
       why: after
-        ? 'Moved from 64 because current critical-supplier assessments were approved.'
-        : 'Held at Needs attention because current critical-supplier assessments are missing.',
+        ? `Position holds with ${demo.focusRiskCode} residual ${residualLine} and phishing controls evidenced.`
+        : `Needs attention while ${aboveAppetite} cyber risks sit above appetite; ${demo.focusRiskCode} residual is ${residualLine} and ${appetite}.`,
       askPrompt: after ? 'Why did compliance readiness change?' : 'Why does compliance readiness need attention?',
       tone: directionTone(after ? 'improved' : 'requires-attention'),
     },
@@ -111,79 +133,62 @@ export function buildHubView(position: PositionState) {
       value: `${coverageAverage}%`,
       status: `${frameworks.length} in scope`,
       direction: (after ? 'improved' : 'requires-attention') as IndicatorDirection,
-      directionLabel: after ? 'Improved across four frameworks' : 'Limited by one gap',
+      directionLabel: after ? 'Improved across four frameworks' : `${leading?.name} leads`,
       why: after
         ? `ISO 27001 ${coverageOf('fw-iso27001', 'after')}% · NIS2 ${coverageOf('fw-nis2', 'after')}% · GDPR ${coverageOf('fw-gdpr', 'after')}% · NCA ECC ${coverageOf('fw-nca-ecc', 'after')}%.`
-        : `${leading?.name} leads at ${leading?.coverage}%. All four are limited by the same supplier-assurance gap.`,
+        : `${leading?.name} leads at ${leading?.coverage}%. ${demo.controlBlurb}`,
       askPrompt: 'How do the four frameworks compare?',
       tone: directionTone(after ? 'improved' : 'requires-attention'),
     },
     {
       id: 'gaps' as const,
       label: 'Material assurance gaps',
-      value: after ? '0' : '1',
-      status: after ? 'Closed for this review' : 'Highest impact',
+      value: String(aboveAppetite),
+      status: after ? 'Phishing within appetite' : 'Above-appetite cyber risks',
       direction: (after ? 'improved' : 'requires-attention') as IndicatorDirection,
       directionLabel: after ? 'Improved' : 'Requires attention',
       why: after
-        ? 'The material supplier-assurance gap is closed. Watch items remain in the evidence catalogue.'
-        : 'Current assessment evidence is missing for several critical suppliers.',
-      askPrompt: after ? 'Has our position improved?' : 'Which gap affects the most frameworks?',
+        ? pos.materialGap
+        : `${pos.materialGap} Start with ${demo.focusRiskCode}.`,
+      askPrompt: after ? 'Has our position improved?' : 'What should I focus on first?',
       tone: directionTone(after ? 'improved' : 'requires-attention'),
     },
     {
       id: 'evidence' as const,
       label: 'Evidence health',
       value: evidenceLabel,
-      status: after
-        ? `${superseded} superseded · ${duplicate} duplicate · ${expiring} expiring`
-        : `${missing} missing · ${expired} expired · ${duplicate} duplicate · ${expiring} expiring`,
-      direction: (after ? 'improved' : 'requires-attention') as IndicatorDirection,
-      directionLabel: after ? 'Improved · watch remains' : 'Requires attention',
+      status: `${focusEvidence.length} phishing packs · ${expiring} expiring catalogue-wide`,
+      direction: (after ? 'improved' : 'held') as IndicatorDirection,
+      directionLabel: after ? 'Accepted · watch remains' : 'Accepted for phishing controls',
       why: after
-        ? 'The 2026 pack is current. A duplicate questionnaire is still flagged and the continuity test is expiring.'
-        : 'The critical pack is missing. An expired 2023 pack, a duplicate 2024 pack and an expiring continuity test remain.',
-      askPrompt: 'Where are we missing evidence?',
-      tone: missing ? 'attention' : duplicate || expiring ? 'partial' : 'assured',
+        ? 'EVD-005 and EVD-006 remain accepted. Broader catalogue watch items do not reopen the phishing position.'
+        : 'EVD-005 confirms privileged-user MFA enrollment; EVD-006 shows test campaigns were blocked.',
+      askPrompt: 'How are we protecting against phishing?',
+      tone: focusEvidence.length ? 'assured' : expired || expiring ? 'partial' : 'assured',
     },
   ]
 
-  const factIdsBefore = [
-    { text: 'The supplier-assurance policy is current (version 3.0).', citationIds: ['ev-policy-supplier'] },
-    {
-      text: 'Current assessment evidence is missing for several critical suppliers.',
-      citationIds: ['ev-audit-findings'],
-    },
-    {
-      text: 'Four international obligations are only partly supported.',
-      citationIds: ['obl-iso-a532', 'obl-nis2-supply', 'obl-gdpr-processor', 'obl-nca-third-party'],
-    },
-    {
-      text: 'ISO 27001, NIS2, GDPR and NCA ECC are affected by the same control.',
-      citationIds: ['ctl-supplier-assurance'],
-    },
-    {
-      text: 'Two connected governance risks are elevated.',
-      citationIds: ['risk-third-party', 'risk-regulatory'],
-    },
-  ]
+  const factIdsBefore = hubAnswerBefore.sourcedFacts.map((fact) => ({
+    text: fact.text,
+    citationIds: fact.citationIds,
+  }))
 
   const factIdsAfter = [
     {
-      text: '2026 critical-supplier assessments are current and approved.',
-      citationIds: ['ev-supplier-assessments-2026'],
+      text: `${demo.focusRiskCode} residual rating remains ${residualLine} and ${appetite}.`,
+      citationIds: ['risk-002'],
     },
     {
-      text: 'Supplier assurance is assured (policy plus current assessments).',
-      citationIds: ['ctl-supplier-assurance'],
+      text: 'CTL-005 Phishing-resistant MFA and CTL-006 Email threat protection remain Effective.',
+      citationIds: ['ctl-005', 'ctl-006'],
     },
     {
-      text: 'Coverage improved across ISO 27001, NIS2, GDPR and NCA ECC.',
-      citationIds: ['obl-iso-a532'],
+      text: 'EVD-005 and EVD-006 stay accepted for the linked phishing controls.',
+      citationIds: ['evd-005', 'evd-006'],
     },
     {
-      text: 'Third-party assurance and regulatory exposure are reduced.',
-      citationIds: ['risk-third-party', 'risk-regulatory'],
+      text: `Next action remains with ${maya?.role ?? 'Learning Manager'}: ${nextAction}`,
+      citationIds: ['risk-002', data.actions[0]?.id ?? 'act-phishing-coach'],
     },
   ]
 
@@ -197,118 +202,141 @@ export function buildHubView(position: PositionState) {
   const briefing = {
     kicker: 'Nox AI briefing',
     title: after
-      ? 'Current assessments are now in place across four frameworks.'
-      : 'Supplier assurance is the highest-impact gap before the review.',
+      ? `${demo.focusRiskCode} stays Within Appetite with evidenced phishing protections.`
+      : `Start with ${demo.focusRiskCode} — ${risk?.title ?? demo.story}.`,
     facts,
     interpretation: after
-      ? 'One approval moved coverage, control assurance and connected risk together. The duplicate questionnaire does not reopen the material gap.'
+      ? demo.controlBlurb
       : hubAnswerBefore.interpretation,
     confidence: after ? 'high' : hubAnswerBefore.confidence,
     freshness: after
-      ? 'Policy current · 2026 assessments current · 2023 pack superseded'
+      ? 'Evidence accepted · coaching action still due'
       : hubAnswerBefore.freshness,
     recommendedAction: after
-      ? 'Open the Board Summary and cite the approved 2026 assessments. Resolve the duplicate pack when convenient.'
-      : `${omar?.name} should complete the critical-supplier evidence package before the review. ${layla?.name} approves.`,
+      ? `Open ${demo.focusRiskCode} and cite EVD-005 and EVD-006 in the Phishing Risk Summary.`
+      : hubAnswerBefore.recommendedAction,
     approval: after
-      ? `Already approved by ${layla?.name}.`
-      : 'Human approval required before coverage or risk changes.',
+      ? `No further approval required for this snapshot · ${layla?.name} remains accountable.`
+      : hubAnswerBefore.approvalRequired
+        ? 'Human approval required before coverage or risk changes.'
+        : `No approval gate on the coaching action · owner ${maya?.name ?? 'Maya Torres'}.`,
     sources: sourceIds.map((id) => sourceRef(id, position)),
-    askPrompt: after ? 'Has our position improved?' : 'Which gap affects the most frameworks?',
+    askPrompt: after ? 'Has our position improved?' : 'What should I focus on first?',
+    primaryCta: 'Open phishing risk',
   }
 
   const primary = data.actions[0]
-  const actions = after
+  const controlTitle = supplierControl?.title ?? 'Phishing-resistant MFA'
+  type HubActionTarget = 'record' | 'board' | 'upload'
+  const actions: {
+    id: string
+    title: string
+    recordTitle: string
+    owner: string
+    ownerRole: string
+    due: string
+    impact: string
+    approvalStatus: string
+    primary: boolean
+    askPrompt: string
+    cta: string
+    target: HubActionTarget
+    recordId?: string
+  }[] = after
     ? [
         {
           id: primary.id,
-          title: 'Critical-supplier evidence package completed',
-          recordTitle: primary.title,
-          owner: layla ? `${layla.name}` : 'Layla Rahman',
-          ownerRole: layla?.role ?? 'Chief Compliance Officer',
-          due: 'Completed',
+          title: primary.title,
+          recordTitle: `${demo.focusRiskCode} · ${risk?.title ?? demo.story}`,
+          owner: maya?.name ?? 'Maya Torres',
+          ownerRole: maya?.role ?? 'Learning Manager',
+          due: `Due ${dueDate}`,
           impact: primary.impact,
-          approvalStatus: `Approved by ${layla?.name}`,
+          approvalStatus: 'Open · no further approval required',
           primary: true,
           askPrompt: 'What should I prioritise?',
-          cta: 'Open Board Summary',
-          target: 'board' as const,
+          cta: 'Open phishing risk',
+          target: 'record',
+          recordId: 'risk-002',
         },
         {
-          id: 'act-duplicate-pack',
-          title: 'Resolve duplicate 2024 supplier questionnaire pack',
-          recordTitle: '2024 supplier questionnaire pack',
-          owner: omar?.name ?? 'Omar Haddad',
-          ownerRole: omar?.role ?? 'Head of Procurement',
-          due: 'Still flagged',
-          impact: 'Catalogue integrity — does not reopen the material gap.',
-          approvalStatus: 'No further approval required',
+          id: 'act-review-mfa',
+          title: `Review ${controlTitle}`,
+          recordTitle: controlTitle,
+          owner: maya?.name ?? 'Maya Torres',
+          ownerRole: maya?.role ?? 'Learning Manager',
+          due: 'Linked control',
+          impact: demo.controlBlurb,
+          approvalStatus: 'No approval required to inspect',
           primary: false,
-          askPrompt: 'Where are we missing evidence?',
-          cta: 'Open evidence record',
-          target: 'record' as const,
-          recordId: 'ev-supplier-q-duplicate',
+          askPrompt: 'How are we protecting against phishing?',
+          cta: 'Open control record',
+          target: 'record',
+          recordId: 'ctl-005',
         },
         {
-          id: 'act-continuity-watch',
-          title: 'Review expiring business continuity test report',
-          recordTitle: 'Business continuity test report',
-          owner: nadia?.name ?? 'Nadia Chen',
-          ownerRole: nadia?.role ?? 'Information Security Lead',
-          due: 'Watch · not the primary action',
-          impact: 'Continuity evidence approaching review.',
-          approvalStatus: 'No approval required for this watch item',
+          id: 'act-review-email-filter',
+          title: 'Review email filtering test evidence',
+          recordTitle: 'Email filtering test',
+          owner: maya?.name ?? 'Maya Torres',
+          ownerRole: maya?.role ?? 'Learning Manager',
+          due: 'Accepted evidence',
+          impact: 'Supports CTL-006 Email threat protection for RSK-002.',
+          approvalStatus: 'No approval required to inspect',
           primary: false,
-          askPrompt: 'What should I prioritise?',
+          askPrompt: 'How are we protecting against phishing?',
           cta: 'Open evidence record',
-          target: 'record' as const,
-          recordId: 'ev-bc-test',
+          target: 'record',
+          recordId: 'evd-006',
         },
       ]
     : [
         {
           id: primary.id,
-          title: 'Complete critical-supplier evidence package',
-          recordTitle: primary.title,
-          owner: omar?.name ?? 'Omar Haddad',
-          ownerRole: omar?.role ?? 'Head of Procurement',
-          due: `Due in ${organisation.review.daysRemaining} days`,
+          title: primary.title,
+          recordTitle: `${demo.focusRiskCode} · ${risk?.title ?? demo.story}`,
+          owner: maya?.name ?? 'Maya Torres',
+          ownerRole: maya?.role ?? 'Learning Manager',
+          due: `Due ${dueDate}`,
           impact: primary.impact,
-          approvalStatus: `Approval required · ${layla?.name}`,
+          approvalStatus: hubAnswerBefore.approvalRequired
+            ? `Approval required · ${layla?.name}`
+            : `Owner ${maya?.name} · due ${dueDate}`,
           primary: true,
-          askPrompt: 'What is the highest-impact action before the review?',
-          cta: 'Upload current assessments',
-          target: 'upload' as const,
+          askPrompt: 'What should I focus on first?',
+          cta: 'Open phishing risk',
+          target: 'record',
+          recordId: 'risk-002',
         },
         {
-          id: 'act-continuity-watch',
-          title: 'Review expiring business continuity test report',
-          recordTitle: 'Business continuity test report',
-          owner: nadia?.name ?? 'Nadia Chen',
-          ownerRole: nadia?.role ?? 'Information Security Lead',
-          due: 'Watch · not the primary action',
-          impact: 'Continuity evidence approaching review — not the material gap.',
-          approvalStatus: 'No approval required for this watch item',
+          id: 'act-review-mfa',
+          title: `Confirm ${controlTitle} coverage`,
+          recordTitle: controlTitle,
+          owner: maya?.name ?? 'Maya Torres',
+          ownerRole: maya?.role ?? 'Learning Manager',
+          due: 'Linked to EVD-005',
+          impact: 'Phishing-resistant MFA reduces credential-theft residual for RSK-002.',
+          approvalStatus: 'No approval required to inspect',
           primary: false,
-          askPrompt: 'Where are we missing evidence?',
-          cta: 'Open evidence record',
-          target: 'record' as const,
-          recordId: 'ev-bc-test',
+          askPrompt: 'How are we protecting against phishing?',
+          cta: 'Open control record',
+          target: 'record',
+          recordId: 'ctl-005',
         },
         {
-          id: 'act-duplicate-pack',
-          title: 'Resolve duplicate 2024 supplier questionnaire pack',
-          recordTitle: '2024 supplier questionnaire pack',
-          owner: omar?.name ?? 'Omar Haddad',
-          ownerRole: omar?.role ?? 'Head of Procurement',
-          due: 'Flagged in the evidence set',
-          impact: 'Duplicate of an expired pack. Does not close the material gap.',
-          approvalStatus: 'No approval required to inspect the record',
+          id: 'act-review-mfa-evidence',
+          title: 'Open MFA coverage report',
+          recordTitle: 'MFA coverage report',
+          owner: maya?.name ?? 'Maya Torres',
+          ownerRole: maya?.role ?? 'Learning Manager',
+          due: 'Accepted evidence',
+          impact: 'EVD-005 shows privileged users enrolled for CTL-005.',
+          approvalStatus: 'No approval required to inspect',
           primary: false,
-          askPrompt: 'Where are we missing evidence?',
+          askPrompt: 'How are we protecting against phishing?',
           cta: 'Open evidence record',
-          target: 'record' as const,
-          recordId: 'ev-supplier-q-duplicate',
+          target: 'record',
+          recordId: 'evd-005',
         },
       ]
 
@@ -332,7 +360,7 @@ export function buildHubView(position: PositionState) {
       id: 'obligations',
       layer: 'Obligations',
       title: 'Obligations',
-      detail: after ? 'Four international obligations supported' : 'Four international obligations partial',
+      detail: after ? 'International obligations retained' : 'Partial rows retained alongside phishing focus',
       status: after ? 'assured' : 'partial',
       askPrompt: after ? 'Where do ISO 27001, NIS2, GDPR and NCA ECC overlap?' : 'Which obligations are not fully supported?',
     },
@@ -340,110 +368,118 @@ export function buildHubView(position: PositionState) {
       id: 'controls',
       layer: 'Controls',
       title: 'Controls',
-      detail: after ? 'Supplier assurance assured' : 'Supplier assurance partial',
-      status: after ? 'assured' : 'partial',
-      askPrompt: 'Why is this control only partially assured?',
+      detail: after ? 'CTL-005 and CTL-006 effective' : 'MFA and email threat protection effective',
+      status: 'assured',
+      askPrompt: 'How are we protecting against phishing?',
     },
     {
       id: 'evidence',
       layer: 'Evidence',
       title: 'Evidence',
-      detail: after ? 'Critical pack current' : 'Critical pack missing',
-      status: after ? 'partial' : 'attention',
-      askPrompt: 'Where are we missing evidence?',
+      detail: after ? 'EVD-005 · EVD-006 accepted' : 'MFA coverage and email filtering accepted',
+      status: 'assured',
+      askPrompt: 'How are we protecting against phishing?',
     },
     {
       id: 'risks',
       layer: 'Risks',
       title: 'Risks',
-      detail: after ? 'Exposure reduced' : `${elevatedRisks} elevated`,
-      status: after ? 'assured' : 'attention',
-      askPrompt: 'What is our biggest current risk?',
+      detail: after
+        ? `${demo.focusRiskCode} ${residualLine} · ${appetite}`
+        : `${demo.focusRiskCode} ${residualLine} · ${elevatedRisks} elevated elsewhere`,
+      status: after ? 'assured' : 'partial',
+      askPrompt: 'Open the phishing risk',
     },
     {
       id: 'owners',
       layer: 'Owners',
       title: 'Owners',
-      detail: after ? `${layla?.name} approved` : `${omar?.name} accountable`,
-      status: after ? 'assured' : 'partial',
-      askPrompt: 'What is the highest-impact action before the review?',
+      detail: after ? `${maya?.name} owns coaching` : `${maya?.name} accountable`,
+      status: 'partial',
+      askPrompt: 'What should I focus on first?',
     },
   ]
 
   const changes = after
     ? [
         {
-          id: 'ch-approved',
-          time: 'Just now',
-          title: 'Current assessments approved',
-          detail: 'Coverage, control assurance and connected risk moved together.',
-          sourceId: 'ev-supplier-assessments-2026',
-          askPrompt: 'Why did compliance readiness change?',
-        },
-        {
-          id: 'ch-duplicate',
-          time: 'Still open',
-          title: 'Duplicate questionnaire remains flagged',
-          detail: '2024 supplier questionnaire pack. Catalogue issue only.',
-          sourceId: 'ev-supplier-q-duplicate',
-          askPrompt: 'Where are we missing evidence?',
-        },
-        {
-          id: 'ch-policy',
-          time: '20 Jan 2026',
-          title: 'Supplier-assurance policy remains current',
-          detail: 'Version 3.0 now sits beside the 2026 assessments.',
-          sourceId: 'ev-policy-supplier',
+          id: 'ch-position',
+          time: demo.snapshotDate,
+          title: `${demo.focusRiskCode} position unchanged`,
+          detail: `Residual ${residualLine}, ${appetite}.`,
+          sourceId: 'risk-002',
           askPrompt: 'Has our position improved?',
+        },
+        {
+          id: 'ch-controls',
+          time: demo.snapshotDate,
+          title: 'Phishing controls remain effective',
+          detail: demo.controlBlurb,
+          sourceId: 'ctl-005',
+          askPrompt: 'How are we protecting against phishing?',
+        },
+        {
+          id: 'ch-evidence',
+          time: demo.snapshotDate,
+          title: 'Accepted phishing evidence retained',
+          detail: 'EVD-005 MFA coverage · EVD-006 email filtering test.',
+          sourceId: 'evd-005',
+          askPrompt: 'How are we protecting against phishing?',
         },
       ]
     : [
         {
-          id: 'ch-remediation',
-          time: '15 Aug 2026',
-          title: 'Remediation opened',
-          detail: 'Obtain and approve current critical-supplier assessments.',
+          id: 'ch-focus',
+          time: demo.snapshotDate,
+          title: `${demo.focusRiskCode} selected for the walkthrough`,
+          detail: `Inherent High · residual ${residualLine} · ${appetite}.`,
+          sourceId: 'risk-002',
+          askPrompt: 'What should I focus on first?',
+        },
+        {
+          id: 'ch-coaching',
+          time: dueDate,
+          title: 'Coaching action opened',
+          detail: nextAction,
           sourceId: primary.id,
-          askPrompt: 'What is the highest-impact action before the review?',
+          askPrompt: 'What should I focus on first?',
         },
         {
-          id: 'ch-audit',
-          time: '21 Jun 2026',
-          title: 'Audit recorded the missing pack',
-          detail: 'Internal audit findings note that current assessments are missing.',
-          sourceId: 'ev-audit-findings',
-          askPrompt: 'Which gap affects the most frameworks?',
-        },
-        {
-          id: 'ch-policy',
-          time: '20 Jan 2026',
-          title: 'Supplier-assurance policy marked current',
-          detail: 'Version 3.0. Policy does not replace assessments.',
-          sourceId: 'ev-policy-supplier',
-          askPrompt: 'Which gap affects the most frameworks?',
+          id: 'ch-evidence',
+          time: '01 Sep 2026',
+          title: 'Phishing evidence accepted',
+          detail: 'EVD-005 and EVD-006 support CTL-005 and CTL-006.',
+          sourceId: 'evd-005',
+          askPrompt: 'How are we protecting against phishing?',
         },
       ]
 
-  const notifications = after
+  const notifications: {
+    id: string
+    title: string
+    body: string
+    target: NotificationTarget
+    recordId?: string
+  }[] = after
     ? [
         {
-          id: 'n-closed',
-          title: 'Material gap closed for this review',
-          body: 'Board Summary can cite current assessments.',
-          target: 'board' as const,
+          id: 'n-phishing',
+          title: `${demo.focusRiskCode} remains Within Appetite`,
+          body: 'Open phishing risk from the briefing CTA',
+          target: 'hub',
         },
         {
-          id: 'n-dup',
-          title: 'Duplicate questionnaire still flagged',
-          body: '2024 supplier questionnaire pack',
-          target: 'evidence' as const,
-          recordId: 'ev-supplier-q-duplicate',
+          id: 'n-evidence',
+          title: 'Phishing evidence still accepted',
+          body: 'EVD-005 · EVD-006',
+          target: 'evidence',
+          recordId: 'evd-005',
         },
         {
           id: 'n-review',
           title: `Governance review in ${organisation.review.daysRemaining} days`,
           body: `${organisation.name} · ${reportingPeriod}`,
-          target: 'hub' as const,
+          target: 'hub',
         },
       ]
     : [
@@ -451,20 +487,19 @@ export function buildHubView(position: PositionState) {
           id: 'n-review',
           title: `Governance review in ${organisation.review.daysRemaining} days`,
           body: `${organisation.name} · ${reportingPeriod}`,
-          target: 'hub' as const,
+          target: 'hub',
         },
         {
-          id: 'n-gap',
-          title: 'Critical-supplier assessments missing',
-          body: 'Highest-impact gap before the review',
-          target: 'gap' as const,
+          id: 'n-phishing',
+          title: `Focus ${demo.focusRiskCode} phishing risk`,
+          body: `Residual ${residualLine} · ${appetite}`,
+          target: 'hub',
         },
         {
-          id: 'n-dup',
-          title: 'Duplicate questionnaire flagged',
-          body: '2024 supplier questionnaire pack',
-          target: 'evidence' as const,
-          recordId: 'ev-supplier-q-duplicate',
+          id: 'n-coach',
+          title: 'Coaching action due',
+          body: `${maya?.name} · ${dueDate}`,
+          target: 'action',
         },
       ]
 
@@ -482,8 +517,8 @@ export function buildHubView(position: PositionState) {
     orgName: organisation.name,
     reportingPeriod,
     connectedLede: after
-      ? 'The same objects now agree across frameworks, obligations, controls, evidence, risks and owners.'
-      : 'One missing evidence pack sits under four frameworks, keeps the control partial and elevates two connected risks.',
+      ? 'RSK-002 still connects MFA and email threat protection to accepted evidence and the Learning Manager coaching action.'
+      : 'RSK-002 connects phishing-resistant MFA and email threat protection to accepted evidence, with Maya Torres owning the next coaching action.',
   }
 }
 

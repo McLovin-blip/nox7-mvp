@@ -47,7 +47,7 @@ export function buildAppView(position: PositionState) {
   const after = position === 'after'
   const pos = after ? data.position.after : data.position.before
   const catalogue = evidenceFor(position)
-  const expired = catalogue.filter((item) => item.freshness === 'expired' && !item.duplicateOf && !(after && item.id === 'ev-supplier-assessments-2023')).length
+  const expired = catalogue.filter((item) => item.freshness === 'expired' && !item.duplicateOf && !(after && item.id === 'evd-006')).length
   const superseded = after ? 1 : 0
   const duplicate = catalogue.filter((item) => item.duplicateOf).length
   const expiring = catalogue.filter((item) => item.freshness === 'expiring').length
@@ -107,7 +107,7 @@ export function buildAppView(position: PositionState) {
               ? 'Not assessed'
               : 'Partially assured'
     const summary =
-      item.id === 'ctl-supplier-assurance'
+      item.id === 'ctl-005'
         ? after
           ? 'Policy and current assessments are both in place.'
           : (item.partialReason ?? 'Policy is current. Current assessments are missing.')
@@ -132,7 +132,7 @@ export function buildAppView(position: PositionState) {
   })
 
   const evidence = catalogue.map((item) => {
-    const supersededPack = after && item.id === 'ev-supplier-assessments-2023'
+    const supersededPack = after && item.id === 'evd-006'
     const status = supersededPack
       ? 'Superseded'
       : item.duplicateOf
@@ -172,7 +172,7 @@ export function buildAppView(position: PositionState) {
       status,
       tone: toneFrom(level === 'reduced' ? 'assured' : level),
       owner: personLabel(item.ownerId),
-      summary: after && item.id !== 'risk-continuity'
+      summary: after && item.id !== 'risk-003'
         ? 'Reduced after current assessments were approved.'
         : item.contributingGap,
       meta: status,
@@ -239,55 +239,91 @@ export function buildAppView(position: PositionState) {
     ),
   )
 
+  const focusRisk = data.risks.find((item) => item.id === data.demo.focusRiskId) ?? data.risks.find((item) => item.demoFocus)
+  const focusControls = data.demo.focusControlIds
+    .map((id) => data.controls.find((item) => item.id === id))
+    .filter((item): item is (typeof data.controls)[number] => Boolean(item))
+  const focusEvidence = data.demo.focusEvidenceIds
+    .map((id) => catalogue.find((item) => item.id === id) ?? data.evidence.find((item) => item.id === id))
+    .filter((item): item is (typeof data.evidence)[number] => Boolean(item))
+
+  const phishingPreview = focusRisk
+    ? {
+        risk: {
+          id: focusRisk.id,
+          code: focusRisk.code,
+          title: focusRisk.title,
+          whatCouldHappen: focusRisk.whatCouldHappen,
+          inherentLabel: focusRisk.inherentLabel,
+          residualLabel: focusRisk.residualLabel,
+          appetiteLabel: focusRisk.appetiteLabel,
+        },
+        controls: focusControls.map((item) => ({
+          id: item.id,
+          code: item.code,
+          title: item.title,
+          purpose: item.purpose,
+          effectivenessLabel: item.effectivenessLabel,
+        })),
+        controlBlurb: data.demo.controlBlurb,
+        evidence: focusEvidence.map((item) => ({
+          id: item.id,
+          code: item.code,
+          title: item.title,
+          statusLabel: item.statusLabel,
+          resultOrGap: item.resultOrGap ?? item.summary,
+        })),
+        nextAction: {
+          title: focusRisk.nextAction,
+          owner: personLabel(focusRisk.ownerId),
+          dueDate: focusRisk.dueDate,
+          status: focusRisk.actionStatus,
+        },
+      }
+    : null
+
   const reports = data.reports.map((item) => ({
     id: item.id,
     title: item.title,
     primary: item.primary,
     period: item.period,
-    status: item.primary ? (after ? 'Updated from current position' : 'Describes the material gap') : 'Listed for the same period',
+    description: item.description,
+    preview: item.preview ?? (item.primary ? 'phishing' : 'board'),
+    status: item.primary
+      ? after
+        ? 'Updated from current position'
+        : 'Primary phishing walkthrough'
+      : 'Secondary cyber snapshot',
   }))
 
-  const board = after
-    ? {
-        kicker: 'Board Summary · Q3 2026',
-        title: 'Supplier-assurance gap closed for this review',
-        lede: 'Current critical-supplier assessments have been approved. Coverage improved across ISO 27001, NIS2, GDPR and NCA ECC. The supplier-assurance control is assured. Third-party and regulatory exposure are reduced.',
-        statements: [
-          {
-            text: 'Compliance readiness moved from 64 (Needs attention) to 72 (Improved).',
-            citationId: 'rep-board-summary',
-          },
-          {
-            text: 'ISO 27001 86% · NIS2 82% · GDPR 80% · NCA ECC 79%.',
-            citationId: 'ctl-supplier-assurance',
-          },
-          {
-            text: '2026 critical-supplier assessments are current and cited as the closing evidence.',
-            citationId: 'ev-supplier-assessments-2026',
-          },
-        ],
-        watch: 'A 2024 supplier questionnaire pack remains flagged as a duplicate. The business continuity test report is expiring.',
-      }
-    : {
-        kicker: 'Board Summary · Q3 2026',
-        title: 'One material gap remains before the governance review',
-        lede: 'Meridian has a current supplier-assurance policy, but current assessment evidence is missing for several critical suppliers. That leaves related obligations only partly covered and keeps two connected risks elevated.',
-        statements: [
-          {
-            text: 'Compliance readiness is 64 — Needs attention.',
-            citationId: 'rep-board-summary',
-          },
-          {
-            text: 'The supplier assurance policy is current (version 3.0) and does not replace assessments.',
-            citationId: 'ev-policy-supplier',
-          },
-          {
-            text: 'Internal audit findings record that current critical-supplier assessments are missing.',
-            citationId: 'ev-audit-findings',
-          },
-        ],
-        watch: 'Highest-impact action: obtain and approve current assessments. Omar Haddad accountable. Layla Rahman approves.',
-      }
+  const board = {
+    kicker: 'Board Cyber Risk Snapshot · Q3 2026',
+    title: after
+      ? 'Cyber residual positions remain within the phishing walkthrough'
+      : 'Phishing residual is within appetite; several cyber risks remain above appetite',
+    lede: after
+      ? 'Demo snapshot unchanged — phishing protections remain evidenced and within appetite. Use the Phishing Risk Summary for the primary walkthrough.'
+      : `${pos.materialGap} Start with ${focusRisk?.code ?? 'RSK-002'} — ${focusRisk?.title ?? 'Phishing and credential theft'}.`,
+    statements: [
+      {
+        text: `Readiness ${pos.readinessValue} — ${pos.readinessLabel}.`,
+        citationId: 'rep-board-summary',
+      },
+      {
+        text: focusRisk
+          ? `${focusRisk.code} residual ${focusRisk.residualLabel} · ${focusRisk.appetiteLabel}.`
+          : 'Phishing residual remains the focus story.',
+        citationId: focusRisk?.id ?? 'risk-002',
+      },
+      {
+        text: data.demo.controlBlurb,
+        citationId: data.demo.focusControlIds[0] ?? 'ctl-005',
+      },
+    ],
+    watch: focusRisk
+      ? `Next action: ${focusRisk.nextAction} Owner: ${personLabel(focusRisk.ownerId)}. Due ${focusRisk.dueDate}.`
+      : pos.accountableAction,
+  }
 
   return {
     position,
@@ -310,6 +346,7 @@ export function buildAppView(position: PositionState) {
     risks,
     reports,
     board,
+    phishingPreview,
     prompts,
   }
 }
@@ -389,8 +426,8 @@ function buildGap(
         status: after ? 'Closed for this review' : 'Highest-impact gap',
         tone: after ? ('assured' as const) : ('attention' as const),
         body: after
-          ? 'A current supplier-assurance policy, current assessments, four supported obligations, an assured control, and reduced third-party and regulatory exposure now agree.'
-          : 'A current supplier-assurance policy sits above four overlapping obligations. The supplier-assurance control stays partial because current assessments are missing. That elevates third-party assurance and regulatory exposure ahead of the review.',
+          ? 'Phishing-resistant MFA and email threat protection are evidenced. RSK-002 residual stays within appetite, with the Learning Manager owning the next coaching action.'
+          : 'Start with RSK-002 Phishing and credential theft. Linked controls CTL-005 and CTL-006 are effective, with accepted evidence EVD-005 and EVD-006, and a clear next coaching action.',
         items: [] as { label: string; title: string; meta: string }[],
       },
       policy: {
@@ -411,7 +448,7 @@ function buildGap(
       },
       obligations: {
         kicker: 'Obligations',
-        title: 'Overlapping supplier-assurance requirements',
+        title: 'Connected phishing protections',
         status: after ? 'Supported' : 'Partial',
         tone: after ? ('assured' as const) : ('partial' as const),
         body: after
@@ -475,7 +512,7 @@ function buildGap(
           ? 'Third-party assurance and regulatory exposure reduced together when the assessments were approved. Continuity evidence remains a watch item.'
           : 'Both elevated risks trace to the same missing assessments. Closing the evidence gap is the efficient remediation before the review.',
         items: data.risks
-          .filter((item) => item.id !== 'risk-continuity' || after)
+          .filter((item) => item.id !== 'risk-003' || after)
           .map((item) => {
             const level = after ? item.levelAfter : item.levelBefore
             return {

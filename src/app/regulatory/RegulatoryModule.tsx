@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSession } from '../state/SessionProvider.tsx'
 import { organisation, titleOf, data, frameworkName } from '../mock/data.ts'
+import { TablePagination } from '../ui/TablePagination.tsx'
+import { usePagination } from '../ui/usePagination.ts'
 import {
   attentionObligations,
   buildObligationBriefing,
@@ -62,6 +64,7 @@ export function RegulatoryModule({
   const records = useMemo(() => buildObligationRecords(position), [position])
   const previous = useMemo(() => previousObligations(position), [position])
   const visible = useMemo(() => filterObligations(records, filters), [records, filters])
+  const pagination = usePagination(visible)
   const scoped = useMemo(
     () => filterObligations(records, { ...defaultObligationFilters(), frameworkId: filters.frameworkId, query: filters.query }),
     [records, filters.frameworkId, filters.query],
@@ -361,6 +364,7 @@ export function RegulatoryModule({
             <button type="button" className="wx-btn" onClick={() => patch(defaultObligationFilters())}>Clear filters</button>
           </div>
         ) : (
+          <>
           <div className="wx-table-wrap">
             <table className="wx-table">
               <thead>
@@ -376,7 +380,7 @@ export function RegulatoryModule({
                 </tr>
               </thead>
               <tbody>
-                {visible.map((item) => (
+                {pagination.pageItems.map((item) => (
                   <tr key={item.id}>
                     <td><button type="button" onClick={() => onSelect(item.id)}>{item.title}</button></td>
                     <td><button type="button" onClick={() => patch({ frameworkId: item.frameworkId })}>{item.framework}</button></td>
@@ -391,6 +395,19 @@ export function RegulatoryModule({
               </tbody>
             </table>
           </div>
+          <TablePagination
+            page={pagination.page}
+            pageSize={pagination.pageSize}
+            pageCount={pagination.pageCount}
+            total={pagination.total}
+            start={pagination.start}
+            end={pagination.end}
+            canPrev={pagination.canPrev}
+            canNext={pagination.canNext}
+            onPage={pagination.setPage}
+            onPageSize={pagination.setPageSize}
+          />
+          </>
         )}
       </section>
 
@@ -569,7 +586,7 @@ function OverlayPanel({
             <p className="wx-lede">{item.nextAction}</p>
             <p className="wx-muted">{item.owner} · due {formatDate(item.dueDate)}</p>
             <div className="wx-toolbar">
-              {item.overall === 'unverifiable' && item.id.startsWith('obl-') && item.controlIds.includes('ctl-supplier-assurance') ? (
+              {item.overall === 'unverifiable' && item.id.startsWith('obl-') && item.controlIds.includes('ctl-005') ? (
                 <button type="button" className="wx-btn primary" onClick={() => onNavigate({ type: 'upload' })}>Upload current assessments</button>
               ) : (
                 <button type="button" className="wx-btn primary" onClick={() => onNavigate({ type: 'module', module: 'evidence', recordId: item.evidenceIds[0] ?? null })}>Open evidence</button>

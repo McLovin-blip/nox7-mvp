@@ -11,9 +11,12 @@ export type EvidenceStatus =
   | 'duplicate'
   | 'superseded'
   | 'no-owner'
+  | 'accepted'
+  | 'under-review'
 
 export type EvidenceRecord = {
   id: string
+  code: string
   title: string
   fileType: string
   version: string
@@ -22,7 +25,9 @@ export type EvidenceRecord = {
   owner: string
   ownerRole: string
   status: EvidenceStatus
+  statusLabel: string
   summary: string
+  resultOrGap: string
   controlIds: string[]
   obligationIds: string[]
   riskIds: string[]
@@ -43,14 +48,16 @@ export type EvidenceNavigate =
   | { type: 'evidence'; evidenceId: string | null }
   | { type: 'upload' }
 
-export function statusLabel(value: EvidenceStatus) {
+export function statusLabel(value: EvidenceStatus | string) {
   if (value === 'awaiting-approval') return 'Awaiting approval'
   if (value === 'no-owner') return 'No owner'
+  if (value === 'under-review') return 'Under Review'
+  if (value === 'accepted') return 'Accepted'
   return value.charAt(0).toUpperCase() + value.slice(1)
 }
 
 export function toneOf(value: EvidenceStatus) {
-  if (value === 'current') return 'ok' as const
+  if (value === 'current' || value === 'accepted') return 'ok' as const
   if (value === 'missing' || value === 'expired' || value === 'conflicting') return 'bad' as const
   return 'watch' as const
 }
@@ -66,8 +73,10 @@ export function defaultEvidenceFilters(): EvidenceFilters {
   return { query: '', status: 'all', ownerId: 'all', controlId: 'all', usedBy: 'all', attentionOnly: false }
 }
 
-function deriveStatus(item: (typeof data.evidence)[number], position: PositionState): EvidenceStatus {
-  if (position === 'after' && item.id === 'ev-supplier-assessments-2023') return 'superseded'
+function deriveStatus(item: (typeof data.evidence)[number], _position: PositionState): EvidenceStatus {
+  const label = 'statusLabel' in item ? String(item.statusLabel ?? '').toLowerCase() : ''
+  if (label.includes('accepted')) return 'accepted'
+  if (label.includes('under review')) return 'under-review'
   if (item.duplicateOf) return 'duplicate'
   if (item.processingState === 'awaiting-approval') return 'awaiting-approval'
   if (!item.ownerId) return 'no-owner'
@@ -78,11 +87,13 @@ function deriveStatus(item: (typeof data.evidence)[number], position: PositionSt
 }
 
 export function buildEvidenceRecords(position: PositionState): EvidenceRecord[] {
-  const catalogue: EvidenceRecord[] = evidenceFor(position).map((item) => {
+  return evidenceFor(position).map((item) => {
     const owner = personById(item.ownerId)
     const status = deriveStatus(item, position)
+    const resultOrGap = item.resultOrGap ?? item.summary ?? `${item.fileType} · Version ${item.version}`
     return {
       id: item.id,
+      code: item.code ?? item.id.toUpperCase(),
       title: item.title,
       fileType: item.fileType,
       version: item.version,
@@ -91,40 +102,14 @@ export function buildEvidenceRecords(position: PositionState): EvidenceRecord[] 
       owner: owner?.name ?? 'Unassigned',
       ownerRole: owner?.role ?? '',
       status,
-      summary:
-        status === 'conflicting'
-          ? 'Conflicts with another current pack in the same control mapping.'
-          : status === 'duplicate'
-            ? 'Flagged as a duplicate. Not used to close a gap.'
-            : status === 'superseded'
-              ? 'Replaced by the 2026 assessments for this review.'
-              : status === 'no-owner'
-                ? 'Indexed, but no evidence owner is recorded.'
-                : `${item.fileType} · Version ${item.version}`,
+      statusLabel: item.statusLabel ?? statusLabel(status),
+      summary: resultOrGap,
+      resultOrGap,
       controlIds: item.usedByControlIds ?? [],
       obligationIds: item.usedByObligationIds ?? [],
       riskIds: item.usedByRiskIds ?? [],
     }
   })
-  if (position === 'before') {
-    catalogue.unshift({
-      id: 'ev-missing-supplier-2026',
-      title: 'Current critical-supplier assessments',
-      fileType: 'PDF',
-      version: 'Expected',
-      date: '',
-      ownerId: 'person-omar',
-      owner: 'Omar Haddad',
-      ownerRole: 'Head of Procurement',
-      status: 'missing',
-      summary: 'Expected for supplier assurance. Until this pack exists, related obligations stay unverifiable.',
-      controlIds: ['ctl-supplier-assurance'],
-      obligationIds: ['obl-iso-a532', 'obl-nis2-supply', 'obl-gdpr-processor', 'obl-nca-third-party'],
-      riskIds: ['risk-third-party', 'risk-regulatory'],
-      synthetic: true,
-    })
-  }
-  return catalogue
 }
 
 export function filterEvidence(rows: EvidenceRecord[], filters: EvidenceFilters) {
@@ -139,7 +124,9 @@ export function filterEvidence(rows: EvidenceRecord[], filters: EvidenceFilters)
     if (filters.usedBy === 'risks' && item.riskIds.length === 0) return false
     if (filters.usedBy === 'unused' && (item.controlIds.length || item.obligationIds.length || item.riskIds.length)) return false
     if (query) {
-      const hay = [item.title, item.owner, item.fileType, item.id].join(' ').toLowerCase()
+      const hay = [item.title, item.owner, item.fileType, item.id, item.code, item.statusLabel, item.resultOrGap]
+        .join(' ')
+        .toLowerCase()
       if (!hay.includes(query)) return false
     }
     return true
@@ -167,7 +154,7 @@ export function clearEvidenceChip(filters: EvidenceFilters, key: keyof EvidenceF
 }
 
 export function evidenceIndicators(rows: EvidenceRecord[]) {
-  const current = rows.filter((item) => item.status === 'current').length
+  const current = rows.filter((item) => item.status === 'current' || item.status === 'accepted').length
   return [
     { id: 'total' as const, label: 'Catalogue', value: String(rows.length), context: 'Records in this organisation view', filter: { status: 'all' as const } },
     { id: 'current' as const, label: 'Current', value: String(current), context: 'Can be used for this review', filter: { status: 'current' as const } },
@@ -189,6 +176,7 @@ function attentionRank(item: EvidenceRecord) {
   if (item.status === 'expired') return 35
   if (item.status === 'no-owner') return 30
   if (item.status === 'awaiting-approval') return 25
+  if (item.status === 'under-review') return 22
   if (item.status === 'expiring') return 20
   if (item.status === 'duplicate') return 10
   return 0
@@ -205,35 +193,32 @@ export function reuseRows(rows: EvidenceRecord[]) {
     .slice(0, 5)
 }
 
-export function buildEvidenceBriefing(rows: EvidenceRecord[], position: PositionState) {
-  const after = position === 'after'
-  const lead = attentionEvidence(rows)[0]
+export function buildEvidenceBriefing(rows: EvidenceRecord[], _position: PositionState) {
+  const focusIds = new Set(data.demo.focusEvidenceIds)
+  const focus = rows.filter((item) => focusIds.has(item.id))
+  const lead = focus[0] ?? attentionEvidence(rows)[0]
+  const phishingControls = data.demo.focusControlIds.map((id) => titleOf(data.controls, id)).join(' and ')
   return {
-    title: after
-      ? 'The 2026 assessments are current. Residual evidence risk is expiry, conflict and an unowned HSE pack.'
-      : 'You cannot yet rely on supplier-assurance evidence. A current policy does not replace the missing assessments.',
-    attention: lead ? `${lead.title} is the priority.` : 'Evidence in this view is current.',
-    facts: [
-      {
-        id: 'f1',
-        text: after ? '2026 critical-supplier assessments are current and approved.' : 'Current critical-supplier assessments are missing.',
-        citationId: after ? 'ev-supplier-assessments-2026' : 'ev-missing-supplier-2026',
-      },
-      { id: 'f2', text: 'The business continuity test report is expiring.', citationId: 'ev-bc-test' },
-      { id: 'f3', text: 'Privileged-access review Q2 conflicts with the IAM exception log.', citationId: 'ev-privileged-review-q2' },
-    ],
-    interpretation: after
-      ? 'Approval closed the material gap. It did not cleanse duplicates, refresh continuity tests, or assign an HSE evidence owner.'
-      : 'Missing assessments keep four international obligations unverifiable. Other packs can still be current, expiring or conflicting at the same time.',
+    title:
+      focus.length > 0
+        ? `${data.demo.story}: ${focus.map((item) => item.code).join(' / ')} are ${focus.map((item) => item.statusLabel).join(' / ')}.`
+        : 'Evidence health for the current organisation view.',
+    attention: lead ? `${lead.title}: ${lead.resultOrGap}` : 'Evidence in this view is current.',
+    facts: (focus.length ? focus : rows.slice(0, 3)).map((item, index) => ({
+      id: `f${index + 1}`,
+      text: `${item.code} · ${item.statusLabel}: ${item.resultOrGap}`,
+      citationId: item.id,
+    })),
+    interpretation: data.demo.controlBlurb,
     confidence: 'high',
-    freshness: after ? 'Supplier assessments current · continuity expiring' : 'Policy current · assessments missing · 2023 pack expired',
-    recommendedAction: after ? 'Reconcile conflicting access evidence and refresh the continuity test.' : 'Upload and approve current critical-supplier assessments.',
-    owner: after ? 'Nadia Chen' : 'Omar Haddad',
+    freshness: `${data.demo.snapshotDate} · phishing evidence accepted`,
+    recommendedAction: data.risks.find((item) => item.id === data.demo.focusRiskId)?.nextAction ?? 'Review linked phishing evidence.',
+    owner: personById(data.risks.find((item) => item.id === data.demo.focusRiskId)?.ownerId ?? '')?.name ?? 'Maya Torres',
     approval: 'Human approval is required before evidence changes the organisation position.',
-    askPrompt: 'What evidence is missing, expiring or conflicting?',
+    askPrompt: 'What evidence do we have?',
     sources: [
-      { id: lead?.id ?? 'ev-policy-supplier', kind: 'Evidence', title: lead?.title ?? 'Evidence' },
-      { id: 'ctl-supplier-assurance', kind: 'Control', title: titleOf(data.controls, 'ctl-supplier-assurance') },
+      { id: lead?.id ?? data.demo.focusEvidenceIds[0], kind: 'Evidence', title: lead?.title ?? 'Evidence' },
+      { id: data.demo.focusControlIds[0], kind: 'Control', title: phishingControls },
     ],
   }
 }

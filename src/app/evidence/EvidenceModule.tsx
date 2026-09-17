@@ -3,6 +3,8 @@ import { data } from '../mock/data.ts'
 import { ModuleFrame, Pill as LegacyPill } from '../modules/Records.tsx'
 import '../modules/modules.css'
 import { useSession } from '../state/SessionProvider.tsx'
+import { TablePagination } from '../ui/TablePagination.tsx'
+import { usePagination } from '../ui/usePagination.ts'
 import {
   attentionEvidence,
   buildEvidenceBriefing,
@@ -61,6 +63,7 @@ export function EvidenceModule({
 
   const records = useMemo(() => buildEvidenceRecords(position), [position])
   const visible = useMemo(() => filterEvidence(records, filters), [records, filters])
+  const pagination = usePagination(visible)
   const indicators = useMemo(() => evidenceIndicators(records), [records])
   const briefing = useMemo(() => buildEvidenceBriefing(records, position), [records, position])
   const attention = useMemo(() => attentionEvidence(visible.length ? visible : records), [visible, records])
@@ -248,7 +251,7 @@ export function EvidenceModule({
               {briefing.facts.map((fact) => (
                 <li key={fact.id}>
                   <button type="button" onClick={() => {
-                    if (fact.citationId === 'ev-missing-supplier-2026') go({ type: 'upload' })
+                    if (fact.citationId === 'evd-005') go({ type: 'upload' })
                     else go({ type: 'evidence', evidenceId: fact.citationId })
                   }}>{fact.text}</button>
                 </li>
@@ -262,11 +265,13 @@ export function EvidenceModule({
             <p className="wx-lede">{briefing.recommendedAction}</p>
             <p className="wx-muted">{briefing.owner} · {briefing.approval}</p>
             <div className="wx-toolbar">
-              {position === 'before' ? (
-                <button type="button" className="wx-btn primary" onClick={() => fileRef.current?.click()}>Upload current assessments</button>
-              ) : (
-                <button type="button" className="wx-btn primary" onClick={() => onSelect(attention[0]?.id ?? 'ev-bc-test')}>Open priority evidence</button>
-              )}
+              <button
+                type="button"
+                className="wx-btn primary"
+                onClick={() => onSelect(attention[0]?.id ?? data.demo.focusEvidenceIds[0] ?? records[0]?.id)}
+              >
+                Open priority evidence
+              </button>
               <button type="button" className="wx-btn" onClick={() => onAskNox?.(briefing.askPrompt)}>Ask Nox</button>
             </div>
           </div>
@@ -283,8 +288,8 @@ export function EvidenceModule({
             {attention.map((item) => (
               <li key={item.id}>
                 <button type="button" onClick={() => (item.synthetic ? go({ type: 'upload' }) : onSelect(item.id))}>
-                  <span>{item.title}<em className="wx-muted"> · {item.summary}</em></span>
-                  <Pill tone={toneOf(item.status)}>{statusLabel(item.status)}</Pill>
+                  <span>{item.title}<em className="wx-muted"> · {item.resultOrGap || item.summary}</em></span>
+                  <Pill tone={toneOf(item.status)}>{item.statusLabel || statusLabel(item.status)}</Pill>
                 </button>
               </li>
             ))}
@@ -367,6 +372,7 @@ export function EvidenceModule({
             <button type="button" className="wx-btn" onClick={() => patch(defaultEvidenceFilters())}>Clear filters</button>
           </div>
         ) : (
+          <>
           <div className="wx-table-wrap">
             <table className="wx-table">
               <thead>
@@ -381,10 +387,16 @@ export function EvidenceModule({
                 </tr>
               </thead>
               <tbody>
-                {visible.map((item) => (
+                {pagination.pageItems.map((item) => (
                   <tr key={item.id}>
-                    <td><button type="button" onClick={() => (item.synthetic ? go({ type: 'upload' }) : onSelect(item.id))}>{item.title}</button></td>
-                    <td><button type="button" onClick={() => patch({ status: item.status }, true)}><Pill tone={toneOf(item.status)}>{statusLabel(item.status)}</Pill></button></td>
+                    <td>
+                      <button type="button" onClick={() => (item.synthetic ? go({ type: 'upload' }) : onSelect(item.id))}>
+                        {item.code ? `${item.code} · ` : ''}
+                        {item.title}
+                        <em className="wx-muted"> · {item.resultOrGap}</em>
+                      </button>
+                    </td>
+                    <td><button type="button" onClick={() => patch({ status: item.status }, true)}><Pill tone={toneOf(item.status)}>{item.statusLabel || statusLabel(item.status)}</Pill></button></td>
                     <td><button type="button" onClick={() => setOverlay({ kind: 'owner', personId: item.ownerId })}>{item.owner}</button></td>
                     <td><button type="button" onClick={() => setOverlay({ kind: 'controls', evidenceId: item.id })}>{item.controlIds.length}</button></td>
                     <td><button type="button" onClick={() => setOverlay({ kind: 'obligations', evidenceId: item.id })}>{item.obligationIds.length}</button></td>
@@ -395,6 +407,19 @@ export function EvidenceModule({
               </tbody>
             </table>
           </div>
+          <TablePagination
+            page={pagination.page}
+            pageSize={pagination.pageSize}
+            pageCount={pagination.pageCount}
+            total={pagination.total}
+            start={pagination.start}
+            end={pagination.end}
+            canPrev={pagination.canPrev}
+            canNext={pagination.canNext}
+            onPage={pagination.setPage}
+            onPageSize={pagination.setPageSize}
+          />
+          </>
         )}
       </section>
       <EvidenceOverlay overlay={overlay} records={records} onClose={() => setOverlay({ kind: 'none' })} onNavigate={go} onFilter={(next) => { setOverlay({ kind: 'none' }); patch(next, true) }} onAskNox={(prompt) => onAskNox?.(prompt)} />
@@ -425,11 +450,13 @@ function EvidenceDetail({
         <strong>{item.title}</strong>
       </div>
       <header className="wx-detail-head">
-        <p className="wx-kicker">{item.fileType} · {item.version}</p>
+        <p className="wx-kicker">
+          {item.code} · {item.fileType} · {item.version}
+        </p>
         <h1>{item.title}</h1>
-        <p className="wx-lede">{item.summary}</p>
+        <p className="wx-lede">{item.resultOrGap || item.summary}</p>
         <div className="wx-meta">
-          <Pill tone={toneOf(item.status)}>{statusLabel(item.status)}</Pill>
+          <Pill tone={toneOf(item.status)}>{item.statusLabel || statusLabel(item.status)}</Pill>
           <span>{item.owner}</span>
         </div>
         <div className="wx-toolbar">

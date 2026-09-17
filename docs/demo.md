@@ -26,3 +26,17 @@ If asked whether this is only a briefing, open Regulatory overlap or the supplie
 ## Language
 
 Say **organisation**, never tenant. Lead with executive wording. Identifiers stay in the metadata of a record, not in the spoken demo.
+
+## Phishing demo path (final)
+
+1. Hub → **Open phishing risk** (RSK-002)
+2. Risk detail → what could happen, inherent/residual, appetite, next action
+3. Linked controls → CTL-005 Phishing-resistant MFA, CTL-006 Email threat protection
+4. Evidence → EVD-005 MFA coverage report, EVD-006 Email filtering test
+5. Next action → Learning Manager, due date, Monitoring
+6. Ask Nox → four contextual questions on the selected risk
+7. Connect → focused relationship strip for the same records
+8. Reports → Phishing Risk Summary
+
+Shared mock: `docs/mock/meridian-organisation.json` (`demo` block).
+

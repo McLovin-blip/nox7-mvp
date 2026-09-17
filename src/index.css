@@ -23,10 +23,17 @@
   --accent-soft: rgba(139, 111, 232, 0.15);
   --accent-line: rgba(139, 111, 232, 0.3);
 
-  --status-critical: #e25c5c;
-  --status-high: #e08a4a;
+  --status-critical: #c53b3b;
+  --status-high: #e25c5c;
   --status-warning: #e0b04a;
   --status-success: #4caf82;
+  --status-unknown: #8a8a9c;
+
+  --risk-critical: #c53b3b;
+  --risk-high: #e25c5c;
+  --risk-medium: #e0b04a;
+  --risk-low: #4caf82;
+  --risk-unknown: #8a8a9c;
 
   --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.28);
   --shadow-panel: 0 12px 40px rgba(0, 0, 0, 0.4);
@@ -44,7 +51,9 @@
   --space-7: 32px;
   --space-8: 40px;
 
-  --sidebar-width: 236px;
+  --sidebar-expanded-width: 236px;
+  --sidebar-collapsed-width: 72px;
+  --sidebar-width: var(--sidebar-expanded-width);
   --header-height: 56px;
   --nox-rail-width: 410px;
 
@@ -86,14 +95,67 @@
   --accent-soft: rgba(109, 86, 214, 0.1);
   --accent-line: rgba(109, 86, 214, 0.26);
 
-  --status-critical: #d14343;
-  --status-high: #d4782e;
+  --status-critical: #b32626;
+  --status-high: #d14343;
   --status-warning: #c9971a;
   --status-success: #2f9e6b;
+  --status-unknown: #858ba0;
+
+  --risk-critical: #b32626;
+  --risk-high: #d14343;
+  --risk-medium: #c9971a;
+  --risk-low: #2f9e6b;
+  --risk-unknown: #858ba0;
 
   --shadow-card: 0 8px 22px rgba(21, 23, 42, 0.05);
   --shadow-panel: 0 18px 48px rgba(21, 23, 42, 0.14);
   --shadow-fab: 0 12px 28px rgba(21, 23, 42, 0.14);
+}
+
+/* Shared risk rating badges — Critical / High / Medium·Moderate / Low / Unknown */
+.risk-rating {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border-default);
+  font-size: 11px;
+  font-weight: 650;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--risk-unknown) 12%, var(--bg-surface));
+  color: var(--risk-unknown);
+  border-color: color-mix(in srgb, var(--risk-unknown) 35%, var(--border-default));
+}
+
+.risk-rating--critical {
+  background: color-mix(in srgb, var(--risk-critical) 16%, var(--bg-surface));
+  color: var(--risk-critical);
+  border-color: color-mix(in srgb, var(--risk-critical) 40%, var(--border-default));
+}
+
+.risk-rating--high {
+  background: color-mix(in srgb, var(--risk-high) 16%, var(--bg-surface));
+  color: var(--risk-high);
+  border-color: color-mix(in srgb, var(--risk-high) 40%, var(--border-default));
+}
+
+.risk-rating--medium {
+  background: color-mix(in srgb, var(--risk-medium) 16%, var(--bg-surface));
+  color: var(--risk-medium);
+  border-color: color-mix(in srgb, var(--risk-medium) 40%, var(--border-default));
+}
+
+.risk-rating--low {
+  background: color-mix(in srgb, var(--risk-low) 16%, var(--bg-surface));
+  color: var(--risk-low);
+  border-color: color-mix(in srgb, var(--risk-low) 40%, var(--border-default));
+}
+
+.risk-rating--unknown {
+  background: color-mix(in srgb, var(--risk-unknown) 12%, var(--bg-surface));
+  color: var(--risk-unknown);
+  border-color: color-mix(in srgb, var(--risk-unknown) 35%, var(--border-default));
 }
 
 * {

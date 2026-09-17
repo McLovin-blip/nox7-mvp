@@ -44,16 +44,15 @@ function partialControls(position: PositionState) {
   })
 }
 
-function evidenceSignals(position: PositionState) {
-  const after = position === 'after'
-  const catalogue = data.evidence.filter((item) => {
-    if (after && item.id === 'ev-supplier-assessments-2026') return true
-    if (!after && item.id === 'ev-supplier-assessments-2026') return false
-    return true
-  })
-  const missing = after ? 0 : 1
+function focusRiskId() {
+  return data.demo?.focusRiskId ?? 'risk-002'
+}
+
+function evidenceSignals(_position: PositionState) {
+  const catalogue = data.evidence
+  const missing = 0
   const expired = catalogue.filter((item) => item.freshness === 'expired' && !item.duplicateOf).length
-  const underReview = 0
+  const underReview = catalogue.filter((item) => String(item.statusLabel ?? '').toLowerCase().includes('under review')).length
   const expiring = catalogue.filter((item) => item.freshness === 'expiring').length
   return { missing, expired, underReview, expiring }
 }
@@ -122,14 +121,10 @@ function recordGuidance(ctx: SuggestionContext): NoxGuidance | null {
             },
       ] as NoxActionChip[],
       questions: [
-        `Why is ${name} rated ${risk?.severity ?? 'this severity'}?`,
-        'What is driving residual risk?',
-        'Why is this risk above appetite?',
-        'Which controls are ineffective?',
-        'Which evidence is missing?',
-        'Which frameworks are affected?',
-        'Is the treatment plan on track?',
-        'What should I do next?',
+        'What is this risk?',
+        'How are we protecting against it?',
+        'What evidence do we have?',
+        'What should we do next?',
       ],
     }
   }
@@ -160,7 +155,7 @@ function recordGuidance(ctx: SuggestionContext): NoxGuidance | null {
         {
           id: 'act-ctl-risk',
           label: 'Review related risk',
-          navigate: { type: 'module' as const, module: 'risks', recordId: control?.riskIds[0] ?? 'risk-third-party' },
+          navigate: { type: 'module' as const, module: 'risks', recordId: control?.riskIds[0] ?? focusRiskId() },
         },
       ],
       questions: [
@@ -185,7 +180,7 @@ function recordGuidance(ctx: SuggestionContext): NoxGuidance | null {
         {
           id: 'act-ev-control',
           label: 'Open affected control',
-          navigate: { type: 'module' as const, module: 'controls', recordId: 'ctl-supplier-assurance' },
+          navigate: { type: 'module' as const, module: 'controls', recordId: data.demo.focusControlIds[0] ?? 'ctl-005' },
         },
       ],
       questions: [
@@ -207,7 +202,7 @@ function recordGuidance(ctx: SuggestionContext): NoxGuidance | null {
         {
           id: 'act-obl-control',
           label: 'Review related controls',
-          navigate: { type: 'module' as const, module: 'controls', recordId: 'ctl-supplier-assurance' },
+          navigate: { type: 'module' as const, module: 'controls', recordId: data.demo.focusControlIds[0] ?? 'ctl-005' },
         },
         {
           id: 'act-obl-gap',
@@ -256,22 +251,22 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
 
   if (ctx.module === 'gap') {
     return {
-      intro: 'You are on the connected supplier-assurance gap. Follow policy → obligation → control → evidence → risk → action.',
+      intro: 'You are on the connected assurance view. For the demo, follow phishing risk → controls → evidence → next action.',
       actions: [
         {
           id: 'gap-evidence',
           label: 'Review missing evidence',
-          navigate: { type: 'module' as const, module: 'evidence', recordId: after ? 'ev-supplier-assessments-2026' : 'ev-audit-findings' },
+          navigate: { type: 'module' as const, module: 'evidence', recordId: data.demo.focusEvidenceIds[0] ?? 'evd-005' },
         },
         {
           id: 'gap-control',
           label: 'Open affected control',
-          navigate: { type: 'module' as const, module: 'controls', recordId: 'ctl-supplier-assurance' },
+          navigate: { type: 'module' as const, module: 'controls', recordId: data.demo.focusControlIds[0] ?? 'ctl-005' },
         },
         {
           id: 'gap-risk',
           label: 'Review related risk',
-          navigate: { type: 'module' as const, module: 'risks', recordId: 'risk-third-party' },
+          navigate: { type: 'module' as const, module: 'risks', recordId: 'risk-002' },
         },
         ...(after
           ? ([{ id: 'gap-board', label: 'Prepare board summary', navigate: { type: 'board' as const } }] as NoxActionChip[])
@@ -311,7 +306,7 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
           navigate: {
             type: 'module' as const,
             module: 'risks',
-            recordId: elevated[0]?.id ?? 'risk-continuity',
+            recordId: elevated[0]?.id ?? focusRiskId(),
           },
         },
         {
@@ -320,7 +315,7 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
           navigate: {
             type: 'module' as const,
             module: 'risks',
-            recordId: above[0]?.id ?? elevated[0]?.id ?? 'risk-third-party',
+            recordId: above[0]?.id ?? elevated[0]?.id ?? focusRiskId(),
           },
         },
         {
@@ -329,7 +324,7 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
           navigate: {
             type: 'module' as const,
             module: 'risks',
-            recordId: overdue[0]?.id ?? 'risk-privileged-access',
+            recordId: overdue[0]?.id ?? focusRiskId(),
           },
         },
         {
@@ -338,21 +333,17 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
           navigate: {
             type: 'module' as const,
             module: 'evidence',
-            recordId: after ? 'ev-supplier-assessments-2026' : 'ev-audit-findings',
+            recordId: data.demo.focusEvidenceIds[0] ?? 'evd-005',
           },
         },
       ],
       questions: drill?.questions?.length
         ? drill.questions
         : [
-            count > 0 ? `Show me the ${count} elevated risks.` : 'What are our biggest risks?',
-            'Which risks need immediate attention?',
-            'Which risks are above appetite?',
-            'Which risks have overdue treatments?',
-            'Which business unit has the highest exposure?',
-            'Which risks have ineffective controls?',
-            'Which risks affect compliance the most?',
-            'What changed in our risk position?',
+            'What is this risk?',
+            'How are we protecting against it?',
+            'What evidence do we have?',
+            'What should we do next?',
           ],
     }
   }
@@ -378,13 +369,13 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
         {
           id: 'ctl-priority',
           label: 'Open the highest-priority control',
-          navigate: { type: 'module' as const, module: 'controls', recordId: priority?.id ?? 'ctl-supplier-assurance' },
+          navigate: { type: 'module' as const, module: 'controls', recordId: priority?.id ?? data.demo.focusControlIds[0] ?? 'ctl-005' },
         },
         {
           id: 'ctl-missing-ev',
-          label: after ? 'Review approved assessments' : 'Show missing supplier evidence',
+          label: 'Review phishing evidence',
           navigate: after
-            ? { type: 'module' as const, module: 'evidence', recordId: 'ev-supplier-assessments-2026' }
+            ? { type: 'module' as const, module: 'evidence', recordId: data.demo.focusEvidenceIds[0] ?? 'evd-005' }
             : { type: 'upload' as const },
         },
         {
@@ -395,7 +386,7 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
         {
           id: 'ctl-risk',
           label: 'Review related risk',
-          navigate: { type: 'module' as const, module: 'risks', recordId: 'risk-third-party' },
+          navigate: { type: 'module' as const, module: 'risks', recordId: 'risk-002' },
         },
       ],
       questions: drill?.questions?.length
@@ -424,13 +415,13 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
           navigate: {
             type: 'module' as const,
             module: 'evidence',
-            recordId: after ? 'ev-supplier-assessments-2026' : 'ev-audit-findings',
+            recordId: data.demo.focusEvidenceIds[0] ?? 'evd-005',
           },
         },
         {
           id: 'ev-expired',
           label: 'Review expired evidence',
-          navigate: { type: 'module' as const, module: 'evidence', recordId: 'ev-supplier-assessments-2023' },
+          navigate: { type: 'module' as const, module: 'evidence', recordId: data.demo.focusEvidenceIds[1] ?? 'evd-006' },
         },
         ...(after
           ? ([{ id: 'ev-board', label: 'Prepare board summary', navigate: { type: 'board' as const } }] as NoxActionChip[])
@@ -462,13 +453,13 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
         },
         {
           id: 'reg-gap',
-          label: 'Show the connected supplier gap',
+          label: 'Open the phishing risk',
           navigate: { type: 'gap' as const, step: 'overview' },
         },
         {
           id: 'reg-controls',
           label: 'Review related controls',
-          navigate: { type: 'module' as const, module: 'controls', recordId: 'ctl-supplier-assurance' },
+          navigate: { type: 'module' as const, module: 'controls', recordId: data.demo.focusControlIds[0] ?? 'ctl-005' },
         },
       ],
       questions: drill?.questions?.length
@@ -486,7 +477,7 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
     return {
       intro: after
         ? 'Board Summary can cite the approved assessments and improved position.'
-        : 'Board narrative still depends on closing the supplier-assurance evidence gap.',
+        : 'Board narrative for this demo centres on RSK-002 phishing residual, linked controls, and accepted evidence.',
       actions: [
         { id: 'rep-board', label: 'Open Board Summary', navigate: { type: 'board' as const } },
         {
@@ -535,7 +526,7 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
         {
           id: 'connect-risks',
           label: 'Review priority risks',
-          navigate: { type: 'module' as const, module: 'risks', recordId: elevated[0]?.id ?? 'risk-third-party' },
+          navigate: { type: 'module' as const, module: 'risks', recordId: elevated[0]?.id ?? focusRiskId() },
         },
         {
           id: 'connect-evidence',
@@ -543,7 +534,7 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
           navigate: {
             type: 'module' as const,
             module: 'evidence',
-            recordId: after ? 'ev-supplier-assessments-2026' : 'ev-audit-findings',
+            recordId: data.demo.focusEvidenceIds[0] ?? 'evd-005',
           },
         },
         {
@@ -569,34 +560,35 @@ export function buildContextGuidance(ctx: SuggestionContext): NoxGuidance {
   // Executive Hub default
   return {
     intro: after
-      ? `${organisation.name}'s position improved after approval. Focus on the Board Summary and remaining watch items.`
-      : `${organisation.name}'s position still needs attention. The material gap is missing current critical-supplier assessments.`,
+      ? `${organisation.name}'s phishing walkthrough remains evidenced. Start with ${data.demo.focusRiskCode} and the Phishing Risk Summary.`
+      : `${organisation.name}'s focus is ${data.demo.story}. Open ${data.demo.focusRiskCode}, review linked controls and evidence, then track the coaching action.`,
     actions: [
-      { id: 'hub-gap', label: 'Show the biggest gap', navigate: { type: 'gap' as const, step: 'overview' } },
+      {
+        id: 'hub-phishing-risk',
+        label: 'Open the phishing risk',
+        navigate: { type: 'module' as const, module: 'risks', recordId: focusRiskId() },
+      },
       {
         id: 'hub-risks',
         label: 'Review priority risks',
-        navigate: { type: 'module' as const, module: 'risks', recordId: elevated[0]?.id ?? 'risk-third-party' },
+        navigate: { type: 'module' as const, module: 'risks', recordId: elevated[0]?.id ?? focusRiskId() },
       },
       {
         id: 'hub-evidence',
-        label: after ? 'Review approved evidence' : 'Review missing evidence',
+        label: 'Review phishing evidence',
         navigate: {
           type: 'module' as const,
           module: 'evidence',
-          recordId: after ? 'ev-supplier-assessments-2026' : 'ev-audit-findings',
+          recordId: data.demo.focusEvidenceIds[0] ?? 'evd-005',
         },
       },
-      ...(after
-        ? ([{ id: 'hub-board', label: 'Prepare board summary', navigate: { type: 'board' as const } }] as NoxActionChip[])
-        : ([{ id: 'hub-upload', label: 'Upload missing evidence', navigate: { type: 'upload' as const } }] as NoxActionChip[])),
+      { id: 'hub-board', label: 'Open phishing summary', navigate: { type: 'board' as const } },
     ],
     questions: [
-      'What is the biggest issue affecting our assurance position?',
-      'What changed from our previous position?',
-      'What should I focus on today?',
-      'What should I tell the board?',
-      'Where is our biggest remaining gap?',
+      'What is our biggest current risk?',
+      'Open the phishing risk',
+      'How are we protecting against phishing?',
+      'What should I prioritise?',
     ],
   }
 }

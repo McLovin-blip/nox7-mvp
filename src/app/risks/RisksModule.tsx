@@ -1,19 +1,26 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { organisation, reportingPeriod } from '../mock/data.ts'
 import type { ModuleId, PositionState } from '../mock/types.ts'
 import { useSession } from '../state/SessionProvider.tsx'
+import { riskRatingClass } from '../ui/riskRating.ts'
+import { TablePagination } from '../ui/TablePagination.tsx'
+import { usePagination } from '../ui/usePagination.ts'
 import {
   activeFilterChips,
   appetiteLabel,
+  buildComplianceImpactRows,
   buildFrameworkImpact,
   buildRiskRecords,
   buildRiskSummary,
   clearFilterChip,
+  complianceFilterOptions,
   coverageLabel,
   coverageRowsFor,
+  defaultComplianceFilters,
   defaultFilters,
   describeRiskDrill,
   emptyStateForFilters,
+  filterComplianceImpactRows,
   filterRisks,
   hasActiveFilters,
   linkedControlsFor,
@@ -23,7 +30,8 @@ import {
   severityLabel,
   sortRisks,
   treatmentLabel,
-  trendLabel,
+  type ComplianceImpactFilters,
+  type ComplianceImpactRow,
   type FilterChip,
   type FrameworkImpact,
   type RiskFilters,
@@ -150,11 +158,14 @@ export function RisksModule({
 
       <ExecutiveSummary
         summary={summary}
+        risks={risks}
+        position={position}
         onDrill={applyDrill}
         onOpenRisk={(id) => {
           setTab('overview')
           onSelect(id)
         }}
+        onNavigate={onNavigate}
       />
 
       <Register
@@ -186,12 +197,18 @@ export function RisksModule({
 
 function ExecutiveSummary({
   summary,
+  risks,
+  position,
   onDrill,
   onOpenRisk,
+  onNavigate,
 }: {
   summary: ReturnType<typeof buildRiskSummary>
+  risks: RiskRecord[]
+  position: PositionState
   onDrill: (filters: RiskFilters, panel?: DrillPanel) => void
   onOpenRisk: (id: string) => void
+  onNavigate?: (target: RiskNavigateTarget) => void
 }) {
   const unitMax = Math.max(...summary.byUnit.map((item) => item.count), 1)
   const categoryMax = Math.max(...summary.byCategory.map((item) => item.count), 1)
@@ -307,97 +324,308 @@ function ExecutiveSummary({
         </section>
       </div>
 
-      <div className="risk-exec-grid two">
-        <section className="risk-card">
-          <header>
-            <h2>Compliance impact</h2>
-            <p>{summary.complianceCount} risks affect active regulatory obligations.</p>
-          </header>
-          <ul className="risk-frameworks">
-            {summary.frameworks.map((item) => (
-              <li key={item.name}>
-                <button type="button" onClick={() => drill({ framework: item.name }, 'framework')}>
-                  <strong>{item.name}</strong>
-                  <span>
-                    {item.count} linked risk{item.count === 1 ? '' : 's'}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section>
+      <ComplianceImpactPanel risks={risks} position={position} onOpenRisk={onOpenRisk} onNavigate={onNavigate} />
 
-        <section className="risk-card">
-          <header>
-            <h2>Emerging / changing risks</h2>
-            <p>Material movement supported by current position data.</p>
-          </header>
-          <ul className="risk-emerging">
-            {summary.emerging.map((item) => (
-              <li key={item.id}>
-                <div className="risk-emerging-row">
-                  <button type="button" className="risk-emerging-main" onClick={() => onOpenRisk(item.id)}>
-                    <strong>{item.title}</strong>
-                    <em>
-                      {item.businessUnit} · Residual {item.residual.score} · {appetiteLabel(item.appetiteStatus)}
-                    </em>
-                  </button>
-                  <div className="risk-pill-row">
-                    <button
-                      type="button"
-                      className={`risk-pill sev-${item.severity}`}
-                      onClick={() => drill({ severity: item.severity })}
-                    >
-                      {severityLabel(item.severity)}
-                    </button>
-                    <button
-                      type="button"
-                      className={`risk-pill trend-${item.trend}`}
-                      onClick={() => drill({ trend: item.trend })}
-                    >
-                      {trendLabel(item.trend)}
-                    </button>
-                    <button
-                      type="button"
-                      className={`risk-pill treatment-${item.treatment.status}`}
-                      onClick={() => drill({ treatment: item.treatment.status }, 'treatment')}
-                    >
-                      {treatmentLabel(item.treatment.status)}
-                    </button>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-      </div>
-
-      <section className="risk-card">
-        <header>
-          <h2>Top risks requiring attention</h2>
-          <p>Ranked by residual exposure, appetite, control weakness, treatment pressure and compliance impact.</p>
+      <section className="risk-card risk-priority-panel">
+        <header className="risk-register-head">
+          <div>
+            <h2>Top risks requiring attention</h2>
+            <p>Ranked by residual exposure, appetite, control weakness, treatment pressure and compliance impact.</p>
+          </div>
+          <em>
+            Showing {summary.topRisks.length} priority risk{summary.topRisks.length === 1 ? '' : 's'}
+          </em>
         </header>
-        <div className="risk-top-list">
-          {summary.topRisks.map((item, index) => (
-            <button key={item.id} type="button" className="risk-top-row" onClick={() => onOpenRisk(item.id)}>
-              <b>{index + 1}</b>
-              <div>
-                <strong>{item.title}</strong>
-                <em>
-                  {item.businessUnit} · Residual {item.residual.score} ({item.residual.rating}) ·{' '}
-                  {treatmentLabel(item.treatment.status)}
-                </em>
-              </div>
-              <div className="risk-pill-row">
-                <Pill className={`sev-${item.severity}`}>{severityLabel(item.severity)}</Pill>
-                <Pill className={`appetite-${item.appetiteStatus}`}>{appetiteLabel(item.appetiteStatus)}</Pill>
-                <Pill className={`coverage-${item.controlCoverage}`}>{coverageLabel(item.controlCoverage)}</Pill>
-              </div>
-            </button>
-          ))}
+        <div className="risk-table-wrap">
+          <table className="risk-table risk-table-priority">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Risk</th>
+                <th scope="col">Business unit</th>
+                <th scope="col">Severity</th>
+                <th scope="col">Residual</th>
+                <th scope="col">Appetite</th>
+                <th scope="col">Coverage</th>
+                <th scope="col">Treatment</th>
+                <th scope="col">Owner</th>
+                <th scope="col">Next review</th>
+              </tr>
+            </thead>
+            <tbody>
+              {summary.topRisks.map((item, index) => (
+                <tr key={item.id} onClick={() => onOpenRisk(item.id)}>
+                  <td className="risk-rank-cell">
+                    <b>{index + 1}</b>
+                  </td>
+                  <td>
+                    <strong>{item.title}</strong>
+                    <small>{item.code}</small>
+                  </td>
+                  <td>{item.businessUnit}</td>
+                  <td>
+                    <Pill className={`sev-${item.severity}`}>{severityLabel(item.severity)}</Pill>
+                  </td>
+                  <td>
+                    <strong>{item.residual.score}</strong>
+                    <small className={riskRatingClass(item.residual.rating)}>{item.residual.rating}</small>
+                  </td>
+                  <td>
+                    <Pill className={`appetite-${item.appetiteStatus}`}>{appetiteLabel(item.appetiteStatus)}</Pill>
+                  </td>
+                  <td>
+                    <Pill className={`coverage-${item.controlCoverage}`}>{coverageLabel(item.controlCoverage)}</Pill>
+                  </td>
+                  <td>
+                    <Pill className={`treatment-${item.treatment.status}`}>{treatmentLabel(item.treatment.status)}</Pill>
+                    <small>{item.treatment.progress}%</small>
+                  </td>
+                  <td>{item.owner}</td>
+                  <td>{formatDate(item.nextReview)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {summary.topRisks.length === 0 ? (
+            <div className="risk-empty-state">
+              <strong>No priority risks</strong>
+              <p>There are no risks currently ranked for executive attention.</p>
+            </div>
+          ) : null}
         </div>
       </section>
     </div>
+  )
+}
+
+function ComplianceImpactPanel({
+  risks,
+  position,
+  onOpenRisk,
+  onNavigate,
+}: {
+  risks: RiskRecord[]
+  position: PositionState
+  onOpenRisk: (id: string) => void
+  onNavigate?: (target: RiskNavigateTarget) => void
+}) {
+  const [filters, setFilters] = useState<ComplianceImpactFilters>(defaultComplianceFilters)
+  const rows = useMemo(() => buildComplianceImpactRows(risks, position), [risks, position])
+  const options = useMemo(() => complianceFilterOptions(rows), [rows])
+  const visible = useMemo(() => filterComplianceImpactRows(rows, filters), [rows, filters])
+  const pagination = usePagination(visible)
+  const active =
+    filters.query.trim() !== '' ||
+    filters.residualRating !== 'all' ||
+    filters.framework !== 'all' ||
+    filters.evidenceStatus !== 'all' ||
+    filters.ownerId !== 'all'
+
+  const openModule = (module: ModuleId, recordId: string) => {
+    onNavigate?.({ type: 'module', module, recordId })
+  }
+
+  return (
+    <section className="risk-card risk-compliance-panel" aria-label="Compliance impact">
+      <header className="risk-compliance-head">
+        <div>
+          <h2>Compliance impact</h2>
+          <p>
+            How organisational risks connect to controls, evidence, and framework or regulatory references in the
+            shared demo dataset.
+          </p>
+        </div>
+        <em>
+          Showing {visible.length} of {rows.length} risk{rows.length === 1 ? '' : 's'}
+        </em>
+      </header>
+
+      <div className="risk-compliance-filters">
+        <label className="risk-compliance-search">
+          <span>Search</span>
+          <input
+            type="search"
+            value={filters.query}
+            placeholder="Risk, control, or evidence name / ID"
+            onChange={(event) => setFilters((current) => ({ ...current, query: event.target.value }))}
+          />
+        </label>
+        <label>
+          <span>Risk rating</span>
+          <select
+            value={filters.residualRating}
+            onChange={(event) => setFilters((current) => ({ ...current, residualRating: event.target.value }))}
+          >
+            <option value="all">All ratings</option>
+            {options.ratings.map((rating) => (
+              <option key={rating} value={rating}>
+                {rating}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Framework / requirement</span>
+          <select
+            value={filters.framework}
+            onChange={(event) => setFilters((current) => ({ ...current, framework: event.target.value }))}
+          >
+            <option value="all">All references</option>
+            {options.frameworks.map((framework) => (
+              <option key={framework} value={framework}>
+                {framework}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Evidence status</span>
+          <select
+            value={filters.evidenceStatus}
+            onChange={(event) => setFilters((current) => ({ ...current, evidenceStatus: event.target.value }))}
+          >
+            <option value="all">All statuses</option>
+            {options.evidenceStatuses.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Owner</span>
+          <select
+            value={filters.ownerId}
+            onChange={(event) => setFilters((current) => ({ ...current, ownerId: event.target.value }))}
+          >
+            <option value="all">All owners</option>
+            {options.owners.map((owner) => (
+              <option key={owner.id} value={owner.id}>
+                {owner.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button
+          type="button"
+          className="risk-compliance-clear"
+          disabled={!active}
+          onClick={() => setFilters(defaultComplianceFilters())}
+        >
+          Clear filters
+        </button>
+      </div>
+
+      <div className="risk-compliance-table-wrap">
+        <table className="risk-compliance-table">
+          <thead>
+            <tr>
+              <th scope="col">Risk</th>
+              <th scope="col">Risk rating</th>
+              <th scope="col">Related controls</th>
+              <th scope="col">Related evidence</th>
+              <th scope="col">Framework / requirement</th>
+              <th scope="col">Compliance impact</th>
+              <th scope="col">Owner</th>
+              <th scope="col">Next action and due date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pagination.pageItems.map((row) => (
+              <ComplianceImpactTableRow
+                key={row.riskId}
+                row={row}
+                onOpenRisk={onOpenRisk}
+                onOpenControl={(id) => openModule('controls', id)}
+                onOpenEvidence={(id) => openModule('evidence', id)}
+              />
+            ))}
+          </tbody>
+        </table>
+        {visible.length === 0 ? (
+          <p className="risk-compliance-empty">No risks match the current compliance filters.</p>
+        ) : null}
+      </div>
+      <TablePagination
+        page={pagination.page}
+        pageSize={pagination.pageSize}
+        pageCount={pagination.pageCount}
+        total={pagination.total}
+        start={pagination.start}
+        end={pagination.end}
+        canPrev={pagination.canPrev}
+        canNext={pagination.canNext}
+        onPage={pagination.setPage}
+        onPageSize={pagination.setPageSize}
+      />
+    </section>
+  )
+}
+
+function ComplianceImpactTableRow({
+  row,
+  onOpenRisk,
+  onOpenControl,
+  onOpenEvidence,
+}: {
+  row: ComplianceImpactRow
+  onOpenRisk: (id: string) => void
+  onOpenControl: (id: string) => void
+  onOpenEvidence: (id: string) => void
+}) {
+  return (
+    <tr>
+      <td>
+        <button type="button" className="risk-compliance-link" onClick={() => onOpenRisk(row.riskId)}>
+          <strong>{row.riskCode}</strong>
+          <span>{row.riskTitle}</span>
+        </button>
+      </td>
+      <td>
+        <span className={riskRatingClass(row.residualRating)}>{row.residualRating}</span>
+      </td>
+      <td>
+        <div className="risk-compliance-stack">
+          {row.controls.length ? (
+            row.controls.map((item) => (
+              <button key={item.id} type="button" className="risk-compliance-chip" onClick={() => onOpenControl(item.id)}>
+                <strong>{item.code ?? item.id}</strong>
+                <span>{item.title}</span>
+              </button>
+            ))
+          ) : (
+            <em>None linked</em>
+          )}
+        </div>
+      </td>
+      <td>
+        <div className="risk-compliance-stack">
+          {row.evidence.length ? (
+            row.evidence.map((item) => (
+              <button key={item.id} type="button" className="risk-compliance-chip" onClick={() => onOpenEvidence(item.id)}>
+                <strong>{item.title}</strong>
+                <span>{item.status}</span>
+              </button>
+            ))
+          ) : (
+            <em>None linked</em>
+          )}
+        </div>
+      </td>
+      <td>
+        <span className={`risk-compliance-framework kind-${row.frameworkKind}`}>{row.frameworkLabel}</span>
+      </td>
+      <td>
+        <p className="risk-compliance-impact">{row.impact}</p>
+      </td>
+      <td>{row.owner}</td>
+      <td>
+        <div className="risk-compliance-action">
+          <span>{row.nextAction}</span>
+          <em>Due {row.dueDate}</em>
+        </div>
+      </td>
+    </tr>
   )
 }
 
@@ -444,6 +672,7 @@ function Register({
   const categories = unique(allRisks.map((item) => item.category))
   const owners = unique(allRisks.map((item) => item.owner))
   const active = hasActiveFilters(filters)
+  const pagination = usePagination(risks)
 
   return (
     <section className="risk-register" id="risk-register">
@@ -453,7 +682,8 @@ function Register({
           <p>Review and manage all organisational risks.</p>
         </div>
         <em>
-          Showing {risks.length} of {allRisks.length}
+          Showing {pagination.total === 0 ? 0 : `${pagination.start}–${pagination.end}`} of {pagination.total} filtered
+          · {allRisks.length} total
         </em>
       </header>
 
@@ -706,7 +936,7 @@ function Register({
             </tr>
           </thead>
           <tbody>
-            {risks.map((item) => (
+            {pagination.pageItems.map((item) => (
               <tr key={item.id} onClick={() => onOpenRisk(item.id)}>
                 <td>
                   <strong>{item.title}</strong>
@@ -719,7 +949,7 @@ function Register({
                 </td>
                 <td>
                   <strong>{item.residual.score}</strong>
-                  <small>{item.residual.rating}</small>
+                  <small className={riskRatingClass(item.residual.rating)}>{item.residual.rating}</small>
                 </td>
                 <td>
                   <Pill className={`appetite-${item.appetiteStatus}`}>{appetiteLabel(item.appetiteStatus)}</Pill>
@@ -748,6 +978,18 @@ function Register({
           </div>
         ) : null}
       </div>
+      <TablePagination
+        page={pagination.page}
+        pageSize={pagination.pageSize}
+        pageCount={pagination.pageCount}
+        total={pagination.total}
+        start={pagination.start}
+        end={pagination.end}
+        canPrev={pagination.canPrev}
+        canNext={pagination.canNext}
+        onPage={pagination.setPage}
+        onPageSize={pagination.setPageSize}
+      />
     </section>
   )
 }
@@ -783,25 +1025,30 @@ function RiskDetail({
         <h1>{risk.title}</h1>
         <div className="risk-pill-row">
           <Pill className={`sev-${risk.severity}`}>{severityLabel(risk.severity)}</Pill>
-          <Pill className="neutral">{`Residual ${risk.residual.rating}`}</Pill>
-          <Pill className={`appetite-${risk.appetiteStatus}`}>{appetiteLabel(risk.appetiteStatus)}</Pill>
-          <Pill className={`treatment-${risk.treatment.status}`}>{treatmentLabel(risk.treatment.status)}</Pill>
+          <span className={riskRatingClass(risk.inherentLabel)}>Inherent {risk.inherentLabel}</span>
+          <span className={riskRatingClass(risk.residualLabel)}>Residual {risk.residualLabel}</span>
+          <Pill className={`appetite-${risk.appetiteStatus}`}>{risk.appetiteLabel}</Pill>
+          <Pill className={`treatment-${risk.treatment.status}`}>{risk.actionStatus}</Pill>
+          {risk.demoFocus ? <Pill className="neutral">Demo focus</Pill> : null}
         </div>
         <div className="risk-detail-meta">
           <span>Owner · {risk.owner}</span>
           <span>Business unit · {risk.businessUnit}</span>
           <span>Next review · {formatDate(risk.nextReview)}</span>
+          <span>
+            Next action · {risk.nextAction} · Due {formatDate(risk.dueDate)}
+          </span>
         </div>
         <p className="risk-ai-hint">{riskContextIntro(risk)}</p>
       </header>
 
       <div className="risk-metric-row">
-        <Metric label="Inherent risk" score={risk.inherent.score} rating={risk.inherent.rating} />
-        <Metric label="Residual risk" score={risk.residual.score} rating={risk.residual.rating} />
-        <Metric label="Target risk" score={risk.target.score} rating={risk.target.rating} />
-        <Metric label="Appetite" score={appetiteLabel(risk.appetiteStatus)} />
+        <Metric label="Inherent risk" score={<span className={riskRatingClass(risk.inherentLabel)}>{risk.inherentLabel}</span>} rating={`${risk.inherent.score}`} />
+        <Metric label="Residual risk" score={<span className={riskRatingClass(risk.residualLabel)}>{risk.residualLabel}</span>} rating={`${risk.residual.score}`} />
+        <Metric label="Target risk" score={<span className={riskRatingClass(risk.target.rating)}>{risk.target.rating}</span>} rating={`${risk.target.score}`} />
+        <Metric label="Appetite" score={risk.appetiteLabel} />
         <Metric label="Control coverage" score={coverageLabel(risk.controlCoverage)} />
-        <Metric label="Compliance impact" score={`${risk.obligationIds.length} obligations`} />
+        <Metric label="Next action" score={risk.actionStatus} rating={formatDate(risk.dueDate)} />
         <Metric label="Treatment" score={`${risk.treatment.progress}%`} rating={treatmentLabel(risk.treatment.status)} />
       </div>
 
@@ -828,6 +1075,10 @@ function RiskDetail({
               <h2>Risk statement</h2>
             </header>
             <div className="risk-statement">
+              <div>
+                <h3>What could happen</h3>
+                <p>{risk.whatCouldHappen}</p>
+              </div>
               <div>
                 <h3>Cause</h3>
                 <p>{risk.cause}</p>
@@ -867,8 +1118,17 @@ function RiskDetail({
                 </dd>
               </div>
               <div>
-                <dt>Status</dt>
-                <dd>{risk.level}</dd>
+                <dt>Appetite</dt>
+                <dd>{risk.appetiteLabel}</dd>
+              </div>
+              <div>
+                <dt>Next action</dt>
+                <dd>
+                  {risk.nextAction}
+                  <small>
+                    Due {formatDate(risk.dueDate)} · {risk.actionStatus}
+                  </small>
+                </dd>
               </div>
               <div>
                 <dt>Last assessment</dt>
@@ -878,12 +1138,46 @@ function RiskDetail({
                 <dt>Next review</dt>
                 <dd>{formatDate(risk.nextReview)}</dd>
               </div>
-              <div>
-                <dt>Updated</dt>
-                <dd>{formatDate(risk.updatedAt)}</dd>
-              </div>
             </dl>
           </section>
+          {risk.demoFocus ? (
+            <section className="risk-card">
+              <header>
+                <h2>Connected protections</h2>
+                <p>Open controls or evidence without leaving this risk walkthrough.</p>
+              </header>
+              <p>{controls[0]?.purposeBlurb || risk.contributingGap}</p>
+              <ul className="risk-link-list">
+                {controls.map((item) => (
+                  <li key={item.id}>
+                    <button type="button" onClick={() => go('controls', item.id)}>
+                      <div>
+                        <strong>
+                          {item.code} · {item.title}
+                        </strong>
+                        <em>{item.purposeBlurb}</em>
+                      </div>
+                      <div>
+                        <span>{item.effectiveness}</span>
+                        <small>{item.evidenceStatus}</small>
+                      </div>
+                    </button>
+                  </li>
+                ))}
+                {evidence.map((item) => (
+                  <li key={item.id}>
+                    <button type="button" onClick={() => go('evidence', item.id)}>
+                      <div>
+                        <strong>{item.title}</strong>
+                        <em>{item.resultOrGap ?? item.freshness}</em>
+                      </div>
+                      <span>{item.statusLabel ?? item.freshness}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
         </div>
       ) : null}
 
@@ -902,13 +1196,17 @@ function RiskDetail({
           </div>
           <div className="risk-appetite-panel">
             <h3>Risk appetite</h3>
-            <Pill className={`appetite-${risk.appetiteStatus}`}>{appetiteLabel(risk.appetiteStatus)}</Pill>
+            <Pill className={`appetite-${risk.appetiteStatus}`}>{risk.appetiteLabel}</Pill>
             <p>
               {risk.appetiteStatus === 'above'
                 ? 'Residual exposure is outside the approved appetite and needs active treatment.'
                 : risk.appetiteStatus === 'near'
                   ? 'Residual exposure is close to appetite and should remain under close review.'
                   : 'Residual exposure is currently within the approved appetite.'}
+            </p>
+            <p>
+              Next action: {risk.nextAction} · Owner {risk.owner} · Due {formatDate(risk.dueDate)} ·{' '}
+              {risk.actionStatus}
             </p>
           </div>
         </section>
@@ -947,9 +1245,11 @@ function RiskDetail({
                 <li key={item.id}>
                   <button type="button" onClick={() => go('controls', item.id)}>
                     <div>
-                      <strong>{item.title}</strong>
+                      <strong>
+                        {item.code} · {item.title}
+                      </strong>
                       <em>
-                        {item.id} · {item.owner}
+                        {item.purposeBlurb || `${item.id} · ${item.owner}`}
                       </em>
                     </div>
                     <div>
@@ -996,10 +1296,11 @@ function RiskDetail({
                     <div>
                       <strong>{item.title}</strong>
                       <em>
-                        {item.id} · {item.date ? formatDate(item.date) : 'n/a'}
+                        {item.resultOrGap ?? item.id}
+                        {item.date ? ` · ${formatDate(item.date)}` : ''}
                       </em>
                     </div>
-                    <span>{item.freshness}</span>
+                    <span>{item.statusLabel ?? item.freshness}</span>
                   </button>
                 </li>
               ))}
@@ -1085,7 +1386,7 @@ function RiskDetail({
   )
 }
 
-function Metric({ label, score, rating }: { label: string; score: string | number; rating?: string }) {
+function Metric({ label, score, rating }: { label: string; score: ReactNode; rating?: string }) {
   return (
     <div className="risk-metric">
       <span>{label}</span>
@@ -1100,7 +1401,7 @@ function AssessmentBlock({ title, score }: { title: string; score: RiskRecord['r
     <div className="risk-assessment-block">
       <span>{title}</span>
       <strong>
-        {score.score} — {score.rating}
+        {score.score} — <span className={riskRatingClass(score.rating)}>{score.rating}</span>
       </strong>
       <em>
         Likelihood {score.likelihood} · Impact {score.impact}

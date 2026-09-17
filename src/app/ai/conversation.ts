@@ -5,7 +5,6 @@ import {
   organisation,
   personLabel,
   prompts,
-  supplierControl,
 } from '../mock/data.ts'
 import type { AiPanelModel, GapStepId, HubFocus, ModuleId, PositionState } from '../mock/types.ts'
 import { answerFor, gapAiFor, hubAiFor } from './answers.ts'
@@ -49,11 +48,11 @@ export type ConversationContext = {
 
 export const EMPTY_SUGGESTIONS = [
   'What is our biggest current risk?',
-  'Where are we missing evidence?',
-  'Show me our supplier assurance gaps.',
+  'Open the phishing risk',
+  'How are we protecting against phishing?',
   'What should I prioritise?',
-  'Why is our assurance position low?',
-  'Summarise this for the board.',
+  'What evidence do we have?',
+  'What should we do next?',
 ]
 
 function suggestionsFor(ctx: ConversationContext, fallback?: string[]) {
@@ -97,7 +96,7 @@ function factsToCitations(answer: AiPanelModel, position: PositionState) {
 }
 
 function screenLabel(ctx: ConversationContext) {
-  if (ctx.module === 'gap') return 'Connected supplier-assurance gap'
+  if (ctx.module === 'gap') return 'Connected phishing assurance'
   if (ctx.module === 'hub') return 'Executive Hub'
   if (ctx.module === 'connect') return 'Nox Connect'
   if (ctx.module === 'regulatory') return 'Regulatory'
@@ -155,150 +154,77 @@ function composeFromAnswer(
   }
 }
 
-function supplierGapReply(ctx: ConversationContext): Reply {
-  const after = ctx.position === 'after'
-  const control = supplierControl
-  const policy = data.evidence.find((item) => item.id === 'ev-policy-supplier')
-  const risk = data.risks.find((item) => item.id === 'risk-third-party')
-  const action = data.actions[0]
-
-  if (after) {
-    return {
-      text: [
-        'Your largest supplier-assurance gap is closed for this review.',
-        '',
-        `Why it matters: ${organisation.name} can now show current critical-supplier assessments against ${control?.title ?? 'supplier assurance'}, so the connected frameworks and risks move together.`,
-        '',
-        'From the records:',
-        `• ${control?.title ?? 'Supplier assurance'} is assured.`,
-        '• 2026 critical-supplier assessments are current.',
-        '• Third-party and regulatory exposure are reduced.',
-        '',
-        'Recommendation: Open the Board Summary and cite the approved assessments. Keep the duplicate questionnaire flagged as a catalogue issue.',
-        '',
-        'Would you like the Board Summary sources, or what still needs watching?',
-      ].join('\n'),
-      citations: citationsFrom(
-        ['ctl-supplier-assurance', 'ev-supplier-assessments-2026', 'risk-third-party', 'rep-board-summary'],
-        ctx.position,
-      ),
-      suggestions: ['Summarise this for the board.', 'What should I prioritise?', 'Where are we missing evidence?'],
-      topic: 'supplier-gap',
-    }
-  }
-
+function phishingFocusReply(ctx: ConversationContext): Reply {
+  const risk = data.risks.find((item) => item.id === data.demo.focusRiskId)
+  const controls = data.demo.focusControlIds
+  const evidence = data.demo.focusEvidenceIds
   return {
     text: [
-      'Your biggest current supplier-assurance gap is missing current critical-supplier assessments.',
+      `Start with ${data.demo.focusRiskCode} — ${risk?.title ?? data.demo.story}.`,
       '',
-      `Why it matters: ${policy?.title ?? 'The supplier assurance policy'} is current, but without the assessments ${control?.title ?? 'supplier assurance'} stays only partially assured. That leaves obligations across ISO 27001, NIS2, GDPR and NCA ECC weakly supported and keeps ${risk?.title ?? 'third-party assurance'} elevated ahead of the review.`,
+      risk?.whatCouldHappen ?? data.demo.story,
       '',
-      'From the records:',
-      `• Control: ${control?.title ?? 'Supplier assurance'} — partially assured.`,
-      '• Expected evidence: current critical-supplier assessments.',
-      `• Accountable owner: ${ownerName(action?.ownerId)}. Approver: ${ownerName(action?.approverId)}.`,
+      `Inherent ${risk?.inherentLabel ?? 'High'}; residual ${risk?.residualLabel ?? 'Moderate'}; ${risk?.appetiteLabel ?? 'Within Appetite'}.`,
       '',
-      'Recommendation: Upload the current assessment pack, review the suggested mappings, then approve. The organisation position does not move until approval.',
+      data.demo.controlBlurb,
       '',
-      'Would you like me to show the affected control and evidence, or explain what to do next?',
+      `Next action: ${risk?.nextAction ?? 'Coach repeat-click users'}. Owner: ${ownerName(risk?.ownerId)}. Due: ${risk?.dueDate ?? '15 Oct 2026'}.`,
+      '',
+      'Would you like the linked controls, the evidence findings, or the next action detail?',
     ].join('\n'),
-    citations: citationsFrom(
-      ['ctl-supplier-assurance', 'ev-policy-supplier', 'ev-audit-findings', 'risk-third-party', 'risk-regulatory'],
-      ctx.position,
-    ),
+    citations: citationsFrom([risk?.id, ...controls, ...evidence, 'rep-phishing-summary'], ctx.position),
     suggestions: [
-      'Show me the affected control and evidence.',
-      'What should I do next?',
-      'Which gap affects the most frameworks?',
-      'Where are we missing evidence?',
+      'What is this risk?',
+      'How are we protecting against it?',
+      'What evidence do we have?',
+      'What should we do next?',
     ],
-    topic: 'supplier-gap',
+    topic: 'risk',
   }
 }
 
-function missingEvidenceReply(ctx: ConversationContext): Reply {
-  const after = ctx.position === 'after'
-  if (after) {
-    return {
-      text: [
-        'The critical missing pack is no longer missing.',
-        '',
-        'Why it matters: the review can cite current assessments. A duplicate questionnaire remains flagged, and continuity evidence is still approaching review — those are watch items, not the material gap.',
-        '',
-        'Recommendation: Keep the duplicate pack visible and schedule a refresh of the continuity report.',
-      ].join('\n'),
-      citations: citationsFrom(
-        ['ev-supplier-assessments-2026', 'ev-supplier-q-duplicate', 'ev-bc-test'],
-        ctx.position,
-      ),
-      suggestions: ['What should I prioritise?', 'Summarise this for the board.'],
-      topic: 'evidence',
-    }
-  }
+function supplierGapReply(ctx: ConversationContext): Reply {
+  return phishingFocusReply(ctx)
+}
 
-  const expired = data.evidence.find((item) => item.id === 'ev-supplier-assessments-2023')
-  const duplicate = data.evidence.find((item) => item.id === 'ev-supplier-q-duplicate')
+function missingEvidenceReply(ctx: ConversationContext): Reply {
+  const packs = data.demo.focusEvidenceIds
+    .map((id) => data.evidence.find((item) => item.id === id))
+    .filter((item): item is (typeof data.evidence)[number] => Boolean(item))
   return {
     text: [
-      'The material missing evidence is current critical-supplier assessments.',
-      '',
-      'Why it matters: without that pack, supplier assurance stays partial and four frameworks stay only partly supported.',
+      'For the phishing walkthrough, the linked evidence is already accepted.',
       '',
       'From the records:',
-      '• Missing: current critical-supplier assessments for this review.',
-      `• ${expired?.title ?? '2023 assessments'} are expired and not acceptable.`,
-      `• ${duplicate?.title ?? '2024 questionnaire pack'} is a duplicate of an older pack.`,
+      ...packs.map((item) => `• ${item.code}: ${item.statusLabel} — ${item.resultOrGap ?? item.summary}`),
       '',
-      'Recommendation: Upload the current assessments in one action, then approve the suggested mappings.',
-      '',
-      'I can explain the upload path, or show the connected control first.',
+      'Recommendation: Keep EVD-005 and EVD-006 current while the Learning Manager completes the coaching action.',
     ].join('\n'),
-    citations: citationsFrom(
-      ['ev-audit-findings', 'ev-supplier-assessments-2023', 'ev-supplier-q-duplicate', 'ctl-supplier-assurance'],
-      ctx.position,
-    ),
-    suggestions: [
-      'Show me our supplier assurance gaps.',
-      'What should I do next?',
-      'What requires my attention today?',
-    ],
+    citations: citationsFrom([...data.demo.focusEvidenceIds, data.demo.focusRiskId], ctx.position),
+    suggestions: ['What evidence do we have?', 'How are we protecting against it?', 'What should we do next?'],
     topic: 'evidence',
   }
 }
 
 function nextActionReply(ctx: ConversationContext): Reply {
-  const after = ctx.position === 'after'
-  const action = data.actions[0]
-  if (after) {
-    return {
-      text: [
-        'Next, take the improved position into the Board Summary.',
-        '',
-        'Why it matters: the approval already updated coverage, assurance and risk. The board pack should cite the same 2026 assessments.',
-        '',
-        'Recommendation: Open Board Summary and ask me to show the sources behind the conclusion.',
-      ].join('\n'),
-      citations: citationsFrom(['rep-board-summary', 'ev-supplier-assessments-2026'], ctx.position),
-      suggestions: ['Summarise this for the board.', 'Show the sources behind this conclusion.'],
-      topic: 'next-action',
-    }
-  }
-
+  const risk = data.risks.find((item) => item.id === (ctx.selectedId?.startsWith('risk-') ? ctx.selectedId : data.demo.focusRiskId))
+  const action = data.actions.find((item) => item.id === 'act-phishing-coach') ?? data.actions[0]
   return {
     text: [
-      'I recommend requesting and uploading the missing current critical-supplier assessments first.',
+      `Next action: ${risk?.nextAction ?? action?.title ?? 'Coach repeat-click users and retest reporting behavior.'}`,
       '',
-      `Why it matters: that is the highest-impact open action — ${action?.title ?? 'obtain and approve current assessments'}. Owner: ${ownerName(action?.ownerId)}. Approver: ${ownerName(action?.approverId)}.`,
+      `Owner: ${ownerName(risk?.ownerId ?? action?.ownerId)} (${personLabel(risk?.ownerId ?? action?.ownerId)}). Due: ${risk?.dueDate ?? '2026-10-15'}. Status: ${risk?.actionStatus ?? 'Monitoring'}.`,
       '',
-      'If the evidence cannot be provided in time for the review, raise a remediation action or exception — but the happy path is upload, review, and approve.',
+      'Why it matters: the linked phishing controls are effective and evidenced; the remaining work is cultural coaching and retesting.',
       '',
-      'Would you like the connected gap first, or a short explanation of the Evidence upload path?',
+      'Recommendation: Open RSK-002, confirm CTL-005 / CTL-006 with EVD-005 / EVD-006, then track the Learning Manager action.',
     ].join('\n'),
-    citations: citationsFrom(['ctl-supplier-assurance', 'ev-audit-findings', action?.id], ctx.position),
+    citations: citationsFrom([risk?.id ?? data.demo.focusRiskId, ...data.demo.focusControlIds, ...data.demo.focusEvidenceIds, 'rep-phishing-summary'], ctx.position),
     suggestions: [
-      'Show me our supplier assurance gaps.',
-      'Where are we missing evidence?',
-      'What requires my attention today?',
+      'What is this risk?',
+      'How are we protecting against it?',
+      'What evidence do we have?',
+      'Open the phishing risk',
     ],
     topic: 'next-action',
   }
@@ -320,9 +246,7 @@ function positionReply(ctx: ConversationContext): Reply {
       `Recommendation: ${answer.recommendedAction}`,
     ].join('\n'),
     citations: factsToCitations(answer, ctx.position),
-    suggestions: after
-      ? ['Summarise this for the board.', 'What should I prioritise?']
-      : ['Show me our supplier assurance gaps.', 'What should I do next?', 'Where are we missing evidence?'],
+    suggestions: ['Open the phishing risk', 'What should I prioritise?', 'How are we protecting against phishing?'],
     topic: 'position',
   }
 }
@@ -346,8 +270,8 @@ function recordWhyReply(ctx: ConversationContext): Reply | null {
         '',
         'Would you like the connected control, or the recommended next action?',
       ].join('\n'),
-      citations: citationsFrom([ctx.selectedId, 'ctl-supplier-assurance'], ctx.position),
-      suggestions: ['What should I do next?', 'Show me our supplier assurance gaps.'],
+      citations: citationsFrom([ctx.selectedId, ...data.demo.focusControlIds], ctx.position),
+      suggestions: ['What should we do next?', 'How are we protecting against it?'],
       topic: 'evidence',
     }
   }
@@ -389,7 +313,7 @@ function recordWhyReply(ctx: ConversationContext): Reply | null {
     const appetite = after ? risk?.appetiteStatusAfter : risk?.appetiteStatusBefore
     const coverage = after ? risk?.controlCoverageAfter : risk?.controlCoverageBefore
     const treatment = after ? risk?.treatment.statusAfter : risk?.treatment.statusBefore
-    const controlId = risk?.controlIds[0] ?? 'ctl-supplier-assurance'
+    const controlId = risk?.controlIds[0] ?? data.demo.focusControlIds[0]
     return {
       text: [
         '### Fact',
@@ -431,7 +355,7 @@ function recordWhyReply(ctx: ConversationContext): Reply | null {
       source ? `Record type: ${source.kind}. Status: ${source.freshness}.` : '',
       source?.meta ? source.meta : '',
       '',
-      'Ask me what to do next, or how this connects to the supplier-assurance gap.',
+      'Ask me what to do next, or how this connects to the phishing walkthrough.',
     ]
       .filter(Boolean)
       .join('\n'),
@@ -442,25 +366,25 @@ function recordWhyReply(ctx: ConversationContext): Reply | null {
   }
 
 function controlAndEvidenceReply(ctx: ConversationContext): Reply {
-  const control = supplierControl
+  const controls = data.demo.focusControlIds
+    .map((id) => data.controls.find((item) => item.id === id))
+    .filter((item): item is (typeof data.controls)[number] => Boolean(item))
+  const evidence = data.demo.focusEvidenceIds
+    .map((id) => data.evidence.find((item) => item.id === id))
+    .filter((item): item is (typeof data.evidence)[number] => Boolean(item))
   return {
     text: [
-      'Here is the control and related evidence.',
+      'Here are the phishing protections and evidence.',
       '',
-      `Control: ${control?.title ?? 'Supplier assurance'} — ${ctx.position === 'after' ? 'assured' : 'partially assured'}.`,
-      ctx.position === 'after'
-        ? 'Related evidence: supplier assurance policy (current) and 2026 critical-supplier assessments (current).'
-        : 'Related evidence: supplier assurance policy is current; current critical-supplier assessments are missing. Internal audit already flags that gap.',
+      data.demo.controlBlurb,
       '',
-      `Recommendation: ${ctx.position === 'after' ? 'Cite these records in the Board Summary.' : 'Upload the missing assessments, then approve the mappings.'}`,
+      ...controls.map((item) => `• ${item.code} ${item.title} — ${item.effectivenessLabel}`),
+      ...evidence.map((item) => `• ${item.code} ${item.title}: ${item.statusLabel} — ${item.resultOrGap ?? item.summary}`),
+      '',
+      'Recommendation: Keep these records open while you walk RSK-002.',
     ].join('\n'),
-    citations: citationsFrom(
-      ctx.position === 'after'
-        ? ['ctl-supplier-assurance', 'ev-policy-supplier', 'ev-supplier-assessments-2026']
-        : ['ctl-supplier-assurance', 'ev-policy-supplier', 'ev-audit-findings'],
-      ctx.position,
-    ),
-    suggestions: ['What should I do next?', 'Where are we missing evidence?', 'Summarise this for the board.'],
+    citations: citationsFrom([...data.demo.focusControlIds, ...data.demo.focusEvidenceIds, data.demo.focusRiskId], ctx.position),
+    suggestions: ['What is this risk?', 'What should we do next?', 'What evidence do we have?'],
     topic: 'control',
   }
 }
@@ -500,7 +424,7 @@ function followUpReply(question: string, ctx: ConversationContext, history: Chat
           ctx.position === 'after'
             ? 'It mattered because missing assessments left four frameworks only partly supported and kept third-party and regulatory exposure elevated. That is now closed for this review.'
             : 'It is a problem because a current policy cannot substitute for current assessments. The same gap weakens the control, leaves obligations only partly supported, and elevates third-party and regulatory risk before the review.',
-        citations: citationsFrom(['ctl-supplier-assurance', 'risk-third-party', 'risk-regulatory'], ctx.position),
+        citations: citationsFrom(['ctl-005', 'risk-002', 'risk-002'], ctx.position),
         suggestions: ['What should I do next?', 'Show me the affected control and evidence.'],
         topic,
       }
@@ -536,8 +460,8 @@ function frameworkCompareReply(ctx: ConversationContext): Reply {
         ].join('\n'),
     citations: citationsFrom(
       after
-        ? ['ev-supplier-assessments-2026', 'ctl-supplier-assurance', 'obl-iso-a532']
-        : ['ctl-supplier-assurance', 'obl-iso-a532', 'obl-nis2-supply', 'obl-gdpr-processor', 'obl-nca-third-party'],
+        ? ['evd-005', 'ctl-005', 'obl-iso-a532']
+        : ['ctl-005', 'obl-iso-a532', 'obl-nis2-supply', 'obl-gdpr-processor', 'obl-nca-third-party'],
       ctx.position,
     ),
     suggestions: after
@@ -569,7 +493,7 @@ function frameworkDetailReply(name: string, ctx: ConversationContext): Reply {
           'The same gap also limits NIS2, GDPR and NCA ECC. Closing one evidence package is the action.',
         ].join('\n'),
     citations: citationsFrom(
-      [obligation?.id, 'ctl-supplier-assurance', after ? 'ev-supplier-assessments-2026' : 'ev-audit-findings'],
+      [obligation?.id, 'ctl-005', after ? 'evd-005' : 'evd-005'],
       ctx.position,
     ),
     suggestions: ['How do the four frameworks compare?', 'What should I do next?'],
@@ -616,26 +540,11 @@ function intentReply(question: string, ctx: ConversationContext): Reply | null {
 
   const q = norm(question)
 
-  if ((/biggest (current )?risk|top risk|largest risk/.test(q) || /what is our biggest/.test(q)) && /risk/.test(q)) {
-    const risk = data.risks.find((item) => item.id === 'risk-third-party')
-    return {
-      text: [
-        ctx.position === 'after'
-          ? `The previously elevated ${risk?.title ?? 'third-party assurance'} risk is now reduced after the assessment approval. Continuity evidence approaching review remains a watch item.`
-          : `Your biggest current risk is ${risk?.title ?? 'third-party assurance'} — elevated because current critical-supplier assessments are missing.`,
-        '',
-        'Why it matters: it is the risk language of the same supplier-assurance gap that also drives regulatory exposure ahead of the review.',
-        '',
-        'Recommendation: treat the assessment upload as the risk-reduction action, not a separate workstream.',
-      ].join('\n'),
-      citations: citationsFrom(['risk-third-party', 'risk-regulatory', 'ctl-supplier-assurance'], ctx.position),
-      suggestions: [
-        'Show me our supplier assurance gaps.',
-        'What should I prioritise?',
-        'Where are we missing evidence?',
-      ],
-      topic: 'risk',
-    }
+  if (
+    ((/biggest (current )?risk|top risk|largest risk/.test(q) || /what is our biggest/.test(q)) && /risk/.test(q)) ||
+    /open the phishing risk|phishing risk|protecting against phishing/.test(q)
+  ) {
+    return phishingFocusReply(ctx)
   }
 
   if (/missing evidence|where are we missing|evidence gap|incomplete evidence|expiring or conflicting/.test(q)) {
@@ -754,18 +663,16 @@ export function buildNoxReply(
         `I can help from ${organisation.name}'s seeded records while you are on ${screenLabel(ctx)}.`,
         ctx.selectedTitle ? `You currently have “${ctx.selectedTitle}” selected.` : '',
         '',
-        `Fact: readiness is ${ctx.position === 'after' ? '72 (Improved)' : '64 (Needs attention)'} and the material supplier-assurance story is ${ctx.position === 'after' ? 'closed for this review' : 'still open'}.`,
+        `Fact: readiness is ${ctx.position === 'after' ? '72 (Improved)' : '64 (Needs attention)'} and the focus story is ${data.demo.story} (${data.demo.focusRiskCode}).`,
         '',
         'Interpretation: I will not invent obligations, evidence or scores outside this organisation dataset.',
         '',
-        'Try one of the suggestions below, or ask about the supplier-assurance gap, missing evidence, risk, or the board summary.',
+        'Try one of the suggestions below, or ask about the phishing risk, linked controls, evidence, or next action.',
       ]
         .filter(Boolean)
         .join('\n'),
       citations: citationsFrom(
-        ctx.position === 'after'
-          ? ['ev-supplier-assessments-2026', 'ctl-supplier-assurance']
-          : ['ctl-supplier-assurance', 'ev-audit-findings'],
+        [data.demo.focusRiskId, ...data.demo.focusControlIds, ...data.demo.focusEvidenceIds],
         ctx.position,
       ),
       suggestions: suggestionsFor(ctx),

@@ -5,6 +5,8 @@
   gap: 20px;
   color: var(--text-primary);
   min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .ctl-page-head,
@@ -442,7 +444,9 @@
 }
 
 .ctl-table-wrap {
-  overflow: auto;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .ctl-table {

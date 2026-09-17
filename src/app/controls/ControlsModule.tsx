@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSession } from '../state/SessionProvider.tsx'
+import { TablePagination } from '../ui/TablePagination.tsx'
+import { usePagination } from '../ui/usePagination.ts'
 import { ControlDetail, Pill } from './ControlDetail.tsx'
 import {
   activeFilterChips,
@@ -83,6 +85,7 @@ export function ControlsModule({
   const previous = useMemo(() => previousRecords(position, drafts), [position, drafts])
   const categories = useMemo(() => buildCategorySummaries(controls, previous), [controls, previous])
   const visible = useMemo(() => filterControls(controls, filters), [controls, filters])
+  const pagination = usePagination(visible)
   const scoped = useMemo(
     () =>
       filterControls(controls, {
@@ -407,7 +410,7 @@ export function ControlsModule({
               {briefing.owner} · due {briefing.due} · {briefing.approval}
             </p>
             <div className="ctl-toolbar">
-              <button type="button" className="ctl-btn primary" onClick={() => openOverlay({ kind: 'action', controlId: attention[0]?.id ?? 'ctl-supplier-assurance' })}>
+              <button type="button" className="ctl-btn primary" onClick={() => openOverlay({ kind: 'action', controlId: attention[0]?.id ?? 'ctl-005' })}>
                 Open recommended action
               </button>
               <button type="button" className="ctl-btn" onClick={() => onAskNox?.(briefing.askPrompt)}>
@@ -713,6 +716,7 @@ export function ControlsModule({
             </button>
           </div>
         ) : (
+          <>
           <div className="ctl-table-wrap">
             <table className="ctl-table">
               <thead>
@@ -732,7 +736,7 @@ export function ControlsModule({
                 </tr>
               </thead>
               <tbody>
-                {visible.map((item) => (
+                {pagination.pageItems.map((item) => (
                   <tr key={item.id} className={selectedId === item.id ? 'is-active' : undefined}>
                     <td>
                       <button type="button" onClick={() => openControl(item.id)}>
@@ -783,6 +787,19 @@ export function ControlsModule({
               </tbody>
             </table>
           </div>
+          <TablePagination
+            page={pagination.page}
+            pageSize={pagination.pageSize}
+            pageCount={pagination.pageCount}
+            total={pagination.total}
+            start={pagination.start}
+            end={pagination.end}
+            canPrev={pagination.canPrev}
+            canNext={pagination.canNext}
+            onPage={pagination.setPage}
+            onPageSize={pagination.setPageSize}
+          />
+          </>
         )}
       </section>
 
@@ -1226,7 +1243,7 @@ function ActionPanel({
   onClose: () => void
 }) {
   const action = control.openActions[0]
-  const needsUpload = control.id === 'ctl-supplier-assurance' && control.overall === 'unverifiable'
+  const needsUpload = control.id === 'ctl-005' && control.overall === 'unverifiable'
   return (
     <div className="ctl-blocks">
       <p className="ctl-lede">{control.nextAction}</p>

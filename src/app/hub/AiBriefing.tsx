@@ -13,7 +13,6 @@ export function AiBriefing({
 }) {
   const { view } = useSession()
   const briefing = view.hub.briefing
-  const closed = view.position === 'after'
 
   return (
     <section className={`briefing${selected ? ' on' : ''}`} aria-label="Nox AI executive briefing">
@@ -67,7 +66,7 @@ export function AiBriefing({
         </div>
         <div className="briefing-actions">
           <button className="primary" type="button" onClick={onPrimary}>
-            {closed ? 'Open Board Summary' : 'Open connected gap'}
+            {briefing.primaryCta ?? 'Open phishing risk'}
           </button>
         </div>
       </div>

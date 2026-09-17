@@ -12,6 +12,16 @@ import type { NoxNavigateTarget } from '../ai/suggestions.ts'
 
 export type ConnectNavigate = NoxNavigateTarget
 
+export type ConnectRelationshipNode = {
+  id: string
+  code: string
+  title: string
+  kind: 'Risk' | 'Control' | 'Evidence'
+  summary: string
+  status?: string
+  navigate: ConnectNavigate
+}
+
 export type ConnectView = {
   organisationName: string
   reviewLine: string
@@ -43,6 +53,13 @@ export type ConnectView = {
     severity: string
     assurance: number
   }>
+  relationshipStrip: {
+    story: string
+    controlBlurb: string
+    risk: ConnectRelationshipNode
+    controls: ConnectRelationshipNode[]
+    evidence: ConnectRelationshipNode[]
+  }
   regulatoryInsight: string
   priorities: Array<{
     id: string
@@ -54,10 +71,6 @@ export type ConnectView = {
     navigate: ConnectNavigate
   }>
   insightPrompts: string[]
-}
-
-function titleCase(value: string): string {
-  return value.charAt(0).toUpperCase() + value.slice(1)
 }
 
 function severityRank(level: string): number {
@@ -83,13 +96,24 @@ function riskAssurance(
   return Math.round(score / linked.length)
 }
 
+function demoFocusIds() {
+  const demo = data.demo
+  return {
+    riskId: demo.focusRiskId,
+    controlIds: new Set(demo.focusControlIds),
+    evidenceIds: new Set(demo.focusEvidenceIds),
+  }
+}
+
 export function buildConnectView(position: PositionState): ConnectView {
   const after = position === 'after'
   const pos = after ? data.position.after : data.position.before
   const catalogue = evidenceFor(position)
   const risks = data.risks
-  const storyControlIds = new Set(['ctl-supplier-assurance', 'ctl-isms-policy', 'ctl-data-retention', 'ctl-continuity'])
+  const focus = demoFocusIds()
+  const storyControlIds = focus.controlIds
   const controls = data.controls.filter((item) => storyControlIds.has(item.id))
+  const focusRisk = risks.find((item) => item.id === focus.riskId) ?? risks.find((item) => item.demoFocus)
   const obligations = data.obligations.filter(
     (item) => item.frameworkId !== 'fw-internal' && item.includeInHub !== false,
   )
@@ -112,13 +136,14 @@ export function buildConnectView(position: PositionState): ConnectView {
   const needEvidence = controls.filter((control) => assuranceOf(control) !== 'assured').length
   const controlsScore = Math.round((controlAssured / Math.max(controls.length, 1)) * 100)
 
-  const currentEvidence = catalogue.filter((item) => item.freshness === 'current' && !item.duplicateOf).length
+  const focusEvidence = catalogue.filter((item) => focus.evidenceIds.has(item.id))
+  const currentEvidence = focusEvidence.filter((item) => item.freshness === 'current' && !item.duplicateOf).length
   const expired = catalogue.filter((item) => item.freshness === 'expired' && !item.duplicateOf).length
   const expiring = catalogue.filter((item) => item.freshness === 'expiring').length
   const duplicate = catalogue.filter((item) => item.duplicateOf).length
-  const missing = after ? 0 : 1
+  const missing = 0
   const attention = expired + expiring + duplicate + missing
-  const evidenceScore = Math.round((currentEvidence / Math.max(catalogue.length, 1)) * 100)
+  const evidenceScore = Math.round((currentEvidence / Math.max(focusEvidence.length || 1, 1)) * 100)
 
   const frameworks = internationalFrameworks.map((framework) => ({
     id: framework.id,
@@ -140,11 +165,14 @@ export function buildConnectView(position: PositionState): ConnectView {
   const trend = after ? 8 : 0
 
   const whyAssurance = after
-    ? 'Assurance improved after current critical-supplier assessments were approved. That one evidence pack strengthened the supplier-assurance control, supported related regulatory obligations, and reduced the two elevated organisational risks.'
-    : 'Assurance is primarily held back by controls with insufficient evidence. The supplier-assurance control is only partially assured, which leaves related NCA, ISO 27001, NIS2 and GDPR obligations partly covered and keeps the highest organisational risks elevated.'
+    ? 'Assurance holds because phishing-resistant MFA and email threat protection remain effective, with accepted evidence for privileged-user enrollment and blocked test campaigns. Residual phishing exposure stays within appetite under monitoring.'
+    : 'Assurance is shaped by the phishing storyline: RSK-002 remains within appetite with Moderate residual, while CTL-005 and CTL-006 are effective and EVD-005 / EVD-006 are accepted. The open coaching action keeps the residual under active monitoring.'
 
   const topRisks = [...risks]
     .sort((left, right) => {
+      const leftFocus = left.id === focus.riskId || left.demoFocus ? 0 : 1
+      const rightFocus = right.id === focus.riskId || right.demoFocus ? 0 : 1
+      if (leftFocus !== rightFocus) return leftFocus - rightFocus
       const bySeverity = severityRank(levelOf(left)) - severityRank(levelOf(right))
       if (bySeverity !== 0) return bySeverity
       return riskAssurance(left, position) - riskAssurance(right, position)
@@ -152,44 +180,91 @@ export function buildConnectView(position: PositionState): ConnectView {
     .slice(0, 5)
     .map((risk) => {
       const level = levelOf(risk)
+      const residual = position === 'after' ? risk.residualAfter : risk.residualBefore
       return {
         id: risk.id,
         title: risk.title,
         domain: risk.contributingGap,
         level,
-        severity: titleCase(level),
+        severity: residual.rating,
         assurance: riskAssurance(risk, position),
       }
     })
 
+  const relationshipStrip: ConnectView['relationshipStrip'] = {
+    story: data.demo.story,
+    controlBlurb: data.demo.controlBlurb,
+    risk: {
+      id: focusRisk?.id ?? focus.riskId,
+      code: focusRisk?.code ?? data.demo.focusRiskCode,
+      title: focusRisk?.title ?? data.demo.story,
+      kind: 'Risk',
+      summary: focusRisk?.whatCouldHappen ?? focusRisk?.contributingGap ?? data.demo.story,
+      status: focusRisk?.appetiteLabel ?? focusRisk?.residualLabel,
+      navigate: { type: 'module', module: 'risks', recordId: focusRisk?.id ?? focus.riskId },
+    },
+    controls: data.demo.focusControlIds.map((id) => {
+      const control = data.controls.find((item) => item.id === id)
+      return {
+        id,
+        code: control?.code ?? id.toUpperCase(),
+        title: control?.title ?? id,
+        kind: 'Control' as const,
+        summary: control?.purpose ?? data.demo.controlBlurb,
+        status: control?.effectivenessLabel,
+        navigate: { type: 'module' as const, module: 'controls' as const, recordId: id },
+      }
+    }),
+    evidence: data.demo.focusEvidenceIds.map((id) => {
+      const evidence = catalogue.find((item) => item.id === id) ?? data.evidence.find((item) => item.id === id)
+      return {
+        id,
+        code: evidence?.code ?? id.toUpperCase(),
+        title: evidence?.title ?? id,
+        kind: 'Evidence' as const,
+        summary: evidence?.resultOrGap ?? evidence?.summary ?? '',
+        status: evidence?.statusLabel,
+        navigate: { type: 'module' as const, module: 'evidence' as const, recordId: id },
+      }
+    }),
+  }
+
   const priorities: ConnectView['priorities'] = []
 
-  if (!after && needEvidence > 0) {
+  if (focusRisk) {
     priorities.push({
-      id: 'priority-supplier-evidence',
+      id: 'priority-phishing-risk',
       index: '01',
-      title: 'Supplier evidence gap',
-      detail: `${needEvidence} control${needEvidence === 1 ? '' : 's'} lack sufficient evidence — including the critical-supplier assessments owned with ${personLabel(data.actions[0].ownerId)}.`,
-      impact: 'High impact',
-      status: 'Action required',
-      navigate: { type: 'gap', step: 'overview' },
+      title: focusRisk.title,
+      detail: `${focusRisk.code} · Residual ${focusRisk.residualLabel} · ${focusRisk.appetiteLabel}. Next: ${focusRisk.nextAction}`,
+      impact: focusRisk.demoFocus ? 'Demo focus' : 'High impact',
+      status: focusRisk.actionStatus,
+      navigate: { type: 'module', module: 'risks', recordId: focusRisk.id },
     })
   }
 
-  const privilegeOrThirdParty = risks.find((risk) => /third-party|privilege|access/i.test(risk.title))
-  if (privilegeOrThirdParty) {
+  const coaching = actions.find((item) => item.id === 'act-phishing-coach') ?? actions[0]
+  if (coaching) {
     priorities.push({
-      id: 'priority-third-party',
+      id: 'priority-phishing-action',
       index: String(priorities.length + 1).padStart(2, '0'),
-      title: privilegeOrThirdParty.title,
-      detail: after
-        ? 'Third-party exposure is reduced. Keep linked controls and evidence current through the review.'
-        : 'Control effectiveness and evidence coverage on third-party assurance remain below executive tolerance.',
-      impact: after ? 'In progress' : 'High impact',
-      status: 'Review',
-      navigate: { type: 'module', module: 'risks', recordId: privilegeOrThirdParty.id },
+      title: coaching.title,
+      detail: `${personLabel(coaching.ownerId)} owns the next coaching step for ${data.demo.focusRiskCode}.`,
+      impact: 'Culture',
+      status: actionStatus(coaching) === 'open' ? 'Open' : 'Completed',
+      navigate: { type: 'module', module: 'risks', recordId: focus.riskId },
     })
   }
+
+  priorities.push({
+    id: 'priority-phishing-report',
+    index: String(priorities.length + 1).padStart(2, '0'),
+    title: 'Phishing Risk Summary',
+    detail: 'Open the primary report for assessment, controls, evidence findings and the owned next action.',
+    impact: 'Board ready',
+    status: 'Review',
+    navigate: { type: 'board' },
+  })
 
   if (withGaps > 0) {
     const weakest = [...frameworks].sort((a, b) => a.coverage - b.coverage)[0]
@@ -206,26 +281,25 @@ export function buildConnectView(position: PositionState): ConnectView {
     })
   }
 
-  if (after) {
-    priorities.push({
-      id: 'priority-board',
-      index: String(priorities.length + 1).padStart(2, '0'),
-      title: 'Prepare board summary',
-      detail: 'Assurance improved after evidence approval. Capture the connected story for leadership.',
-      impact: 'Board ready',
-      status: 'Action',
-      navigate: { type: 'board' },
-    })
-  } else if (missing > 0 || openActions > 0) {
-    priorities.push({
-      id: 'priority-upload',
-      index: String(priorities.length + 1).padStart(2, '0'),
-      title: 'Upload missing evidence',
-      detail: 'Current critical-supplier assessments are still missing from the evidence catalogue.',
-      impact: 'Action required',
-      status: 'Upload',
-      navigate: { type: 'upload' },
-    })
+  // Lightly surface one additional mapped risk that shares focus controls (not every record).
+  const relatedMapping = data.mappings.find(
+    (item) =>
+      item.riskId !== focus.riskId &&
+      (focus.controlIds.has(item.controlId) || focus.evidenceIds.has(item.evidenceId)),
+  )
+  if (relatedMapping) {
+    const relatedRisk = risks.find((item) => item.id === relatedMapping.riskId)
+    if (relatedRisk) {
+      priorities.push({
+        id: 'priority-related-mapping',
+        index: String(priorities.length + 1).padStart(2, '0'),
+        title: relatedRisk.title,
+        detail: `Also linked through ${relatedMapping.controlCode} / ${relatedMapping.evidenceCode} in the mapping set.`,
+        impact: 'Related',
+        status: 'Mapped',
+        navigate: { type: 'module', module: 'risks', recordId: relatedRisk.id },
+      })
+    }
   }
 
   return {
@@ -237,7 +311,7 @@ export function buildConnectView(position: PositionState): ConnectView {
     evidenceScore,
     regulatoryScore,
     trend,
-    trendLabel: after ? '↑ 8% since last assessment' : 'Held by evidence gaps',
+    trendLabel: after ? '↑ 8% since last assessment' : 'Phishing residual within appetite',
     whyAssurance,
     riskExposure: {
       total: risks.length,
@@ -252,16 +326,18 @@ export function buildConnectView(position: PositionState): ConnectView {
       risks: { total: risks.length, critical: elevated, medium: watch },
       controls: { total: controls.length, ineffective: controlPartial, needEvidence },
       regulatory: { total: obligations.length, withGaps, highExposure },
-      evidence: { total: catalogue.length, missing, attention },
+      evidence: { total: focusEvidence.length || catalogue.length, missing, attention },
       actions: { total: actions.length, overdue: openActions, completed: completedActions },
     },
     topRisks,
+    relationshipStrip,
     regulatoryInsight: `${withGaps} regulatory obligation${withGaps === 1 ? '' : 's'} currently have insufficient control coverage.`,
     priorities: priorities.slice(0, 5),
     insightPrompts: [
-      'What should I focus on next?',
-      `Why is our assurance ${overall}%?`,
-      'Show me our biggest organisational risks',
+      'What is our biggest current risk?',
+      'Open the phishing risk',
+      'How are we protecting against phishing?',
+      'What should I prioritise?',
     ],
   }
 }

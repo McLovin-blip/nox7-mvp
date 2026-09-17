@@ -271,20 +271,6 @@ export function NoxAiPanel({
 
   return (
     <div className={`nox-dock${open ? ' is-open' : ''}`} aria-live="polite">
-      <button
-        type="button"
-        className="nox-fab"
-        aria-label="Ask Nox AI"
-        aria-expanded={open}
-        onClick={onOpen}
-      >
-        <span className="nox-fab-pulse" aria-hidden="true" />
-        <span className="nox-fab-core">
-          <Owl className="nox-fab-owl" />
-          <span className="nox-fab-label">Ask Nox</span>
-        </span>
-      </button>
-
       <section
         className="nox-chat"
         aria-label="Nox AI conversation"
